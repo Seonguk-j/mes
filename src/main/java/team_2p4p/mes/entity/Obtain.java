@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 public class Obtain {
 
     @Id
-    private Long obtain_id;
+    private long obtain_id;
 
     @Column(nullable = false)
     private long item_id;
