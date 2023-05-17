@@ -2,9 +2,7 @@ package team_2p4p.mes.entity;
 
 import lombok.*;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
@@ -13,36 +11,38 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
+@Table(name = "obtain")
 public class Obtain {
 
     @Id
-    private long obtain_id;
+    @Column(name="obtain_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long obtainId;
 
-    @Column(nullable = false)
-    private long item_id;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(nullable = false, name = "item_id")
+    private Item item;
 
-    @Column(nullable = false)
-    private long customer_id;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(nullable = false, name = "customer_id")
+    private Customer customerId;
 
-    @Column(nullable = false)
-    private long obtain_amount;
+    @Column(nullable = false, name="obtain_amount")
+    private Long obtainAmount;
 
-    @Column(nullable = false)
-    private LocalDateTime obtain_date;
+    @Column(nullable = false, name="obtain_date")
+    private LocalDateTime obtainDate;
 
-    @Column
-    private LocalDateTime customer_request_date;
+    @Column(name="customer_request_date")
+    private LocalDateTime customerRequestDate;
 
-    @Column
-    private LocalDateTime expect_date;
+    @Column(nullable = false, name="expect_date")
+    private LocalDateTime expectDate;
 
-    @Column(nullable = false)
-    private boolean obtain_stat;
+    @Column(nullable = false, name="obtain_stat")
+    private boolean obtainStat;
 
-    @Column
-    private LocalDateTime obtain_stat_date;
-
-
-
+    @Column(name="obtain_stat_date")
+    private LocalDateTime obtainStatDate;
 
 }
