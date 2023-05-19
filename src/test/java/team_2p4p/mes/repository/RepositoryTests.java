@@ -34,8 +34,8 @@ public class RepositoryTests {
 
         itemService.saveItem("OP-001", "양배추", 0);
         itemService.saveItem("OP-002", "흑마늘", 0);
-        itemService.saveItem("OP-003", "석류액기스", 0);
-        itemService.saveItem("OP-004", "매실액기스", 0);
+        itemService.saveItem("OP-003", "석류농축액", 0);
+        itemService.saveItem("OP-004", "매실농축액", 0);
         itemService.saveItem("OP-005", "정제수", 0);
         itemService.saveItem("OP-006", "콜라겐", 0);
         itemService.saveItem("OP-007", "포장지", 0);
@@ -44,10 +44,18 @@ public class RepositoryTests {
 
     @Test
     public void facility(){
-
-        facilityService.saveFacility("세척탱크, 절단기", "1ton/h", 20, 30, itemService.findItem("양배추"),itemService.findItem("흑마늘"), null, null);
-        facilityService.saveFacility("추출기", "2000L", 20, 30, itemService.findItem("양배추"),itemService.findItem("흑마늘"), itemService.findItem("정제수"), null);
-        facilityService.saveFacility("저장탱크", "2000L", 20, 30, itemService.findItem("석류농축액"),itemService.findItem("매실농축액"), itemService.findItem("정제수"), itemService.findItem("콜라겐"));
+    Item item = itemService.findItem("양배추");
+//        System.out.println(item.getItemName());
+        facilityService.saveFacility("세척탱크, 절단기", "1ton/h", 20,itemService.findItem("양배추"),itemService.findItem("흑마늘"), null, null);
+        facilityService.saveFacility("추출기", "2000L", 20, itemService.findItem("양배추"),itemService.findItem("흑마늘"), itemService.findItem("정제수"), null);
+        facilityService.saveFacility("추출기", "2000L", 20, itemService.findItem("양배추"),itemService.findItem("흑마늘"), itemService.findItem("정제수"), null);
+        facilityService.saveFacility("저장탱크", "2000L", 20, itemService.findItem("석류농축액"),itemService.findItem("매실농축액"), itemService.findItem("정제수"), itemService.findItem("콜라겐"));
+        facilityService.saveFacility("저장탱크", "2000L", 20, itemService.findItem("석류농축액"),itemService.findItem("매실농축액"), itemService.findItem("정제수"), itemService.findItem("콜라겐"));
+        facilityService.saveFacility("스틱충진기 1열", "1500ea/1h",20,itemService.findItem("포장지"),itemService.findItem("석류젤리 반제품"),itemService.findItem("매실젤리 반제품"),null);
+        facilityService.saveFacility("스틱충진기 2열", "1500ea/1h",20,itemService.findItem("포장지"),itemService.findItem("석류젤리 반제품"),itemService.findItem("매실젤리 반제품"),null);
+        facilityService.saveFacility("파우치포장 1열", "1750ea/1h",20,itemService.findItem("포장지"),itemService.findItem("양배추 추출액상 반제품"),itemService.findItem("흑마늘 추출액상 반제품"),null);
+        facilityService.saveFacility("파우치포장 2열", "1750ea/1h",20,itemService.findItem("포장지"),itemService.findItem("양배추 추출액상 반제품"),itemService.findItem("흑마늘 추출액상 반제품"),null);
+        facilityService.saveFacility("금속검출기", "5000/1h",10,itemService.findItem("포장지"),itemService.findItem("양배추 추출액상 반제품"),itemService.findItem("흑마늘 추출액상 반제품"),null);
     }
 
     @Test

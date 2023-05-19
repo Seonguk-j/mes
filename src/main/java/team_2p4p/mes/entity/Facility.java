@@ -41,9 +41,6 @@ public class Facility {
     @Column(name="facility_capa")
     private String facilityCapa;
 
-    @Column(name="process_worktime")
-    private int processWorktime;
-
     @Column(name="process_redytime")
     private int processReadytime;
 }
