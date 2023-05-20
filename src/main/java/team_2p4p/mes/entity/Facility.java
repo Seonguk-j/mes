@@ -22,24 +22,28 @@ public class Facility {
     @Column(name="facility_name")
     private String facilityName;
 
-    @Column(name="item1")
-    private String item1;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "material1", referencedColumnName = "item_id")
+    private Item item1;
 
-    @Column(name="item2")
-    private String item2;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "material2", referencedColumnName = "item_id")
+    private Item item2;
 
-    @Column(name="item3")
-    private String item3;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "material3", referencedColumnName = "item_id")
+    private Item item3;
 
-    @Column(name="item4")
-    private String item4;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "material4", referencedColumnName = "item_id")
+    private Item item4;
 
     @Column(name="facility_capa")
     private String facilityCapa;
 
     @Column(name="process_worktime")
-    private Long processWorktime;
+    private int processWorktime;
 
-    @Column(name="process_redaytime")
-    private Long processReadytime;
+    @Column(name="process_redytime")
+    private int processReadytime;
 }
