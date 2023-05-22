@@ -22,19 +22,21 @@ public class Facility {
     @Column(name="facility_name")
     private String facilityName;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+
+
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "material1", referencedColumnName = "item_id")
     private Item item1;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "material2", referencedColumnName = "item_id")
     private Item item2;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "material3", referencedColumnName = "item_id")
     private Item item3;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "material4", referencedColumnName = "item_id")
     private Item item4;
 
