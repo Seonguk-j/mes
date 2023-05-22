@@ -7,6 +7,7 @@ import team_2p4p.mes.constant.Stat;
 import team_2p4p.mes.entity.Facility;
 import team_2p4p.mes.entity.Item;
 import team_2p4p.mes.entity.Process;
+import team_2p4p.mes.service.EnterpriseService;
 import team_2p4p.mes.service.FacilityService;
 import team_2p4p.mes.service.ItemService;
 import team_2p4p.mes.service.ProcessService;
@@ -33,6 +34,12 @@ public class RepositoryTests {
 
     @Autowired
     private ProcessService processService;
+
+    @Autowired
+    private EnterpriseRepository enterpriseRepository;
+
+    @Autowired
+    private EnterpriseService enterpriseService;
 
 
 
@@ -85,6 +92,13 @@ public class RepositoryTests {
         processService.saveProcess("혼합 및 살균", "필요에 따라 혼합 및 저장 가능", itemService.findItem("석류농축액"),itemService.findItem("매실농축액"), itemService.findItem("정제수"), itemService.findItem("콜라겐"),facilityService.findFacility(4L),facilityService.findFacility(5L),null,null);
         processService.saveProcess("충진(제품생산)", "자동화 설비를 통해 포장지에 용액을 투입하고 포장함(밀봉)", itemService.findItem("포장지"),itemService.findItem("석류젤리 반제품"),itemService.findItem("매실젤리 반제품"),null, facilityService.findFacility(6L),facilityService.findFacility(7L),facilityService.findFacility(8L),facilityService.findFacility(9L));
         processService.saveProcess("검사", "금속 검출", itemService.findItem("포장지"),itemService.findItem("양배추 추출액상 반제품"),itemService.findItem("흑마늘 추출액상 반제품"),null, facilityService.findFacility(10L),null,null,null);
+    }
+
+    @Test
+    public void enterprise(){
+        enterpriseService.saveEnterprise(itemService.findItem("양배추즙"), itemService.findItem("흑마늘즙"), "11OO","성욱","055-000-0000","창원시 성산구","2일");
+        enterpriseService.saveEnterprise(itemService.findItem("석류 젤리스틱"), itemService.findItem("매실 젤리스틱"), "CouOO","불고미","055-123-1234","창원시 성산구","2일");
+
     }
 
 
