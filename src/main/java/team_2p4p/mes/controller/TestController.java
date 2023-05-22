@@ -8,7 +8,9 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import team_2p4p.mes.entity.Facility;
 import team_2p4p.mes.entity.Item;
+import team_2p4p.mes.repository.FacilityRepository;
 import team_2p4p.mes.repository.ItemRepository;
 
 import java.util.List;
@@ -21,6 +23,9 @@ public class TestController {
     @Autowired
     ItemRepository itemRepository;
 
+    @Autowired
+    FacilityRepository facilityRepository;
+
     //juicyfreash
     @GetMapping("test")
     public List<Item> test(){
@@ -30,6 +35,13 @@ public class TestController {
         Page<Item> all = itemRepository.findAll(pageable);
 
         return all.get().collect(Collectors.toList());
+    }
+
+    @GetMapping("facility")
+    public List<Facility> facility(){
+
+        List<Facility> list = facilityRepository.findAll();
+        return list;
     }
 
 }
