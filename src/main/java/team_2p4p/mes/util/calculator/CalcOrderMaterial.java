@@ -78,7 +78,7 @@ public class CalcOrderMaterial {
     }
 
     // 수주 확정 전 날짜 예측을 위한 매소드
-    static MesAll estimateDate(Long itemId, int amount, LocalDateTime now) {
+    public static MesAll estimateDate(Long itemId, int amount, LocalDateTime now) {
         MesAll mesAll = new MesAll();
         mesAll.itemId = itemId;
 

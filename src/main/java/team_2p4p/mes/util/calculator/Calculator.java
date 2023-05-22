@@ -17,16 +17,17 @@ public class Calculator {
     int checkProcessingLeadTime = 10;
     static int packingProcessingLeadTime = 20;
 
-    void obtain(MesAll mesAll, Measurement measurement, PreProcessing preProcessing, LiquidSystem liquidSystem, FillPouchProcessing fillPouchProcessing, FillStickProcessing fillStickProcessing, CheckProcessing checkProcessing, Packing packing){
+    public void obtain(MesAll mesAll, Measurement measurement, PreProcessing preProcessing, LiquidSystem liquidSystem, FillPouchProcessing fillPouchProcessing, FillStickProcessing fillStickProcessing, CheckProcessing checkProcessing, Packing packing){
         materialMeasurement(mesAll,measurement);
         preProcessing(mesAll,preProcessing);
         operateLiquidSystem(mesAll,liquidSystem);
         fillPouchProcessing(mesAll,fillPouchProcessing);
         CheckProcessing(mesAll,checkProcessing);
         packingPrecessing(mesAll,packing);
+        mesAll.setEstimateDate(mesAll.getPackingOutputTimeList().get(mesAll.getPackingOutputTimeList().size()-1)); //예상납품일
     }
 
-    void confirmObtain(MesAll mesAll, Measurement measurement, PreProcessing preProcessing, LiquidSystem liquidSystem, FillPouchProcessing fillPouchProcessing, FillStickProcessing fillStickProcessing, CheckProcessing checkProcessing, Packing packing){
+    public void confirmObtain(MesAll mesAll, Measurement measurement, PreProcessing preProcessing, LiquidSystem liquidSystem, FillPouchProcessing fillPouchProcessing, FillStickProcessing fillStickProcessing, CheckProcessing checkProcessing, Packing packing){
         measurement.getConfirmList().add(mesAll);
         preProcessing.getConfirmList().add(mesAll);
         liquidSystem.getConfirmList().add(mesAll);
@@ -536,32 +537,6 @@ public class Calculator {
             }
         }
 
-//        for(int i = 0; i < mesAll.getPackingCount(); i++){
-//            mesAll.getPackingInputAmountList().add(mesAll.getCheckOutputAmountList().get(i));
-////            if(!mesAll.getRemainAmountList().isEmpty()) {
-////                mesAll.getPackingInputAmountList().set(i, mesAll.getPackingInputAmountList().get(i) + mesAll.getRemainAmountList().get(i - 1));
-////            }
-//            box = mesAll.getPackingInputAmountList().get(i)/ea;
-//            mesAll.getPackingOutputAmountList().add(box);
-////          mesAll.getRemainAmountList().add(mesAll.getPackingInputAmountList().get(i) % ea);
-//            List<LocalDateTime> temp = mesAll.getCheckOutputTimeList();
-//            LocalDateTime inputTime;
-//
-//            if(mesAll.getPackingOutputTimeList().isEmpty()){
-//                mesAll.getPackingInputTimeList().add(temp.get(i));
-//                inputTime = temp.get(temp.size() - 1);
-//            }else {
-//                if (temp.get(i).isAfter(mesAll.getPackingOutputTimeList().get(mesAll.getPackingOutputTimeList().size() - 1))) {
-//                    mesAll.getPackingInputTimeList().add(temp.get(i));
-//                    inputTime = temp.get(i);
-//                } else {
-//                    mesAll.getPackingInputTimeList().add(mesAll.getPackingOutputTimeList().get(mesAll.getPackingOutputTimeList().size() - 1));
-//                    inputTime = mesAll.getPackingOutputTimeList().get(mesAll.getPackingOutputTimeList().size() - 1);
-//                }
-//            }
-//
-//            mesAll.getPackingOutputTimeList().add(start(inputTime, box));
-//        }
         return mesAll;
     }
 
@@ -670,12 +645,20 @@ public class Calculator {
             //9시부터 18:00 - 리드타임에 종료 되었을때
             outputTime = lunchCheck(leadTime,inputPossible);
         }else{
-            //원료계량이 9시부터 17 40분과 사이에 종료되지 않았을때
+            //전공정이 9시부터 17 40분과 사이에 종료되지 않았을때
             if(inputPossible.getDayOfWeek().getValue() == 5){
                 //금요일 이면
-                outputTime = inputPossible.plusDays(3).withHour(9).withMinute(0).plusMinutes(leadTime).withSecond(0).withNano(0);
+                if(inputPossible.getHour() < 9){
+                    outputTime = inputPossible.plusDays(2).withHour(9).withMinute(0).plusMinutes(leadTime).withSecond(0).withNano(0);
+                }else{
+                    outputTime = inputPossible.plusDays(3).withHour(9).withMinute(0).plusMinutes(leadTime).withSecond(0).withNano(0);
+                }
             }else{
-                outputTime = inputPossible.plusDays(1).withHour(9).withMinute(0).plusMinutes(leadTime).withSecond(0).withNano(0);
+                if(inputPossible.getHour() < 9){
+                    outputTime = inputPossible.plusDays(0).withHour(9).withMinute(0).plusMinutes(leadTime).withSecond(0).withNano(0);
+                }else{
+                    outputTime = inputPossible.plusDays(1).withHour(9).withMinute(0).plusMinutes(leadTime).withSecond(0).withNano(0);
+                }
             }
         }
         return outputTime;

@@ -146,7 +146,8 @@ public class MesAll {
     private List<Integer> packingOutputAmountList; //포장 1회당 아웃풋
     private List<Integer> remainAmountList; //포장 1회당 남은량
 
-
+    // 예상납품일
+    private LocalDateTime estimateDate;
     void infoMeasurement(){
         System.out.println("============MESAll infoMeasurement===============");
         System.out.println("투입량 " + measurementAmount);
@@ -218,5 +219,7 @@ public class MesAll {
         infoFillPouchProcessing();
         infoCheckProcessing();
         infoPacking();
+        System.out.println("==========예상납품일==========");
+        System.out.println(estimateDate);
     }
 }
