@@ -10,7 +10,7 @@ import team_2p4p.mes.repository.ItemRepository;
 import java.util.List;
 
 @RestController
-@RequestMapping("juicyfreash/")
+@RequestMapping("juicyfresh/")
 public class TestController {
 
     @Autowired
