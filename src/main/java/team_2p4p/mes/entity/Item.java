@@ -3,6 +3,7 @@ package team_2p4p.mes.entity;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Getter
@@ -15,6 +16,7 @@ public class Item {
 
     @Id
     @Column(name="item_id")
+
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long itemId;
 
