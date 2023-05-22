@@ -3,6 +3,7 @@ package team_2p4p.mes.repository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import team_2p4p.mes.entity.Facility;
 import team_2p4p.mes.entity.Item;
 import team_2p4p.mes.service.FacilityService;
 import team_2p4p.mes.service.ItemService;
@@ -14,6 +15,9 @@ public class RepositoryTests {
 
     @Autowired
     private ItemRepository itemRepository;
+
+    @Autowired
+    private FacilityRepository facilityRepository;
 
     @Autowired
     private ItemService itemService;
@@ -66,6 +70,11 @@ public class RepositoryTests {
     @Test
     public void findAll() {
         List<Item> list = itemRepository.findAll();
+        System.out.println(list);
+    }
+    @Test
+    public void findAll2() {
+        List<Facility> list = facilityRepository.findAll();
         System.out.println(list);
     }
 
