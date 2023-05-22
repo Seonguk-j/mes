@@ -22,8 +22,6 @@ public class Facility {
     @Column(name="facility_name")
     private String facilityName;
 
-
-
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "material1", referencedColumnName = "item_id")
     private Item item1;

@@ -27,6 +27,6 @@ public class Item {
     private String itemName;
 
     @Column(nullable = false, name="item_stat")
-    private int itemStat;
+    private String itemStat;
 
 }

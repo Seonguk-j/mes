@@ -10,8 +10,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import team_2p4p.mes.entity.Facility;
 import team_2p4p.mes.entity.Item;
+import team_2p4p.mes.entity.Process;
 import team_2p4p.mes.repository.FacilityRepository;
 import team_2p4p.mes.repository.ItemRepository;
+import team_2p4p.mes.repository.ProcessRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,6 +27,9 @@ public class TestController {
 
     @Autowired
     FacilityRepository facilityRepository;
+
+    @Autowired
+    ProcessRepository processRepository;
 
     //juicyfreash
     @GetMapping("test")
@@ -41,6 +46,13 @@ public class TestController {
     public List<Facility> facility(){
 
         List<Facility> list = facilityRepository.findAll();
+        return list;
+    }
+
+    @GetMapping("process")
+    public List<Process> process(){
+
+        List<Process> list = processRepository.findAll();
         return list;
     }
 

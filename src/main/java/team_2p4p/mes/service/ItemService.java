@@ -16,7 +16,7 @@ public class ItemService {
     @Autowired
     private final ItemRepository itemRepository;
 
-    public void saveItem(String code, String name, int stat){
+    public void saveItem(String code, String name, String stat){
         Item item = Item.builder()
                 .itemCode(code)
                 .itemName(name)
@@ -28,7 +28,5 @@ public class ItemService {
 
     public Item findItem(String name){
     return  itemRepository.findByItemName(name);
-
-
     }
 }
