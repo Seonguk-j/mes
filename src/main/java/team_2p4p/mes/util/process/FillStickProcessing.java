@@ -8,18 +8,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-public class LiquidSystem {
+public class FillStickProcessing {
 
-    public LiquidSystem(){
+    public FillStickProcessing(){
         confirmList = new ArrayList<>();
     }
-    boolean liquidSystemStat = false; // 액체제조시스템 진행중 유무
-    LocalDateTime inputTime; // 액체제조시스템 투입시간
-    LocalDateTime outputTime; // 액체제조시스템 완료 시간
+    boolean fillStickProcessingStat = false; // 스틱충진 진행중 유무
+    LocalDateTime inputTime; // 스틱충진 투입시간
+    LocalDateTime outputTime; // 스틱충진 완료 시간
     List<MesAll> confirmList; //확정 리스트
     double amount; // 투입량
     long itemId;// 투입물종류 1,2,3,4
-
-
-
 }

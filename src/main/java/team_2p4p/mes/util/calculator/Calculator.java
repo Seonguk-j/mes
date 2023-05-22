@@ -1,8 +1,6 @@
 package team_2p4p.mes.util.calculator;
 
-import team_2p4p.mes.util.process.LiquidSystem;
-import team_2p4p.mes.util.process.Measurement;
-import team_2p4p.mes.util.process.PreProcessing;
+import team_2p4p.mes.util.process.*;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -15,7 +13,33 @@ public class Calculator {
 
     int measuremntLeadTime = 20;
     int preprocessingLeadTime = 20;
-    int liquidSystemLeadTime = 0;
+    int fillProcessingLeadTime = 20;
+    int checkProcessingLeadTime = 10;
+    static int packingProcessingLeadTime = 20;
+
+    void obtain(MesAll mesAll, Measurement measurement, PreProcessing preProcessing, LiquidSystem liquidSystem, FillPouchProcessing fillPouchProcessing, FillStickProcessing fillStickProcessing, CheckProcessing checkProcessing, Packing packing){
+        materialMeasurement(mesAll,measurement);
+        preProcessing(mesAll,preProcessing);
+        operateLiquidSystem(mesAll,liquidSystem);
+        fillPouchProcessing(mesAll,fillPouchProcessing);
+        CheckProcessing(mesAll,checkProcessing);
+        packingPrecessing(mesAll,packing);
+    }
+
+    void confirmObtain(MesAll mesAll, Measurement measurement, PreProcessing preProcessing, LiquidSystem liquidSystem, FillPouchProcessing fillPouchProcessing, FillStickProcessing fillStickProcessing, CheckProcessing checkProcessing, Packing packing){
+        measurement.getConfirmList().add(mesAll);
+        preProcessing.getConfirmList().add(mesAll);
+        liquidSystem.getConfirmList().add(mesAll);
+
+        if(mesAll.getItemId() == 1 || mesAll.getItemId() == 2){
+            fillPouchProcessing.getConfirmList().add(mesAll);
+        }else {
+            fillStickProcessing.getConfirmList().add(mesAll);
+        }
+
+        checkProcessing.getConfirmList().add(mesAll);
+        packing.getConfirmList().add(mesAll);
+    }
 
 
     //원료계량
@@ -37,7 +61,7 @@ public class Calculator {
     //전처리
     MesAll preProcessing(MesAll mesAll, PreProcessing preProcessing) {
         int preProcessingCount = (int)Math.ceil(mesAll.getMeasurementAmount()/1000.0) == 0 ? 1 : (int)Math.ceil(mesAll.getMeasurementAmount()/1000.0);
-        int preProcessingLastAmount = (int) mesAll.getMeasurementAmount()%1000;
+        int preProcessingLastAmount = (int) mesAll.getMeasurementAmount()%1000==0?1000:(int) mesAll.getMeasurementAmount()%1000;
 
         mesAll.setPreProcessingCount(preProcessingCount);
 
@@ -65,6 +89,8 @@ public class Calculator {
                     //전처리 확정리스트에 대기목록이 있을때
                     List<LocalDateTime> list = preProcessing.getConfirmList().get(preProcessing.getConfirmList().size() - 1).getOutputPreProcessingTimeList();
                     LocalDateTime lastTime = list.get(list.size()-1);
+                    System.out.println("lastTime : " + lastTime);
+                    System.out.println("lastTime inputTimeCheck : " + inputTimeCheck(preprocessingLeadTime,lastTime));
                     mesAll.getInputPreProcessingTimeList().add(inputTimeCheck(preprocessingLeadTime,lastTime));
                     //시간계산 1ton/hour  1분당 16.667kg 가능 1kg당 3.6초 걸림
                 }
@@ -81,17 +107,7 @@ public class Calculator {
             } // i != 0
         } //
 
-        //위에 for문에서 list들한테 값을 다 넣어줌
-        //여기서 for문 한번 더돌려서 map에 값을 넣어줌
-        for(int i = 0; i < mesAll.getPreProcessingCount(); i++){
-            Map<String,Object> map = new HashMap<>();
 
-            map.put(i+1 + "번째 투입양", mesAll.getPreProcessingAmountList().get(i));
-            map.put(i+1 + "번째 시작시간", mesAll.getInputPreProcessingTimeList().get(i));
-            map.put(i+1 + "번째 끝난시간",mesAll.getOutputPreProcessingTimeList().get(i));
-
-            mesAll.getPreProcessingMapList().add(map);
-        }
         return mesAll;
     }
 
@@ -155,6 +171,465 @@ public class Calculator {
     }
 
 
+    //즙충진
+    MesAll fillPouchProcessing(MesAll mesAll, FillPouchProcessing fillPouchProcessing) {
+
+        mesAll.setFillPouchCount(mesAll.getTotalLiquidSystemCount());
+        //전공정 output을 ml로 변환
+        int ml = 0;
+        //1개 생산되는데 걸리는 시간
+        long fillTime = 0;
+
+        if(fillPouchProcessing.getConfirmList().isEmpty()){
+            // 충진기가 비었을때
+            for(int i = 0; i < mesAll.getFillPouchCount(); i++){
+                ml = mesAll.getLiquidSystemOutputAmountList().get(i) * 1000;
+                //1개 생산되는데 걸리는 시간(나노초)
+                fillTime = (ml/80) * (long) (1.02855 * 1_000_000_000);
+                // mesAll에 시작시간 저장
+                if(i == 0){
+                    //첫 투입일때는 전공전 끝난시간 기준으로 투입
+
+                    mesAll.getFillPouchInputTimeList().add(inputTimeCheck(fillProcessingLeadTime, mesAll.getLiquidSystemOutputTimeList().get(i)));
+                    mesAll.getFillPouchOutputTimeList().add(mesAll.getFillPouchInputTimeList().get(i).plusNanos(fillTime));
+                    mesAll.getFillPouchInputAmountList().add(mesAll.getLiquidSystemOutputAmountList().get(i));
+                    mesAll.getFillPouchOutputAmountList().add(ml/80);
+                }else{
+                    //n번째 투입일때는 시간 비교
+                    if(mesAll.getLiquidSystemOutputTimeList().get(i).isAfter( mesAll.getFillPouchOutputTimeList().get(i-1))){
+                        // 액체제조 시스템이 늦게 끝나면 액체제조 시스템 끝난 시간이 기준이된다.
+                        mesAll.getFillPouchInputTimeList().add(inputTimeCheck(fillProcessingLeadTime, mesAll.getLiquidSystemOutputTimeList().get(i)));
+                        mesAll.getFillPouchOutputTimeList().add(mesAll.getFillPouchInputTimeList().get(i).plusNanos(fillTime));
+                        mesAll.getFillPouchInputAmountList().add(mesAll.getLiquidSystemOutputAmountList().get(i));
+                        mesAll.getFillPouchOutputAmountList().add(ml/80);
+                    }else{
+                        //액체제조시스템이 먼저끝나면(충진이 끝나는 시간이 기준이 된다.)
+                        mesAll.getFillPouchInputTimeList().add(inputTimeCheck(fillProcessingLeadTime, mesAll.getFillPouchOutputTimeList().get(i-1)));
+                        mesAll.getFillPouchOutputTimeList().add(mesAll.getFillPouchInputTimeList().get(i).plusNanos(fillTime));
+                        mesAll.getFillPouchInputAmountList().add(mesAll.getLiquidSystemOutputAmountList().get(i));
+                        mesAll.getFillPouchOutputAmountList().add(ml/80);
+                    }
+                }
+            }
+        }else{
+            //충진기의 스케줄이 있을때
+            List<LocalDateTime> list = fillPouchProcessing.getConfirmList().get(fillPouchProcessing.getConfirmList().size() - 1).getFillPouchOutputTimeList();
+            LocalDateTime lastTime = list.get(list.size()-1);
+            mesAll.getFillPouchInputTimeList().add(inputTimeCheck(fillProcessingLeadTime,lastTime));
+
+            for(int i = 0; i < mesAll.getFillPouchCount(); i++){
+                ml = mesAll.getLiquidSystemOutputAmountList().get(i) * 1000;
+                //1개 생산되는데 걸리는 시간(나노초)
+                fillTime = (ml/80) * (long) (1.02855 * 1_000_000_000);
+                if(i == 0){
+                    // 스케줄이 끝나는 시간과 전공전 끝나는 시간을 비교
+                    List<LocalDateTime> timeList = fillPouchProcessing.getConfirmList().get(fillPouchProcessing.getConfirmList().size()-1).getFillPouchOutputTimeList();
+                    if(mesAll.getLiquidSystemOutputTimeList().get(i).isAfter(timeList.get(timeList.size()-1))){
+                        //액체제조가 더 늦게 끝나면?
+                        mesAll.getFillPouchInputTimeList().add(inputTimeCheck(fillProcessingLeadTime, mesAll.getLiquidSystemOutputTimeList().get(i)));
+                        mesAll.getFillPouchOutputTimeList().add(mesAll.getFillPouchInputTimeList().get(i).plusNanos(fillTime));
+                        mesAll.getFillPouchInputAmountList().add(mesAll.getLiquidSystemOutputAmountList().get(i));
+                        mesAll.getFillPouchOutputAmountList().add(ml/80);
+                    }else{
+                        //스케줄이 더 늦게 끝난다면?
+                        mesAll.getFillPouchInputTimeList().add(inputTimeCheck(fillProcessingLeadTime, timeList.get(timeList.size()-1)));
+                        mesAll.getFillPouchOutputTimeList().add(mesAll.getFillPouchInputTimeList().get(i).plusNanos(fillTime));
+                        mesAll.getFillPouchInputAmountList().add(mesAll.getLiquidSystemOutputAmountList().get(i));
+                        mesAll.getFillPouchOutputAmountList().add(ml/80);
+                    }
+                }else{
+                    //두번째 투입부터는 전 투입이 끝난시간 기준으로 투입
+                    if(mesAll.getLiquidSystemOutputTimeList().get(i).isAfter(mesAll.getFillPouchOutputTimeList().get(mesAll.getFillPouchOutputTimeList().size()-1))){
+                        //액체제조가 더 늦게 끝나면?
+                        mesAll.getFillPouchInputTimeList().add(inputTimeCheck(fillProcessingLeadTime, mesAll.getLiquidSystemOutputTimeList().get(i)));
+                        mesAll.getFillPouchOutputTimeList().add(mesAll.getFillPouchInputTimeList().get(i).plusNanos(fillTime));
+                        mesAll.getFillPouchInputAmountList().add(mesAll.getLiquidSystemOutputAmountList().get(i));
+                        mesAll.getFillPouchOutputAmountList().add(ml/80);
+                    }else{
+                        //i -1번째 충진이 늦게 끝나면
+                        mesAll.getFillPouchInputTimeList().add(inputTimeCheck(fillProcessingLeadTime, mesAll.getFillPouchOutputTimeList().get(mesAll.getFillPouchOutputTimeList().size()-1)));
+                        mesAll.getFillPouchOutputTimeList().add(mesAll.getFillPouchInputTimeList().get(i).plusNanos(fillTime));
+                        mesAll.getFillPouchInputAmountList().add(mesAll.getLiquidSystemOutputAmountList().get(i));
+                        mesAll.getFillPouchOutputAmountList().add(ml/80);
+                    }
+                }
+            }
+        }
+
+        return mesAll;
+    }
+
+
+
+    //스틱충진
+    MesAll fillStickProcessing(MesAll mesAll, FillStickProcessing fillStickProcessing) {
+
+        mesAll.setFillStickCount(mesAll.getTotalLiquidSystemCount());
+        //전공정 output을 ml로 변환
+        int ml = 0;
+        //1개 생산되는데 걸리는 시간
+        long fillTime = 0;
+
+        if(fillStickProcessing.getConfirmList().isEmpty()){
+            // 충진기가 비었을때
+            for(int i = 0; i < mesAll.getFillStickCount(); i++){
+                ml = mesAll.getLiquidSystemOutputAmountList().get(i) * 1000;
+                //1개 생산되는데 걸리는 시간(나노초)
+                fillTime = (ml/15) * (long) (1.2 * 1_000_000_000);
+                // mesAll에 시작시간 저장
+                if(i == 0){
+                    //첫 투입일때는 전공전 끝난시간 기준으로 투입
+
+                    mesAll.getFillStickInputTimeList().add(inputTimeCheck(fillProcessingLeadTime, mesAll.getLiquidSystemOutputTimeList().get(i)));
+                    mesAll.getFillStickOutputTimeList().add(mesAll.getFillStickInputTimeList().get(i).plusNanos(fillTime));
+                    mesAll.getFillStickInputAmountList().add(mesAll.getLiquidSystemOutputAmountList().get(i));
+                    mesAll.getFillStickOutputAmountList().add(ml/15);
+                }else{
+                    //n번째 투입일때는 시간 비교
+                    if(mesAll.getLiquidSystemOutputTimeList().get(i).isAfter( mesAll.getFillStickOutputTimeList().get(i-1))){
+                        // 액체제조 시스템이 늦게 끝나면 액체제조 시스템 끝난 시간이 기준이된다.
+                        mesAll.getFillStickInputTimeList().add(inputTimeCheck(fillProcessingLeadTime, mesAll.getLiquidSystemOutputTimeList().get(i)));
+                        mesAll.getFillStickOutputTimeList().add(mesAll.getFillStickInputTimeList().get(i).plusNanos(fillTime));
+                        mesAll.getFillStickInputAmountList().add(mesAll.getLiquidSystemOutputAmountList().get(i));
+                        mesAll.getFillStickOutputAmountList().add(ml/15);
+                    }else{
+                        //액체제조시스템이 먼저끝나면(충진이 끝나는 시간이 기준이 된다.)
+                        mesAll.getFillStickInputTimeList().add(inputTimeCheck(fillProcessingLeadTime, mesAll.getFillStickOutputTimeList().get(i-1)));
+                        mesAll.getFillStickOutputTimeList().add(mesAll.getFillStickInputTimeList().get(i).plusNanos(fillTime));
+                        mesAll.getFillStickInputAmountList().add(mesAll.getLiquidSystemOutputAmountList().get(i));
+                        mesAll.getFillStickOutputAmountList().add(ml/15);
+                    }
+                }
+            }
+        }else{
+            //충진기의 스케줄이 있을때
+            List<LocalDateTime> list = fillStickProcessing.getConfirmList().get(fillStickProcessing.getConfirmList().size() - 1).getFillStickOutputTimeList();
+            LocalDateTime lastTime = list.get(list.size()-1);
+            mesAll.getFillStickInputTimeList().add(inputTimeCheck(fillProcessingLeadTime,lastTime));
+
+            for(int i = 0; i < mesAll.getFillStickCount(); i++){
+                ml = mesAll.getLiquidSystemOutputAmountList().get(i) * 1000;
+                //1개 생산되는데 걸리는 시간(나노초)
+                fillTime = (ml/15) * (long) (1.2  * 1_000_000_000);
+                if(i == 0){
+                    // 스케줄이 끝나는 시간과 전공전 끝나는 시간을 비교
+                    List<LocalDateTime> timeList = fillStickProcessing.getConfirmList().get(fillStickProcessing.getConfirmList().size()-1).getFillStickOutputTimeList();
+                    if(mesAll.getLiquidSystemOutputTimeList().get(i).isAfter(timeList.get(timeList.size()-1))){
+                        //액체제조가 더 늦게 끝나면?
+                        mesAll.getFillStickInputTimeList().add(inputTimeCheck(fillProcessingLeadTime, mesAll.getLiquidSystemOutputTimeList().get(i)));
+                        mesAll.getFillStickOutputTimeList().add(mesAll.getFillStickInputTimeList().get(i).plusNanos(fillTime));
+                        mesAll.getFillStickInputAmountList().add(mesAll.getLiquidSystemOutputAmountList().get(i));
+                        mesAll.getFillStickOutputAmountList().add(ml/15);
+                    }else{
+                        //스케줄이 더 늦게 끝난다면?
+                        mesAll.getFillStickInputTimeList().add(inputTimeCheck(fillProcessingLeadTime, timeList.get(timeList.size()-1)));
+                        mesAll.getFillStickOutputTimeList().add(mesAll.getFillStickInputTimeList().get(i).plusNanos(fillTime));
+                        mesAll.getFillStickInputAmountList().add(mesAll.getLiquidSystemOutputAmountList().get(i));
+                        mesAll.getFillStickOutputAmountList().add(ml/15);
+                    }
+                }else {
+                    if(mesAll.getLiquidSystemOutputTimeList().get(i).isAfter(mesAll.getFillStickOutputTimeList().get(i-1))){
+                        // 액체제조 시스템이 늦게 끝나면 액체제조 시스템 끝난 시간이 기준이된다.
+                        mesAll.getFillStickInputTimeList().add(inputTimeCheck(fillProcessingLeadTime, mesAll.getLiquidSystemOutputTimeList().get(i)));
+                        mesAll.getFillStickOutputTimeList().add(mesAll.getFillStickInputTimeList().get(i).plusNanos(fillTime));
+                        mesAll.getFillStickInputAmountList().add(mesAll.getLiquidSystemOutputAmountList().get(i));
+                        mesAll.getFillStickOutputAmountList().add(ml/15);
+                    }else{
+                        //액체제조시스템이 먼저끝나면(충진이 끝나는 시간이 기준이 된다.)
+                        mesAll.getFillStickInputTimeList().add(inputTimeCheck(fillProcessingLeadTime, mesAll.getFillStickOutputTimeList().get(i-1)));
+                        mesAll.getFillStickOutputTimeList().add(mesAll.getFillStickInputTimeList().get(i).plusNanos(fillTime));
+                        mesAll.getFillStickInputAmountList().add(mesAll.getLiquidSystemOutputAmountList().get(i));
+                        mesAll.getFillStickOutputAmountList().add(ml/15);
+                    }
+                }
+            }
+        }
+        return mesAll;
+    }
+
+
+    // 검사
+    MesAll CheckProcessing(MesAll mesAll, CheckProcessing checkProcessing) {
+        // 0.72초당 1개씩 생산
+        if (checkProcessing.getConfirmList().isEmpty()) {
+            //검사공정이 비었을때
+            if (mesAll.getItemId() == 1 || mesAll.getItemId() == 2) {
+                // 즙일때
+                mesAll.setCheckCount(mesAll.getFillPouchCount());
+                for (int i = 0; i < mesAll.getCheckCount(); i++) {
+                    mesAll.getCheckInputAmountList().add(mesAll.getFillPouchOutputAmountList().get(i));
+                    mesAll.getCheckOutputAmountList().add(mesAll.getCheckInputAmountList().get(i));
+
+                    if (i == 0) {
+                        mesAll.getCheckInputTimeList().add(inputTimeCheck(checkProcessingLeadTime, mesAll.getFillPouchOutputTimeList().get(i)));
+
+                    } else {
+                        if (mesAll.getFillPouchOutputTimeList().get(i).isAfter(mesAll.getCheckOutputTimeList().get(i - 1))) {
+                            // 충진이 늦게 끝나면 충진시간이 기준이된다.
+                            mesAll.getCheckInputTimeList().add(inputTimeCheck(checkProcessingLeadTime, mesAll.getFillPouchOutputTimeList().get(i)));
+                        } else {
+                            //아니면 (검사가 끝나는 시간이 기준이 된다.)
+                            mesAll.getCheckInputTimeList().add(inputTimeCheck(checkProcessingLeadTime, mesAll.getCheckInputTimeList().get(i - 1)));
+                        }
+                    }
+                    LocalDateTime outputTime = mesAll.getCheckInputTimeList().get(i).plusSeconds((long) (0.72 * mesAll.getCheckInputAmountList().get(i)));
+                    mesAll.getCheckOutputTimeList().add(outputTime);
+                }
+
+            } else {
+                // 스틱일떄
+                for (int i = 0; i < mesAll.getCheckCount(); i++) {
+                    mesAll.getCheckInputAmountList().add(mesAll.getFillStickOutputAmountList().get(i));
+                    mesAll.getCheckOutputAmountList().add(mesAll.getCheckInputAmountList().get(i));
+
+                    if (i == 0) {
+                        mesAll.getCheckInputTimeList().add(inputTimeCheck(checkProcessingLeadTime, mesAll.getFillStickOutputTimeList().get(i)));
+
+                    } else {
+                        if (mesAll.getFillStickOutputTimeList().get(i).isAfter(mesAll.getCheckOutputTimeList().get(i - 1))) {
+                            // 충진이 늦게 끝나면 충진시간이 기준이된다.
+                            mesAll.getCheckInputTimeList().add(inputTimeCheck(checkProcessingLeadTime, mesAll.getFillStickOutputTimeList().get(i)));
+                        } else {
+                            //아니면 (검사가 끝나는 시간이 기준이 된다.)
+                            mesAll.getCheckInputTimeList().add(inputTimeCheck(checkProcessingLeadTime, mesAll.getCheckInputTimeList().get(i - 1)));
+                        }
+                    }
+                    LocalDateTime outputTime = mesAll.getCheckInputTimeList().get(i).plusSeconds((long) (0.72 * mesAll.getCheckInputAmountList().get(i)));
+                    mesAll.getCheckOutputTimeList().add(outputTime);
+                }
+            }
+        } else {
+            //검사 스케줄이 있을때
+            if(mesAll.getItemId() == 1|| mesAll.getItemId() == 2){
+                // 즙일때
+                mesAll.setCheckCount(mesAll.getFillPouchCount());
+                List<LocalDateTime> timeList = checkProcessing.getConfirmList().get(checkProcessing.getConfirmList().size()-1).getFillPouchOutputTimeList();
+                LocalDateTime lastTime = timeList.get(timeList.size()-1);
+
+                for(int i = 0; i < mesAll.getCheckCount(); i++){
+
+                    mesAll.getCheckInputAmountList().add(mesAll.getFillPouchOutputAmountList().get(i));
+                    mesAll.getCheckOutputAmountList().add(mesAll.getCheckInputAmountList().get(i));
+
+                    if(i == 0){
+                        //첫번째 투입
+                        if(mesAll.getFillPouchOutputTimeList().get(i).isAfter(lastTime)){
+                            //이전공정 끝이 스케줄 보다 늦으면 시작시간은 전공정의 끝나는 시간이 기준
+                            mesAll.getCheckInputTimeList().add(inputTimeCheck(checkProcessingLeadTime, mesAll.getFillPouchOutputTimeList().get(i)));
+                        }else{
+                            //아닐때 시작시간의 기준은 수케줄이 끝나는 시간
+                            mesAll.getCheckInputTimeList().add(inputTimeCheck(checkProcessingLeadTime, lastTime));
+                        }
+                    }else{
+                        //n번째 투입
+                        if(mesAll.getFillPouchOutputTimeList().get(i).isAfter(mesAll.getCheckOutputTimeList().get(i-1))){
+                            //이전공정 끝이 검사보다 늦으면 시작시간은 전공정의 끝나는 시간이 기준
+                            mesAll.getCheckInputTimeList().add(inputTimeCheck(checkProcessingLeadTime, mesAll.getFillPouchOutputTimeList().get(i)));
+                        }else{
+                            //아닐때 시작시간의 기준은 수케줄이 끝나는 시간
+                            mesAll.getCheckInputTimeList().add(inputTimeCheck(checkProcessingLeadTime, mesAll.getCheckOutputTimeList().get(i-1)));
+                        }
+                    }
+                    LocalDateTime outputTime = mesAll.getCheckInputTimeList().get(i).plusSeconds((long) (0.72 * mesAll.getCheckInputAmountList().get(i)));
+                    mesAll.getCheckOutputTimeList().add(outputTime);
+                }
+
+
+            }else{
+                // 스틱일때 (검사 스케줄이 있을때)
+                mesAll.setCheckCount(mesAll.getFillStickCount());
+                List<LocalDateTime> timeList = checkProcessing.getConfirmList().get(checkProcessing.getConfirmList().size()-1).getFillStickOutputTimeList();
+                LocalDateTime lastTime = timeList.get(timeList.size()-1);
+
+                for(int i = 0; i < mesAll.getCheckCount(); i++){
+
+                    mesAll.getCheckInputAmountList().add(mesAll.getFillStickOutputAmountList().get(i));
+                    mesAll.getCheckOutputAmountList().add(mesAll.getCheckInputAmountList().get(i));
+                    if(i == 0){
+                        //첫번째 투입
+                        if(mesAll.getFillStickOutputTimeList().get(i).isAfter(lastTime)){
+                            //이전공정 끝이 스케줄 보다 늦으면 시작시간은 전공정의 끝나는 시간이 기준
+                            mesAll.getCheckInputTimeList().add(inputTimeCheck(checkProcessingLeadTime, mesAll.getFillStickOutputTimeList().get(i)));
+                        }else{
+                            //아닐때 시작시간의 기준은 수케줄이 끝나는 시간
+                            mesAll.getCheckInputTimeList().add(inputTimeCheck(checkProcessingLeadTime, lastTime));
+                        }
+                    }else{
+                        //n번째 투입
+                        if(mesAll.getFillStickOutputTimeList().get(i).isAfter(mesAll.getCheckOutputTimeList().get(i-1))){
+                            //이전공정 끝이 검사보다 늦으면 시작시간은 전공정의 끝나는 시간이 기준
+                            mesAll.getCheckInputTimeList().add(inputTimeCheck(checkProcessingLeadTime, mesAll.getFillStickOutputTimeList().get(i)));
+                        }else{
+                            //아닐때 시작시간의 기준은 수케줄이 끝나는 시간
+                            mesAll.getCheckInputTimeList().add(inputTimeCheck(checkProcessingLeadTime, mesAll.getCheckOutputTimeList().get(i-1)));
+                        }
+                    }
+                    LocalDateTime outputTime = mesAll.getCheckInputTimeList().get(i).plusSeconds((long) (0.72 * mesAll.getCheckInputAmountList().get(i)));
+                    mesAll.getCheckOutputTimeList().add(outputTime);
+                }
+            }
+        }
+        return mesAll;
+    }
+
+
+
+    //포장
+    MesAll packingPrecessing(MesAll mesAll,Packing packing){
+
+        int ea = mesAll.getItemId() <= 2?30:25;
+        int box = 0;
+
+
+        mesAll.setPackingCount(mesAll.getCheckCount());
+        if(packing.getConfirmList().isEmpty()) {
+            for(int i = 0; i < mesAll.getPackingCount(); i++){
+                box = mesAll.getCheckOutputAmountList().get(i)/ea;
+
+                mesAll.getPackingInputAmountList().add(mesAll.getCheckOutputAmountList().get(i));
+                mesAll.getPackingOutputAmountList().add(box);
+
+                if(i == 0){
+                    mesAll.getPackingInputTimeList().add(inputTimeCheck(packingProcessingLeadTime,mesAll.getCheckOutputTimeList().get(i)));
+                }else{
+                    if(mesAll.getCheckOutputTimeList().get(i).isAfter(mesAll.getPackingOutputTimeList().get(i-1))){
+                        //검사가 포장보다 늦게 끝나면 기준시간은 검사가 끝나는 시간
+                        mesAll.getPackingInputTimeList().add(inputTimeCheck(packingProcessingLeadTime,mesAll.getCheckOutputTimeList().get(i)));
+                    }else{
+                        //아니면 기준시간은 포장이 끝나는 시간
+                        mesAll.getPackingInputTimeList().add(inputTimeCheck(packingProcessingLeadTime,mesAll.getPackingOutputTimeList().get(i-1)));
+                    }
+                }
+                mesAll.getPackingOutputTimeList().add(start(mesAll.getPackingInputTimeList().get(i),box));
+            }
+        }else{
+            // 스케줄이 있을때
+            for(int i = 0; i < mesAll.getPackingCount(); i++){
+                box = mesAll.getCheckOutputAmountList().get(i)/ea;
+
+                mesAll.getPackingInputAmountList().add(mesAll.getCheckOutputAmountList().get(i));
+                mesAll.getPackingOutputAmountList().add(box);
+
+                if(i == 0){
+                    // 스케줄 끝나는 시간이랑 전공정 끝나는 시간 비교
+                    List<LocalDateTime> timeList = packing.getConfirmList().get(packing.getConfirmList().size()-1).getPackingOutputTimeList();
+                    LocalDateTime lastTime = timeList.get(timeList.size()-1);
+
+                    if(lastTime.isAfter(mesAll.getCheckOutputTimeList().get(i))){
+                        //스케줄의 마지막이 전공정 끝나는 시간보다 미래면? 스케줄의 끝나는 시간이 기준
+                        mesAll.getPackingInputTimeList().add(inputTimeCheck(packingProcessingLeadTime,lastTime));
+                    }else{
+                        //아니면 전공정이 끝나는 시간이 기준
+                        mesAll.getPackingInputTimeList().add(inputTimeCheck(packingProcessingLeadTime,mesAll.getCheckOutputTimeList().get(i)));
+                    }
+                }else {
+                    //i > 0
+                    if(mesAll.getCheckOutputTimeList().get(i).isAfter(mesAll.getPackingOutputTimeList().get(i-1))){
+                        //검사가 포장보다 늦게 끝나면 기준시간은 검사가 끝나는 시간
+                        mesAll.getPackingInputTimeList().add(inputTimeCheck(packingProcessingLeadTime,mesAll.getCheckOutputTimeList().get(i)));
+                    }else{
+                        //아니면 기준시간은 포장이 끝나는 시간
+                        mesAll.getPackingInputTimeList().add(inputTimeCheck(packingProcessingLeadTime,mesAll.getPackingOutputTimeList().get(i-1)));
+                    }
+                }
+                mesAll.getPackingOutputTimeList().add(start(mesAll.getPackingInputTimeList().get(i),box));
+            }
+        }
+
+//        for(int i = 0; i < mesAll.getPackingCount(); i++){
+//            mesAll.getPackingInputAmountList().add(mesAll.getCheckOutputAmountList().get(i));
+////            if(!mesAll.getRemainAmountList().isEmpty()) {
+////                mesAll.getPackingInputAmountList().set(i, mesAll.getPackingInputAmountList().get(i) + mesAll.getRemainAmountList().get(i - 1));
+////            }
+//            box = mesAll.getPackingInputAmountList().get(i)/ea;
+//            mesAll.getPackingOutputAmountList().add(box);
+////          mesAll.getRemainAmountList().add(mesAll.getPackingInputAmountList().get(i) % ea);
+//            List<LocalDateTime> temp = mesAll.getCheckOutputTimeList();
+//            LocalDateTime inputTime;
+//
+//            if(mesAll.getPackingOutputTimeList().isEmpty()){
+//                mesAll.getPackingInputTimeList().add(temp.get(i));
+//                inputTime = temp.get(temp.size() - 1);
+//            }else {
+//                if (temp.get(i).isAfter(mesAll.getPackingOutputTimeList().get(mesAll.getPackingOutputTimeList().size() - 1))) {
+//                    mesAll.getPackingInputTimeList().add(temp.get(i));
+//                    inputTime = temp.get(i);
+//                } else {
+//                    mesAll.getPackingInputTimeList().add(mesAll.getPackingOutputTimeList().get(mesAll.getPackingOutputTimeList().size() - 1));
+//                    inputTime = mesAll.getPackingOutputTimeList().get(mesAll.getPackingOutputTimeList().size() - 1);
+//                }
+//            }
+//
+//            mesAll.getPackingOutputTimeList().add(start(inputTime, box));
+//        }
+        return mesAll;
+    }
+
+
+    LocalDateTime start(LocalDateTime time, int box) {
+        if(time.getHour() < 12) {
+            return morning(time, box);
+        }
+        else {
+            time = time.plusMinutes(packingProcessingLeadTime);
+            return afternoon(time, box);
+        }
+    }
+
+    LocalDateTime morning(LocalDateTime time, int box) {
+        time = time.plusMinutes(packingProcessingLeadTime);
+        int possibleSeconds = ((12 - time.getHour()) * 60 - time.getMinute()) * 60 - time.getSecond() - 1;
+        int possibleBox = possibleSeconds / 18;
+        if(box > possibleBox) {
+            box -= possibleBox;
+            time = time.withHour(13).withMinute(0).withSecond(0).withNano(0);
+            return afternoon(time, box);
+        }
+        else {
+            time = time.plusSeconds(18 * box);
+            box = 0;
+            return time;
+        }
+    }
+
+    LocalDateTime afternoon(LocalDateTime time, int box) {
+        int possibleSeconds = ((18 - time.getHour()) * 60 - time.getMinute()) * 60 - time.getSecond() - 1;
+        int possibleBox = possibleSeconds / 18;
+        if(box > possibleBox) {
+            box -= possibleBox;
+            time = checkWeekend(time);
+            return morning(time, box);
+        }
+        else {
+            time = time.plusSeconds(18 * box);
+            box = 0;
+            return time;
+        }
+    }
+
+    static LocalDateTime checkWeekend(LocalDateTime time) {
+        if(time.getDayOfWeek().getValue() == 5) {
+            time = time.plusDays(3);
+        }
+        else {
+            time = time.plusDays(1);
+        }
+        time = time.withHour(9).withMinute(packingProcessingLeadTime).withSecond(0).withNano(0);
+        return time;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -183,6 +658,7 @@ public class Calculator {
         return outputTime;
     }
 
+
     //전공정 끝난 시간을 넣으면 투입할 시간이 나오는 메서드
     LocalDateTime inputTimeCheck(int leadTime, LocalDateTime inputPossible){
         LocalDateTime outputTime;
@@ -197,9 +673,9 @@ public class Calculator {
             //원료계량이 9시부터 17 40분과 사이에 종료되지 않았을때
             if(inputPossible.getDayOfWeek().getValue() == 5){
                 //금요일 이면
-                outputTime = inputPossible.plusDays(3).withHour(9).plusMinutes(leadTime).withSecond(0).withNano(0);
+                outputTime = inputPossible.plusDays(3).withHour(9).withMinute(0).plusMinutes(leadTime).withSecond(0).withNano(0);
             }else{
-                outputTime = inputPossible.plusDays(1).withHour(9).plusMinutes(leadTime).withSecond(0).withNano(0);
+                outputTime = inputPossible.plusDays(1).withHour(9).withMinute(0).plusMinutes(leadTime).withSecond(0).withNano(0);
             }
         }
         return outputTime;
