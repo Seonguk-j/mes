@@ -13,7 +13,6 @@ import javax.transaction.Transactional;
 @RequiredArgsConstructor
 public class ItemService {
 
-    @Autowired
     private final ItemRepository itemRepository;
 
     public void saveItem(String code, String name, String stat){
