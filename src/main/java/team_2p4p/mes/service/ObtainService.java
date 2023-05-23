@@ -3,9 +3,12 @@ package team_2p4p.mes.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
+import team_2p4p.mes.dto.ObtainDTO;
 import team_2p4p.mes.entity.Customer;
 import team_2p4p.mes.entity.Item;
 import team_2p4p.mes.entity.Obtain;
+import team_2p4p.mes.repository.CustomerRepository;
+import team_2p4p.mes.repository.ItemRepository;
 import team_2p4p.mes.repository.ObtainRepository;
 import team_2p4p.mes.util.calculator.CalcOrderMaterial;
 import team_2p4p.mes.util.calculator.Calculator;
@@ -24,6 +27,8 @@ import java.time.format.DateTimeFormatter;
 public class ObtainService {
 
     private final ObtainRepository obtainRepository;
+    private final ItemRepository itemRepository;
+    private final CustomerRepository customerRepository;
 
     Measurement measurement = new Measurement();
     PreProcessing preProcessing = new PreProcessing();
@@ -34,29 +39,41 @@ public class ObtainService {
     Packing packing = new Packing();
     Calculator cal = new Calculator();
 
-    public void registerObtain(Item item, Customer customer, long amount, LocalDateTime customerReqDate){
 
+
+    public void regObtain(ObtainDTO dto){
         LocalDateTime obtainDate = LocalDateTime.now();
-        MesAll obtainInfo = CalcOrderMaterial.estimateDate(item.getItemId(), (int) amount, obtainDate);
+        dto.setObtainStat(false);
+        dto.setObtainDate(obtainDate);
 
+        MesAll obtainInfo = CalcOrderMaterial.estimateDate(dto.getItemId(), Math.toIntExact(dto.getObtainAmount()), obtainDate);
         cal.obtain(obtainInfo,measurement,preProcessing,liquidSystem,fillPouchProcessing,fillStickProcessing,checkProcessing,packing);
+        dto.setExpectDate(obtainInfo.getEstimateDate());
+        Obtain obtain = dtoToEntity(dto);
+        obtainRepository.save(obtain);
+    }
 
-        Obtain obtain = Obtain.builder()
-                .item(item)
-                .customerId(customer)
-                .obtainAmount(amount)
-                .obtainDate(obtainDate)
-                .customerRequestDate(customerReqDate)
-                .expectDate(obtainInfo.getEstimateDate())
-                .obtainStat(false)
-                .build();
-
+    //여기서 부터 하면됨 db에서 값 들고와서 다시 계산하고 수주확정시키기
+    public void confirmObtain(Obtain obtain){
+        obtain.updateStat();
+        obtain.updateConfirmTime();
         obtainRepository.save(obtain);
     }
 
 
-    public void confirmObtain(Obtain obtain){
+    private Obtain dtoToEntity(ObtainDTO dto){
 
+        Obtain obtain = Obtain.builder()
+                .item(itemRepository.findById(dto.getItemId()).orElseThrow())
+                .customerId(customerRepository.findById(dto.getCustomerId()).orElseThrow())
+                .obtainAmount(dto.getObtainAmount())
+                .obtainDate(dto.getObtainDate())
+                .customerRequestDate(dto.getCustomerRequestDate())
+                .expectDate(dto.getExpectDate())
+                .obtainStat(dto.isObtainStat())
+                .build();
 
+        return obtain;
     }
+
 }

@@ -10,7 +10,7 @@ import java.util.Map;
 @Data
 public class MesAll {
 
-    MesAll(){
+    public MesAll(){
         inputPreProcessingTimeList = new ArrayList<>(); //전처리
         outputPreProcessingTimeList = new ArrayList<>(); //
         preProcessingAmountList = new ArrayList<>();

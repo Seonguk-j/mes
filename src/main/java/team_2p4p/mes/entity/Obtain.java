@@ -46,7 +46,15 @@ public class Obtain {
     private LocalDateTime obtainStatDate;
 
 
+    public void setCustomerId(){
+
+    }
+
     public void updateStat(){
         this.obtainStat = true;
+    }
+
+    public void updateConfirmTime(){
+        this.obtainStatDate = LocalDateTime.now();
     }
 }

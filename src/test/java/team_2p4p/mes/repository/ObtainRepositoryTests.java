@@ -16,14 +16,12 @@ public class ObtainRepositoryTests {
     @Test
     public void confirmTest(){
 
-        Optional<Obtain> res = obtainRepository.findById(10L);
-        if(res.isPresent()){
-            Obtain obtain = res.get();
-            obtain.updateStat();
-            obtainRepository.save(obtain);
-        }
-    }
+        Obtain obtain = obtainRepository.findById(1L).orElseThrow();
+        obtain.updateStat();
+        obtain.updateConfirmTime();
+        obtainRepository.save(obtain);
 
+    }
 
 
 }
