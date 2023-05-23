@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import team_2p4p.mes.entity.Facility;
 import team_2p4p.mes.entity.Item;
+import team_2p4p.mes.entity.Process;
 import team_2p4p.mes.repository.FacilityRepository;
 import team_2p4p.mes.repository.ItemRepository;
 
@@ -33,4 +34,15 @@ public class FacilityService {
 
         facilityRepository.save(facility);
     }
+
+    public Facility findFacilityName(String name){
+        return  facilityRepository.findByFacilityName(name);
+    }
+
+    public Facility findFacility(Long id){
+        return  facilityRepository.findById(id)
+                 .orElseThrow(() ->new IllegalArgumentException("설비가 존재하지 않습니다"));
+    }
+
+
 }
