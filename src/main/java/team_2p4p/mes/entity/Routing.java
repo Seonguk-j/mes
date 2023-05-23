@@ -19,49 +19,39 @@ public class Routing {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long routingId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(nullable = false, name = "item_id")
     private Item item;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "process1", referencedColumnName = "process_id")
     private Process process1;
 
-    @Column(name="process_time1")
-    private int processTime1;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "process2", referencedColumnName = "process_id")
     private Process process2;
 
-    @Column(name="process_time2")
-    private int processTime2;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "process3", referencedColumnName = "process_id")
     private Process process3;
 
-    @Column(name="process_time3")
-    private int processTime3;
-
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "process4", referencedColumnName = "process_id")
     private Process process4;
 
-    @Column(name="process_time4")
-    private int processTime4;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "process5", referencedColumnName = "process_id")
     private Process process5;
 
-    @Column(name="process_time5")
-    private int processTime5;
-
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "process6", referencedColumnName = "process_id")
     private Process process6;
 
-    @Column(name="process_time6")
-    private int processTime6;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "process7", referencedColumnName = "process_id")
+    private Process process7;
+
 }
