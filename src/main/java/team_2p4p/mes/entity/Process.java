@@ -40,6 +40,9 @@ public class Process {
     @JoinColumn(name = "material4", referencedColumnName = "item_id")
     private Item item4;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "material5", referencedColumnName = "item_id")
+    private Item item5;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "facility_id1", referencedColumnName = "facility_id")
