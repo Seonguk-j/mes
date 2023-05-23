@@ -20,24 +20,10 @@ public class Enterprise {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "item_id", referencedColumnName = "item_id")
-    private Item item1;
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "item_id", referencedColumnName = "item_id")
-    private Item item2;
+    private Item item;
 
     @Column(nullable = false, name="enterprise_name")
     private String enterpriseName;
-
-    @Column(name="enterprise_person_name")
-    private String enterprisePersonName;
-
-    @Column(nullable = false, name="enterprise_tel")
-    private String enterpriseTel;
-
-    @Column(nullable = false, name="enterprise_address")
-    private String enterpriseAddress;
-
     @Column(nullable = false, name="delivery_time")
     private String deliveryTime;
 }

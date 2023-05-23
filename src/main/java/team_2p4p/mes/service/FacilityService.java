@@ -19,7 +19,7 @@ public class FacilityService {
     @Autowired
     private final FacilityRepository facilityRepository;
 
-    public void saveFacility(String name, String capa, int ready, Item item1, Item item2, Item item3, Item item4){
+    public void saveFacility(String name, String capa, int ready, Item item1, Item item2, Item item3, Item item4, Item item5){
 
         Facility facility = Facility.builder()
                 .facilityName(name)
@@ -29,6 +29,7 @@ public class FacilityService {
                 .item2(item2)
                 .item3(item3)
                 .item4(item4)
+                .item4(item5)
                 .build();
         System.out.println(facility);
 

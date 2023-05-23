@@ -18,14 +18,10 @@ public class EnterpriseService {
     @Autowired
     private final EnterpriseRepository enterpriseRepository;
 
-    public void saveEnterprise(Item item1,Item item2, String name, String enterprisePersonName, String enterpriseTel, String enterpriseAddress, String deliveryTime){
+    public void saveEnterprise(Item item, String name, String deliveryTime){
         Enterprise enterprise = Enterprise.builder()
-                .item1(item1)
-                .item2(item2)
+                .item(item)
                 .enterpriseName(name)
-                .enterprisePersonName(enterprisePersonName)
-                .enterpriseTel(enterpriseTel)
-                .enterpriseAddress(enterpriseAddress)
                 .deliveryTime(deliveryTime)
                 .build();
         System.out.println(enterprise);
