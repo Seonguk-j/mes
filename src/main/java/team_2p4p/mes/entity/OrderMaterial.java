@@ -35,4 +35,7 @@ public class OrderMaterial {
 
     @Column(nullable = false, name="import_expect_date")
     private LocalDateTime ImportExpectDate;
+
+    @Column(nullable = false, name="order_stat")
+    private boolean orderStat;
 }
