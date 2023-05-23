@@ -34,5 +34,5 @@ public class OrderMaterial {
     private LocalDateTime orderDate;
 
     @Column(nullable = false, name="import_expect_date")
-    private LocalDateTime ImportExpectDate;
+    private LocalDateTime importExpectDate;
 }

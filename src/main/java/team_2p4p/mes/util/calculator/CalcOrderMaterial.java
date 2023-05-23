@@ -8,6 +8,10 @@ package team_2p4p.mes.util.calculator;
  */
 
 
+import team_2p4p.mes.entity.Item;
+import team_2p4p.mes.repository.ItemRepository;
+import team_2p4p.mes.service.ProductService;
+
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -16,6 +20,9 @@ public class CalcOrderMaterial {
     long itemId;            // 제품 id
     int amount;               // 주문수량(box)
     static MesAll mesAll;
+
+    private static ProductService productService;
+    private static ItemRepository itemRepository;
 
     CalcOrderMaterial(long itemId, int amount) {
 
@@ -31,11 +38,12 @@ public class CalcOrderMaterial {
         int comparedAmount = compareStockedProduct(itemId, amount);
         // 재고량이 충분한 경우 comparedAmount < 0
         if (comparedAmount < 0) {
-            // 완제품 재고에서 수주량 차감.
-            MesAll.stockProduct[(int) itemId] -= amount;
             mesAll.stockEnough = true;
             // mesAll에 대한 값이 tae에게 넘어갈 필요가 없음.
             // 이부분에 대한 부분 추가 고려 필요
+            // 23.05.23 db에 재고에서 수주량 차감
+            Item item = itemRepository.findById(itemId).orElseThrow(()-> new IllegalArgumentException("아이템이 존재하지 않습니다."));
+//            productService.addMinusProductStock(item, amount, );
         }
         // 수주량이 재고량보다 많은 경우 am > 0
         else {
@@ -88,6 +96,7 @@ public class CalcOrderMaterial {
             mesAll.time = now;
             mesAll.amount = 0;
             mesAll.stockEnough = true;
+
         } else {
             // 수주량에서 재고량을 뺀 양만큼이 amount 가 되어야함
             amount = comparedAmount;
@@ -219,8 +228,10 @@ public class CalcOrderMaterial {
 
     // 완제품 재고와 주문량 비교 매소드
     static int compareStockedProduct(long itemId, int amount) {
+        // 23.05.23 db에서 가져오는 내용 추가
+        Long stock = productService.productStock(itemId);
 
-        return amount - MesAll.stockProduct[(int) itemId];
+        return (int) (amount - stock);
 //      // 완제품 재고가 부족한 경우
 //      if(MesAll.stockProduct[(int) itemId] < amount) {
 //         // 부족한 만큼에 대한 재료들이 발주 필요 데이터베이스(현재 orderList)에 저장
