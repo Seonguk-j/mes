@@ -53,4 +53,10 @@ public class ObtainService {
 
         obtainRepository.save(obtain);
     }
+
+
+    public void confirmObtain(Obtain obtain){
+
+
+    }
 }

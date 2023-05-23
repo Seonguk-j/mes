@@ -15,7 +15,6 @@ import javax.transaction.Transactional;
 @RequiredArgsConstructor
 public class ProcessService {
 
-    @Autowired
     private final ProcessRepository processRepository;
 
     public void saveProcess(String name, String content,Item item1, Item item2, Item item3, Item item4, Facility facility1, Facility facility2, Facility facility3, Facility facility4){

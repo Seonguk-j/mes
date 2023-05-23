@@ -6,15 +6,20 @@ import org.springframework.boot.test.context.SpringBootTest;
 import team_2p4p.mes.constant.Stat;
 import team_2p4p.mes.entity.Facility;
 import team_2p4p.mes.entity.Item;
+import team_2p4p.mes.entity.Obtain;
 import team_2p4p.mes.entity.Process;
 import team_2p4p.mes.service.FacilityService;
 import team_2p4p.mes.service.ItemService;
 import team_2p4p.mes.service.ProcessService;
 
 import java.util.List;
+import java.util.Optional;
 
 @SpringBootTest
 public class RepositoryTests {
+
+    @Autowired
+    private ObtainRepository obtainRepository;
 
     @Autowired
     private ItemRepository itemRepository;
@@ -111,4 +116,9 @@ public class RepositoryTests {
         List<Process> list = processRepository.findAll();
         System.out.println(list);
     }
+
+
+
+
+
 }

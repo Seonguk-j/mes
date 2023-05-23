@@ -11,31 +11,36 @@ import java.util.Map;
 public class MesAll {
 
     MesAll(){
-        inputPreProcessingTimeList = new ArrayList<>();
-        outputPreProcessingTimeList = new ArrayList<>();
+        inputPreProcessingTimeList = new ArrayList<>(); //전처리
+        outputPreProcessingTimeList = new ArrayList<>(); //
         preProcessingAmountList = new ArrayList<>();
         preProcessingMapList = new ArrayList<>();
-        liquidSystemInputTimeList1 = new ArrayList<>(); // 액체제조 1회당 시작시간
-        liquidSystemOutputTimeList1 = new ArrayList<>(); //액체제조 1회당 끝난시간
-        liquidSystemInputAmountList1 = new ArrayList<>(); //액체제조 1회당 인풋양
-        liquidSystemOutputAmountList1 = new ArrayList<>(); //액체제조 1회당 아웃양
-        liquidSystemInputTimeList2 = new ArrayList<>(); // 액체제조 1회당 시작시간
-        liquidSystemOutputTimeList2 = new ArrayList<>(); //액체제조 1회당 끝난시간
-        liquidSystemInputAmountList2 = new ArrayList<>(); //액체제조 1회당 인풋양
-        liquidSystemOutputAmountList2 = new ArrayList<>(); //액체제조 1회당 아웃양
+
+        liquidSystemInputTimeList1 = new ArrayList<>(); // 액체제조1 1회당 시작시간
+        liquidSystemOutputTimeList1 = new ArrayList<>(); //액체제조1 1회당 끝난시간
+        liquidSystemInputAmountList1 = new ArrayList<>(); //액체제조1 1회당 인풋양
+        liquidSystemOutputAmountList1 = new ArrayList<>(); //액체제조1 1회당 아웃양
+
+        liquidSystemInputTimeList2 = new ArrayList<>(); // 액체제조2 1회당 시작시간
+        liquidSystemOutputTimeList2 = new ArrayList<>(); //액체제조2 1회당 끝난시간
+        liquidSystemInputAmountList2 = new ArrayList<>(); //액체제조2 1회당 인풋양
+        liquidSystemOutputAmountList2 = new ArrayList<>(); //액체제조2 1회당 아웃양
         whereList = new ArrayList<>();
         liquidSystemInputTimeList = new ArrayList<>(); // 액체제조 1회당 시작시간
         liquidSystemOutputTimeList = new ArrayList<>(); //액체제조 1회당 끝난시간
         liquidSystemInputAmountList = new ArrayList<>(); //액체제조 1회당 인풋양
         liquidSystemOutputAmountList = new ArrayList<>(); //액체제조 1회당 아웃양
+
         fillPouchInputTimeList = new ArrayList<>(); // 즙충진 1회당 시작시간
         fillPouchOutputTimeList = new ArrayList<>(); //즙충진 1회당 끝난시간
         fillPouchInputAmountList = new ArrayList<>(); //즙충진 1회당 인풋
         fillPouchOutputAmountList = new ArrayList<>(); //즙충진 1회당 아웃풋
+
         fillStickInputTimeList = new ArrayList<>(); // 스틱충진 1회당 시작시간
         fillStickOutputTimeList = new ArrayList<>(); //스틱충진 1회당 끝난시간
         fillStickInputAmountList = new ArrayList<>(); //스틱충진 1회당 인풋
         fillStickOutputAmountList = new ArrayList<>(); //스틱충진 1회당 아웃풋
+
         checkInputTimeList = new ArrayList<>(); // 검사 1회당 시작시간
         checkOutputTimeList = new ArrayList<>(); // 검사 1회당 끝난시간
         checkInputAmountList = new ArrayList<>(); //검사 1회당 인풋

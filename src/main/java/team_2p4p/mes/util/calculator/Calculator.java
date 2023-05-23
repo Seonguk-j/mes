@@ -53,7 +53,11 @@ public class Calculator {
         } else {
             //리스트에 무언가가 있을때 마지막 시간을 꺼내온다
             LocalDateTime lastTime = measurement.getConfirmList().get(measurement.getConfirmList().size() - 1).getOutputMeasurementTime();
-            mesAll.setInputMeasurementTime(inputTimeCheck(measuremntLeadTime,lastTime));
+            if(lastTime.isAfter(mesAll.getTime())){
+                mesAll.setInputMeasurementTime(inputTimeCheck(measuremntLeadTime,lastTime));
+            }else{
+                mesAll.setInputMeasurementTime(inputTimeCheck(measuremntLeadTime,mesAll.getTime()));
+            }
             mesAll.setOutputMeasurementTime(mesAll.getInputMeasurementTime().plusMinutes(30)); // mesAll에 종료시간
         }
         return mesAll;
@@ -82,7 +86,6 @@ public class Calculator {
 
                 if (preProcessing.getConfirmList().isEmpty()) {
                     //전처리 확정리스트가 비었을때
-
                     mesAll.getInputPreProcessingTimeList().add(inputTimeCheck(preprocessingLeadTime,mesAll.getOutputMeasurementTime()));
                     //시간계산 1ton/hour  1분당 16.667kg 가능 1kg당 3.6초 걸림
 
@@ -90,9 +93,11 @@ public class Calculator {
                     //전처리 확정리스트에 대기목록이 있을때
                     List<LocalDateTime> list = preProcessing.getConfirmList().get(preProcessing.getConfirmList().size() - 1).getOutputPreProcessingTimeList();
                     LocalDateTime lastTime = list.get(list.size()-1);
-                    System.out.println("lastTime : " + lastTime);
-                    System.out.println("lastTime inputTimeCheck : " + inputTimeCheck(preprocessingLeadTime,lastTime));
-                    mesAll.getInputPreProcessingTimeList().add(inputTimeCheck(preprocessingLeadTime,lastTime));
+                    if(lastTime.isAfter(mesAll.getOutputMeasurementTime())){
+                        mesAll.getInputPreProcessingTimeList().add(inputTimeCheck(preprocessingLeadTime,lastTime));
+                    }else{
+                        mesAll.getInputPreProcessingTimeList().add(inputTimeCheck(preprocessingLeadTime,mesAll.getOutputMeasurementTime()));
+                    }
                     //시간계산 1ton/hour  1분당 16.667kg 가능 1kg당 3.6초 걸림
                 }
                 mesAll.getOutputPreProcessingTimeList().add(mesAll.getInputPreProcessingTimeList().get(i).plusSeconds((long) (3.6 * mesAll.getPreProcessingAmountList().get(i))));
@@ -754,10 +759,18 @@ public class Calculator {
 
                         if(machine1LastTime.isBefore(machine2LastTime)) {
                             // 기계1이 먼저끝날때
-                            inputLiquidMachine1(mesAll,leadTime,i,amount,machine1LastTime);
+                            if(machine1LastTime.isAfter(mesAll.getOutputMeasurementTime())){
+                                inputLiquidMachine1(mesAll,leadTime,i,amount,machine1LastTime);
+                            }else{
+                                inputLiquidMachine1(mesAll,leadTime,i,amount,mesAll.getOutputMeasurementTime());
+                            }
                         }else{
                             //기계2가 먼저끝날때
-                            inputLiquidMachine2(mesAll,leadTime,i,amount,machine2LastTime);
+                            if(machine2LastTime.isAfter(mesAll.getOutputMeasurementTime())){
+                                inputLiquidMachine2(mesAll,leadTime,i,amount,machine2LastTime);
+                            }else{
+                                inputLiquidMachine2(mesAll,leadTime,i,amount,mesAll.getOutputMeasurementTime());
+                            }
                         }
                     }
                 }
@@ -771,29 +784,31 @@ public class Calculator {
                         inputLiquidMachine2(mesAll,leadTime,i,amount,mesAll.getOutputMeasurementTime());
                     }else{
 
-                        if (liquidSystem.getConfirmList().get(liquidSystem.getConfirmList().size()-1).getLiquidSystemCount2()==0){
-                            //엑체제조 확정리스트에 리스트는 있지만 2번만 비어있는경우
-                            inputLiquidMachine2(mesAll,leadTime,i,amount,mesAll.getOutputMeasurementTime());
-                        }else{
                             // 기계 2 스케줄 완료 후 투입
                             List<LocalDateTime> machine2List = liquidSystem.getConfirmList().get(liquidSystem.getConfirmList().size() - 1).getLiquidSystemOutputTimeList2(); //액체제조 확정리스트 맨마지막의 아웃풋 타임리스트
                             LocalDateTime machine2LastTime = machine2List.get(machine2List.size()-1); //기계 2 끝나는 시간
-                            inputLiquidMachine2(mesAll,leadTime,i,amount,machine2LastTime);
-                        }
+
+                            if(machine2LastTime.isAfter(mesAll.getOutputMeasurementTime())){
+                                inputLiquidMachine2(mesAll,leadTime,i,amount,machine2LastTime);
+                            }else{
+                                inputLiquidMachine2(mesAll,leadTime,i,amount,mesAll.getOutputMeasurementTime());
+                            }
+
+                        //}
                     }
 
                 }else{
                     // 첫번째 투입이 기계 2일때
-                    // 첫번째 기계의 투입이 2라는 말은 무조건 confirmList가 존재하기 떄문에 get이 가능
-                    if (liquidSystem.getConfirmList().get(liquidSystem.getConfirmList().size()-1).getLiquidSystemCount1()==0){
-                        // 기계 1이 비었으면 기계1투입
-                        inputLiquidMachine1(mesAll,leadTime,i,amount,mesAll.getOutputMeasurementTime());
-                    }else{
+
                         // 기계 1 스케줄 완료 후 투입
                         List<LocalDateTime> machine1List = liquidSystem.getConfirmList().get(liquidSystem.getConfirmList().size() - 1).getLiquidSystemOutputTimeList1(); //액체제조 확정리스트 맨마지막의 아웃풋 타임리스트
                         LocalDateTime machine1LastTime = machine1List.get(machine1List.size()-1); //기계 1 끝나는 시간
-                        inputLiquidMachine1(mesAll,leadTime,i,amount,machine1LastTime);
-                    }
+
+                        if(machine1LastTime.isAfter(mesAll.getOutputMeasurementTime())){
+                            inputLiquidMachine1(mesAll,leadTime,i,amount,machine1LastTime);
+                        }else{
+                            inputLiquidMachine1(mesAll,leadTime,i,amount,mesAll.getOutputMeasurementTime());
+                        }
                 }
             }else{
                 // - 2 의 끝나는 시간을 input 타임으로 잡으면 된다.
@@ -830,10 +845,20 @@ public class Calculator {
 
                         if(machine1LastTime.isBefore(machine2LastTime)) {
                             // 기계1이 먼저끝날때
-                            inputLiquidMachine1(mesAll,leadTime,i,amount,machine1LastTime);
+                            if(machine1LastTime.isAfter(mesAll.getOutputMeasurementTime())){
+                                inputLiquidMachine1(mesAll,leadTime,i,amount,machine1LastTime);
+                            }else{
+                                inputLiquidMachine1(mesAll,leadTime,i,amount,mesAll.getOutputPreProcessingTimeList().get(i));
+                            }
+
                         }else{
                             //기계2가 먼저끝날때
-                            inputLiquidMachine2(mesAll,leadTime,i,amount,machine2LastTime);
+                            if(machine2LastTime.isAfter(mesAll.getOutputMeasurementTime())){
+                                inputLiquidMachine2(mesAll,leadTime,i,amount,machine2LastTime);
+                            }else{
+                                inputLiquidMachine2(mesAll,leadTime,i,amount,mesAll.getOutputPreProcessingTimeList().get(i));
+
+                            }
                         }
                     }
                 }
@@ -844,31 +869,51 @@ public class Calculator {
                     // 첫번째 투입이 기계 1일떄
                     if(liquidSystem.getConfirmList().isEmpty()){
                         //액체제조 1과 2가 전부 비어서 첫번째가 자동으로1로 들어가서 2로 들어갈때
-                        inputLiquidMachine2(mesAll,leadTime,i,amount,mesAll.getOutputPreProcessingTimeList().get(i));
-                    }else{
-
-                        if (liquidSystem.getConfirmList().get(liquidSystem.getConfirmList().size()-1).getLiquidSystemCount2()==0){
-                            //엑체제조 확정리스트에 리스트는 있지만 2번만 비어있는경우
-                            inputLiquidMachine2(mesAll,leadTime,i,amount,mesAll.getOutputPreProcessingTimeList().get(i));
+                        if(mesAll.getItemId() == 2){
+                            inputLiquidMachine2(mesAll,leadTime,i,amount,mesAll.getOutputPreProcessingTimeList().get(i-1));
                         }else{
+                            inputLiquidMachine2(mesAll,leadTime,i,amount,mesAll.getOutputPreProcessingTimeList().get(i));
+                        }
+                    }else{
                             // 기계 2 스케줄 완료 후 투입
                             List<LocalDateTime> machine2List = liquidSystem.getConfirmList().get(liquidSystem.getConfirmList().size() - 1).getLiquidSystemOutputTimeList2(); //액체제조 확정리스트 맨마지막의 아웃풋 타임리스트
                             LocalDateTime machine2LastTime = machine2List.get(machine2List.size()-1); //기계 2 끝나는 시간
-                            inputLiquidMachine2(mesAll,leadTime,i,amount,machine2LastTime);
-                        }
-                    }
 
-                }else{
+                            if(mesAll.getItemId() == 2){
+                                //흑마늘 일때
+                                if(machine2LastTime.isAfter(mesAll.getOutputPreProcessingTimeList().get(i-1))){
+                                    inputLiquidMachine2(mesAll,leadTime,i,amount,machine2LastTime);
+                                }else {
+                                    inputLiquidMachine2(mesAll, leadTime, i, amount, mesAll.getOutputPreProcessingTimeList().get(i-1));
+                                }
+                            }else{
+                                //양배추일때
+                                if(machine2LastTime.isAfter(mesAll.getOutputPreProcessingTimeList().get(i))){
+                                    inputLiquidMachine2(mesAll,leadTime,i,amount,machine2LastTime);
+                                }else {
+                                    inputLiquidMachine2(mesAll, leadTime, i, amount, mesAll.getOutputPreProcessingTimeList().get(i));
+                                }
+                            }
+                        }
+                }else {
                     // 첫번째 투입이 기계 2일때
-                    // 첫번째 기계의 투입이 2라는 말은 무조건 confirmList가 존재하기 떄문에 get이 가능
-                    if (liquidSystem.getConfirmList().get(liquidSystem.getConfirmList().size()-1).getLiquidSystemCount1()==0){
-                        // 기계 1이 비었으면 기계1투입
-                        inputLiquidMachine1(mesAll,leadTime,i,amount,mesAll.getOutputPreProcessingTimeList().get(i));
-                    }else{
-                        // 기계 1 스케줄 완료 후 투입
-                        List<LocalDateTime> machine1List = liquidSystem.getConfirmList().get(liquidSystem.getConfirmList().size() - 1).getLiquidSystemOutputTimeList1(); //액체제조 확정리스트 맨마지막의 아웃풋 타임리스트
-                        LocalDateTime machine1LastTime = machine1List.get(machine1List.size()-1); //기계 1 끝나는 시간
-                        inputLiquidMachine1(mesAll,leadTime,i,amount,machine1LastTime);
+                    // 기계 1 스케줄 완료 후 투입
+                    List<LocalDateTime> machine1List = liquidSystem.getConfirmList().get(liquidSystem.getConfirmList().size() - 1).getLiquidSystemOutputTimeList1(); //액체제조 확정리스트 맨마지막의 아웃풋 타임리스트
+                    LocalDateTime machine1LastTime = machine1List.get(machine1List.size() - 1); //기계 1 끝나는 시간
+
+                    // 기계 1이 스케줄 완료 비교 후 기계1투입
+                    if (mesAll.getItemId() == 2) {
+                        if (machine1LastTime.isAfter(mesAll.getOutputPreProcessingTimeList().get(i - 1))) {
+                            inputLiquidMachine1(mesAll, leadTime, i, amount, machine1LastTime);
+                        } else {
+                            inputLiquidMachine1(mesAll, leadTime, i, amount, mesAll.getOutputPreProcessingTimeList().get(i - 1));
+                        }
+                    } else {
+                        if (machine1LastTime.isAfter(mesAll.getOutputPreProcessingTimeList().get(i))) {
+                            inputLiquidMachine1(mesAll, leadTime, i, amount, machine1LastTime);
+                        } else {
+                            inputLiquidMachine1(mesAll, leadTime, i, amount, mesAll.getOutputPreProcessingTimeList().get(i));
+                        }
                     }
                 }
             }else{

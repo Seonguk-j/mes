@@ -45,4 +45,8 @@ public class Obtain {
     @Column(name="obtain_stat_date")
     private LocalDateTime obtainStatDate;
 
+
+    public void updateStat(){
+        this.obtainStat = true;
+    }
 }
