@@ -25,7 +25,7 @@ public class Obtain {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false, name = "customer_id")
-    private Customer customerId;
+    private Customer customer;
 
     @Column(nullable = false, name="obtain_amount")
     private Long obtainAmount;

@@ -3,6 +3,7 @@ package team_2p4p.mes.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
+import team_2p4p.mes.dto.SearchDto;
 import team_2p4p.mes.entity.Customer;
 import team_2p4p.mes.entity.Item;
 import team_2p4p.mes.entity.Obtain;
@@ -16,6 +17,7 @@ import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Service
 @Transactional
@@ -43,7 +45,7 @@ public class ObtainService {
 
         Obtain obtain = Obtain.builder()
                 .item(item)
-                .customerId(customer)
+                .customer(customer)
                 .obtainAmount(amount)
                 .obtainDate(obtainDate)
                 .customerRequestDate(customerReqDate)
@@ -52,5 +54,9 @@ public class ObtainService {
                 .build();
 
         obtainRepository.save(obtain);
+    }
+
+    public List<Obtain> getObtain(SearchDto searchDto){
+        return obtainRepository.getObtainList(searchDto);
     }
 }
