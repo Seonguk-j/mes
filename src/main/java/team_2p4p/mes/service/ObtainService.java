@@ -85,10 +85,11 @@ public class ObtainService {
         getConfirmList();
 
         dto = entityToDto(obtainRepository.findById(dto.getObtainId()).orElseThrow());
-        MesAll obtainInfo = CalcOrderMaterial.estimateDate(dto.getItemId(), Math.toIntExact(dto.getObtainAmount()), LocalDateTime.now());
-        cal.obtain(obtainInfo);
-        dto.setExpectDate(obtainInfo.getEstimateDate());
+        MesAll mesAll = CalcOrderMaterial.estimateDate(dto.getItemId(), Math.toIntExact(dto.getObtainAmount()), LocalDateTime.now());
+        cal.obtain(mesAll);
+        cal.confirmObtain(mesAll);
 
+        dto.setExpectDate(mesAll.getEstimateDate());
         Obtain entity = dtoToEntity(dto);
         entity.updateStat();
         entity.updateConfirmTime();
@@ -99,8 +100,6 @@ public class ObtainService {
 
 
     public Obtain dtoToEntity(ObtainDTO dto){
-
-
 
         Obtain entity = Obtain.builder()
                 .obtainId(dto.getObtainId())

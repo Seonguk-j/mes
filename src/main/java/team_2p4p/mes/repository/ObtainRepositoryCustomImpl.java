@@ -43,7 +43,7 @@ public class ObtainRepositoryCustomImpl implements ObtainRepositoryCustom {
         if (StringUtils.equals("제품명", searchBy)) {
             return QObtain.obtain.item.itemName.like("%" + searchQuery + "%");
         } else if (StringUtils.equals("업체명", searchBy)) {
-            return QObtain.obtain.customerId.customerName.like("%" + searchQuery + "%");
+            return QObtain.obtain.customer.customerName.like("%" + searchQuery + "%");
         }
         return null;
     }

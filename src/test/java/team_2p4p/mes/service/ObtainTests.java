@@ -18,21 +18,14 @@ public class ObtainTests {
     @Test
     public void regObtainTest(){
         ObtainDTO dto = new ObtainDTO();
-        dto.setItemId(2L);
+        dto.setItemId(1L);
         dto.setCustomerRequestDate(LocalDateTime.now().plusDays(10));
-        dto.setObtainAmount(1200L);
+        dto.setObtainAmount(3000L);
         dto.setCustomerId(1L);
 
         obtainService.regObtain(dto);
     }
 
-    @Test
-    public void confirmTest(){
-        ObtainDTO dto = new ObtainDTO();
-        dto.setObtainId(6L);
-
-        obtainService.confirmObtain(dto);
-    }
 
 
     @Test

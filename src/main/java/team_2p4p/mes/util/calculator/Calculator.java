@@ -20,6 +20,7 @@ public class Calculator {
 
     public void obtain(MesAll mesAll){
         Factory factory = Factory.getInstance();
+
         materialMeasurement(mesAll,factory.getMeasurement());
 
         if(mesAll.getItemId()<=2){
@@ -67,6 +68,22 @@ public class Calculator {
 
         checkProcessing.getConfirmList().add(mesAll);
         packing.getConfirmList().add(mesAll);
+    }
+    public void confirmObtain(MesAll mesAll){
+        Factory factory = Factory.getInstance();
+
+        factory.getMeasurement().getConfirmList().add(mesAll);
+        factory.getPreProcessing().getConfirmList().add(mesAll);
+        factory.getLiquidSystem().getConfirmList().add(mesAll);
+
+        if(mesAll.getItemId() == 1 || mesAll.getItemId() == 2){
+            factory.getFillPouchProcessing().getConfirmList().add(mesAll);
+        }else {
+            factory.getFillStickProcessing().getConfirmList().add(mesAll);
+        }
+
+        factory.getCheckProcessing().getConfirmList().add(mesAll);
+        factory.getPacking().getConfirmList().add(mesAll);
     }
 
 

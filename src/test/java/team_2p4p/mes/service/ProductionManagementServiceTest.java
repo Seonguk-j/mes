@@ -24,11 +24,15 @@ public class ProductionManagementServiceTest {
     public void setProductionPlanTest(){
 
         ObtainDTO obtainDTO = new ObtainDTO();
-        obtainDTO.setObtainId(2L);
+        obtainDTO.setObtainId(6L);
 
         productionManagementService.addProductionManagement(obtainDTO);
     }
 
+    @Test
+    public void confirmAll(){
+
+    }
 
 
 }
