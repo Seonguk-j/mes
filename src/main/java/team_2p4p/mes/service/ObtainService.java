@@ -105,7 +105,7 @@ public class ObtainService {
         Obtain entity = Obtain.builder()
                 .obtainId(dto.getObtainId())
                 .item(itemRepository.findById(dto.getItemId()).orElseThrow())
-                .customerId(customerRepository.findById(dto.getCustomerId()).orElseThrow())
+                .customer(customerRepository.findById(dto.getCustomerId()).orElseThrow())
                 .obtainAmount(dto.getObtainAmount())
                 .obtainDate(dto.getObtainDate())
                 .customerRequestDate(dto.getCustomerRequestDate())
@@ -121,7 +121,7 @@ public class ObtainService {
         ObtainDTO dto = new ObtainDTO();
         dto.setObtainId(entity.getObtainId());
         dto.setItemId(entity.getItem().getItemId()); //객체에서 itemId 를 빼야됨
-        dto.setCustomerId(entity.getCustomerId().getCustomerId());
+        dto.setCustomerId(entity.getCustomer().getCustomerId());
         dto.setObtainAmount(entity.getObtainAmount());
         dto.setObtainDate(entity.getObtainDate());
         dto.setCustomerRequestDate(entity.getCustomerRequestDate());
