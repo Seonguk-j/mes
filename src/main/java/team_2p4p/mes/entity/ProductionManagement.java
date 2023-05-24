@@ -21,7 +21,7 @@ public class ProductionManagement {
     @JoinColumn(nullable = false, name = "obtain_id", referencedColumnName = "obtain_id")
     private Obtain obtain;
 
-    // 1.원료계량 2.전처리 3.액체제조시스템 4.충진 5.검사 6.포장
+    @Column(nullable = false, name="process")
     private Long process;
 
     @Column(nullable = false, name="process_start_time")
