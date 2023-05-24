@@ -19,18 +19,11 @@ public class Test {
         Packing packing = new Packing();
         Calculator cal = new Calculator();
 
-        obtain1 = CalcOrderMaterial.estimateDate(2L, 3300, LocalDateTime.now());
+        obtain1 = CalcOrderMaterial.estimateDate(1L, 3000, LocalDateTime.now());
 
         cal.obtain(obtain1,measurement,preProcessing,liquidSystem,fillPouchProcessing,fillStickProcessing,checkProcessing,packing);
         obtain1.infoAll();
-        cal.confirmObtain(obtain1,measurement,preProcessing,liquidSystem,fillPouchProcessing,fillStickProcessing,checkProcessing,packing);
-
-
-        obtain2 = CalcOrderMaterial.estimateDate(2L, 12000, LocalDateTime.now());
-        cal.obtain(obtain2,measurement,preProcessing,liquidSystem,fillPouchProcessing,fillStickProcessing,checkProcessing,packing);
-        obtain2.infoAll();
 
     }
-
 }
 

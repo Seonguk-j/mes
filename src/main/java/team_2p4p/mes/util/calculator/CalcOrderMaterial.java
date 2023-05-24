@@ -261,7 +261,7 @@ public class CalcOrderMaterial {
             material = (int) (amount * 1.5);         // 1box 당 양배추 1.5kg 필요
             pouch = amount * 30;               // 1box 당 파우치 30ea 필요
         } else if (itemId == 2) {
-            material = (int) (amount * 0.25);      // 1box 당 흑마늘 1.5kg 필요
+            material = (int) (amount * 0.25);      // 1box 당 흑마늘 0.25kg 필요
             pouch = amount * 30;               // 1box 당 파우치 30ea 필요
         } else {
             material = (int) (amount * 0.125);      // 1box 당 젤리 0.125kg 필요

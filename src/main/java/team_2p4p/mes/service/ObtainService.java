@@ -19,6 +19,8 @@ import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @Transactional
@@ -30,40 +32,78 @@ public class ObtainService {
     private final ItemRepository itemRepository;
     private final CustomerRepository customerRepository;
 
-    Measurement measurement = new Measurement();
-    PreProcessing preProcessing = new PreProcessing();
-    LiquidSystem liquidSystem = new LiquidSystem();
-    FillPouchProcessing fillPouchProcessing = new FillPouchProcessing();
-    FillStickProcessing fillStickProcessing = new FillStickProcessing();
-    CheckProcessing checkProcessing = new CheckProcessing();
-    Packing packing = new Packing();
     Calculator cal = new Calculator();
 
 
+    public void getConfirmList(){
+
+        List<Obtain> list = obtainRepository.findByObtainStat(true);
+        List<ObtainDTO> dtoList = new ArrayList<>();
+        Factory factory = Factory.getInstance();
+
+        for(int i = 0; i < list.size(); i++){
+            if(i == 0){
+                factory.getMeasurement().getConfirmList().clear();
+                factory.getPreProcessing().getConfirmList().clear();
+                factory.getLiquidSystem().getConfirmList().clear();
+                factory.getFillPouchProcessing().getConfirmList().clear();
+                factory.getFillPouchProcessing().getConfirmList().clear();
+                factory.getCheckProcessing().getConfirmList().clear();
+                factory.getPacking().getConfirmList().clear();
+            }
+            dtoList.add(entityToDto(list.get(i)));
+            MesAll mesAll = CalcOrderMaterial.estimateDate(dtoList.get(i).getItemId(), Math.toIntExact(dtoList.get(i).getObtainAmount()), dtoList.get(i).getObtainStatDate());
+            factory.getMeasurement().getConfirmList().add(mesAll);
+            factory.getPreProcessing().getConfirmList().add(mesAll);
+            factory.getLiquidSystem().getConfirmList().add(mesAll);
+            factory.getFillPouchProcessing().getConfirmList().add(mesAll);
+            factory.getFillPouchProcessing().getConfirmList().add(mesAll);
+            factory.getCheckProcessing().getConfirmList().add(mesAll);
+            factory.getPacking().getConfirmList().add(mesAll);
+        }
+    }
 
     public void regObtain(ObtainDTO dto){
+
+        getConfirmList();
+
         LocalDateTime obtainDate = LocalDateTime.now();
         dto.setObtainStat(false);
         dto.setObtainDate(obtainDate);
 
         MesAll obtainInfo = CalcOrderMaterial.estimateDate(dto.getItemId(), Math.toIntExact(dto.getObtainAmount()), obtainDate);
-        cal.obtain(obtainInfo,measurement,preProcessing,liquidSystem,fillPouchProcessing,fillStickProcessing,checkProcessing,packing);
+        cal.obtain(obtainInfo);
         dto.setExpectDate(obtainInfo.getEstimateDate());
         Obtain obtain = dtoToEntity(dto);
         obtainRepository.save(obtain);
     }
 
     //여기서 부터 하면됨 db에서 값 들고와서 다시 계산하고 수주확정시키기
-    public void confirmObtain(Obtain obtain){
-        obtain.updateStat();
-        obtain.updateConfirmTime();
-        obtainRepository.save(obtain);
+    public void confirmObtain(ObtainDTO dto){
+
+        //수주확정시 다시계산해야 되고 dto에 확정시간 넣어줘야함
+        getConfirmList();
+
+        dto = entityToDto(obtainRepository.findById(dto.getObtainId()).orElseThrow());
+        MesAll obtainInfo = CalcOrderMaterial.estimateDate(dto.getItemId(), Math.toIntExact(dto.getObtainAmount()), LocalDateTime.now());
+        cal.obtain(obtainInfo);
+        dto.setExpectDate(obtainInfo.getEstimateDate());
+
+        Obtain entity = dtoToEntity(dto);
+        entity.updateStat();
+        entity.updateConfirmTime();
+
+        obtainRepository.save(entity);
+
     }
 
 
-    private Obtain dtoToEntity(ObtainDTO dto){
+    public Obtain dtoToEntity(ObtainDTO dto){
 
-        Obtain obtain = Obtain.builder()
+
+
+        Obtain entity = Obtain.builder()
+                .obtainId(dto.getObtainId())
                 .item(itemRepository.findById(dto.getItemId()).orElseThrow())
                 .customerId(customerRepository.findById(dto.getCustomerId()).orElseThrow())
                 .obtainAmount(dto.getObtainAmount())
@@ -73,7 +113,24 @@ public class ObtainService {
                 .obtainStat(dto.isObtainStat())
                 .build();
 
-        return obtain;
+        return entity;
     }
+
+    public ObtainDTO entityToDto(Obtain entity){
+
+        ObtainDTO dto = new ObtainDTO();
+        dto.setObtainId(entity.getObtainId());
+        dto.setItemId(entity.getItem().getItemId()); //객체에서 itemId 를 빼야됨
+        dto.setCustomerId(entity.getCustomerId().getCustomerId());
+        dto.setObtainAmount(entity.getObtainAmount());
+        dto.setObtainDate(entity.getObtainDate());
+        dto.setCustomerRequestDate(entity.getCustomerRequestDate());
+        dto.setExpectDate(entity.getExpectDate());
+        dto.setObtainStat(entity.isObtainStat());
+        dto.setObtainStatDate(entity.getObtainStatDate());
+
+        return dto;
+    }
+
 
 }

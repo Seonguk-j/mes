@@ -17,11 +17,38 @@ public class Calculator {
     int checkProcessingLeadTime = 10;
     static int packingProcessingLeadTime = 20;
 
+
+    public void obtain(MesAll mesAll){
+        Factory factory = Factory.getInstance();
+        materialMeasurement(mesAll,factory.getMeasurement());
+
+        if(mesAll.getItemId()<=2){
+            preProcessing(mesAll,factory.getPreProcessing());
+        }
+        operateLiquidSystem(mesAll,factory.getLiquidSystem());
+        if(mesAll.getItemId()<=2){
+            fillPouchProcessing(mesAll,factory.getFillPouchProcessing());
+        }else{
+            fillStickProcessing(mesAll,factory.getFillStickProcessing());
+        }
+
+        CheckProcessing(mesAll,factory.getCheckProcessing());
+        packingPrecessing(mesAll,factory.getPacking());
+        mesAll.setEstimateDate(mesAll.getPackingOutputTimeList().get(mesAll.getPackingOutputTimeList().size()-1)); //예상납품일
+    }
     public void obtain(MesAll mesAll, Measurement measurement, PreProcessing preProcessing, LiquidSystem liquidSystem, FillPouchProcessing fillPouchProcessing, FillStickProcessing fillStickProcessing, CheckProcessing checkProcessing, Packing packing){
         materialMeasurement(mesAll,measurement);
-        preProcessing(mesAll,preProcessing);
+
+        if(mesAll.getItemId() <= 2){
+            preProcessing(mesAll,preProcessing);
+        }
         operateLiquidSystem(mesAll,liquidSystem);
-        fillPouchProcessing(mesAll,fillPouchProcessing);
+
+        if(mesAll.getItemId()<=2){
+            fillPouchProcessing(mesAll,fillPouchProcessing);
+        }else{
+            fillStickProcessing(mesAll,fillStickProcessing);
+        }
         CheckProcessing(mesAll,checkProcessing);
         packingPrecessing(mesAll,packing);
         mesAll.setEstimateDate(mesAll.getPackingOutputTimeList().get(mesAll.getPackingOutputTimeList().size()-1)); //예상납품일

@@ -12,10 +12,7 @@ public class ProductionManagementTests {
     @Autowired
     ProductionManagementRepository productionManagementRepository;
 
-    @Test
-    void addProductPlan(MesAll mesAll){
-        ProductionManagement productionManagement = ProductionManagement.builder().build();
-
+    public void regTest(){
 
     }
 }
