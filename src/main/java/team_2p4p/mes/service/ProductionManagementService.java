@@ -24,7 +24,7 @@ public class ProductionManagementService {
     private final ObtainRepository obtainRepository;
 
     Calculator cal = new Calculator();
-    public void addProductionManagement(ObtainDTO dto) {
+    public void productionManagement(ObtainDTO dto) {
 
         //등록 확정되면 yn 을 바꿈
         //1 ObtainDTO에서 받은 id로 mesAll을 다시 구해온다.
@@ -151,8 +151,11 @@ public class ProductionManagementService {
                         .build();
                 productionManagementRepository.save(packingProcessPlan);
             }
-
-        obtainService.confirmObtain(dto); //생산일정을 짜고 t/f 등록
     }
 
+
+    public void confirmAndAddProductionManagement(ObtainDTO dto){
+        productionManagement(dto);
+        obtainService.confirmObtain(dto); //생산일정을 짜고 t/f 등록
+    }
 }
