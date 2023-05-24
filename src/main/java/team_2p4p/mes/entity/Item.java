@@ -28,4 +28,5 @@ public class Item {
     @Column(nullable = false, name="item_stat")
     private String itemStat;
 
+
 }

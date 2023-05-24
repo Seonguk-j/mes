@@ -23,14 +23,7 @@ public class Test {
 
         cal.obtain(obtain1,measurement,preProcessing,liquidSystem,fillPouchProcessing,fillStickProcessing,checkProcessing,packing);
         obtain1.infoAll();
-        cal.confirmObtain(obtain1,measurement,preProcessing,liquidSystem,fillPouchProcessing,fillStickProcessing,checkProcessing,packing);
-
-
-        obtain2 = CalcOrderMaterial.estimateDate(2L, 12000, LocalDateTime.now());
-        cal.obtain(obtain2,measurement,preProcessing,liquidSystem,fillPouchProcessing,fillStickProcessing,checkProcessing,packing);
-        obtain2.infoAll();
 
     }
-
 }
 

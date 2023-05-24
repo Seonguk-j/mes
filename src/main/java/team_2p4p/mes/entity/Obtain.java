@@ -45,4 +45,16 @@ public class Obtain {
     @Column(name="obtain_stat_date")
     private LocalDateTime obtainStatDate;
 
+
+    public void setCustomerId(){
+
+    }
+
+    public void updateStat(){
+        this.obtainStat = true;
+    }
+
+    public void updateConfirmTime(){
+        this.obtainStatDate = LocalDateTime.now();
+    }
 }
