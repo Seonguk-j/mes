@@ -43,7 +43,7 @@ public class ProductionManagementService {
 
         dto = obtainService.entityToDto(obtainRepository.findById(dto.getObtainId()).orElseThrow());
         // id로 해당 수주DTO를 찾아온다.
-        MesAll mesAll = CalcOrderMaterial.estimateDate(dto.getItemId(), Math.toIntExact(dto.getObtainAmount()), dto.getExpectDate());
+        MesAll mesAll = CalcOrderMaterial.estimateDate(dto.getItemId(), Math.toIntExact(dto.getObtainAmount()), LocalDateTime.now());
         cal.obtain(mesAll);
         // mesAll에 db값을 꺼내서 해당 mesAll을 찾아온다.
         Obtain obtain = obtainService.dtoToEntity(dto);
@@ -54,7 +54,7 @@ public class ProductionManagementService {
                 .processAmount((long) mesAll.getMeasurementAmount())
                 .processStartTime(mesAll.getInputMeasurementTime())
                 .processFinishTime(mesAll.getOutputMeasurementTime())
-                .process(1L)
+                .process("원료개량")
                 .build();
 
         productionManagementRepository.save(measurementPlan);
@@ -67,7 +67,7 @@ public class ProductionManagementService {
                     .processAmount((long) mesAll.getPreProcessingAmountList().get(i))
                     .processStartTime(mesAll.getInputPreProcessingTimeList().get(i))
                     .processFinishTime(mesAll.getOutputPreProcessingTimeList().get(i))
-                    .process(2L)
+                    .process("전처리")
                     .build();
             productionManagementRepository.save(preProcessPlan);
         }
@@ -80,7 +80,7 @@ public class ProductionManagementService {
                     .processAmount((long) mesAll.getLiquidSystemInputAmountList1().get(i))
                     .processStartTime(mesAll.getLiquidSystemInputTimeList1().get(i))
                     .processFinishTime(mesAll.getLiquidSystemOutputTimeList1().get(i))
-                    .process(3L)
+                    .process("액체제조 시스템 1")
                     .build();
             productionManagementRepository.save(liquidProcess1Plan);
         }
@@ -93,7 +93,7 @@ public class ProductionManagementService {
                     .processAmount((long) mesAll.getLiquidSystemInputAmountList2().get(i))
                     .processStartTime(mesAll.getLiquidSystemInputTimeList2().get(i))
                     .processFinishTime(mesAll.getLiquidSystemOutputTimeList2().get(i))
-                    .process(4L)
+                    .process("액체제조 시스템 2")
                     .build();
             productionManagementRepository.save(liquidProcess2Plan);
         }
@@ -106,7 +106,7 @@ public class ProductionManagementService {
                         .processAmount((long) mesAll.getFillPouchInputAmountList().get(i))
                         .processStartTime(mesAll.getFillPouchInputTimeList().get(i))
                         .processFinishTime(mesAll.getFillPouchOutputTimeList().get(i))
-                        .process(5L)
+                        .process("즙 충진기")
                         .build();
                 productionManagementRepository.save(fillPouchProcessPlan);
             }
@@ -117,7 +117,7 @@ public class ProductionManagementService {
                         .processAmount((long) mesAll.getFillStickInputAmountList().get(i))
                         .processStartTime(mesAll.getFillStickInputTimeList().get(i))
                         .processFinishTime(mesAll.getFillStickOutputTimeList().get(i))
-                        .process(6L)
+                        .process("스틱 충진기")
                         .build();
                 productionManagementRepository.save(fillStickProcessPlan);
 
@@ -133,7 +133,7 @@ public class ProductionManagementService {
                         .processAmount((long) mesAll.getCheckInputAmountList().get(i))
                         .processStartTime(mesAll.getCheckInputTimeList().get(i))
                         .processFinishTime(mesAll.getCheckOutputTimeList().get(i))
-                        .process(7L)
+                        .process("검사")
                         .build();
                 productionManagementRepository.save(checkProcessPlan);
             }
@@ -147,7 +147,7 @@ public class ProductionManagementService {
                         .processAmount((long) mesAll.getPackingInputAmountList().get(i))
                         .processStartTime(mesAll.getPackingInputTimeList().get(i))
                         .processFinishTime(mesAll.getPackingOutputTimeList().get(i))
-                        .process(8L)
+                        .process("포장")
                         .build();
                 productionManagementRepository.save(packingProcessPlan);
             }

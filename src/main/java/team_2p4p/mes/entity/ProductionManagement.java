@@ -22,7 +22,7 @@ public class ProductionManagement {
     private Obtain obtain;
 
     @Column(nullable = false, name="process")
-    private Long process;
+    private String process;
 
     @Column(nullable = false, name="process_start_time")
     private LocalDateTime processStartTime;
@@ -37,12 +37,12 @@ public class ProductionManagement {
     private int processStat;
 
     @Builder
-    public ProductionManagement(Obtain obtain,Long process,LocalDateTime processStartTime,LocalDateTime processFinishTime,Long processAmount){
+    public ProductionManagement(Obtain obtain,String process,LocalDateTime processStartTime,LocalDateTime processFinishTime,Long processAmount){
         this.obtain = obtain;
         this.process = process;
         this.processStartTime = processStartTime;
         this.processFinishTime = processFinishTime;
         this.processAmount = processAmount;
-        this.processStat = 1;
+        this.processStat = 0;
     }
 }
