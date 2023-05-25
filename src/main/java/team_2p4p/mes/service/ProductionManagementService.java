@@ -41,6 +41,8 @@ public class ProductionManagementService {
         // 7 검사
         // 8 포장
 
+        obtainService.getConfirmList();
+
         dto = obtainService.entityToDto(obtainRepository.findById(dto.getObtainId()).orElseThrow());
         // id로 해당 수주DTO를 찾아온다.
         MesAll mesAll = CalcOrderMaterial.estimateDate(dto.getItemId(), Math.toIntExact(dto.getObtainAmount()), LocalDateTime.now());
