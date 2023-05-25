@@ -27,6 +27,7 @@ public class ObtainController {
     @PostMapping("/obtain/add")
     public void obtainAdd(@RequestBody ObtainDTO obtainDTO, Model model) {
         try {
+            obtainService.regObtain(obtainDTO);
             System.out.println(obtainDTO);
 
         } catch (IllegalStateException e) {
