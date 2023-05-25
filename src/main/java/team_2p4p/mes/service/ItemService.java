@@ -32,4 +32,7 @@ public class ItemService {
     public Item itemFindbyId(Long id){
         return itemRepository.findById(id).orElseThrow(() ->new IllegalArgumentException("아이템 데이터가 존재하지 않습니다"));
     }
+    public Item findItemById(Long itemId) {
+        return itemRepository.findById(itemId).orElseThrow(() -> new IllegalArgumentException("아이템이 존재하지 않습니다."));
+    }
 }
