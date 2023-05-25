@@ -16,9 +16,6 @@ import team_2p4p.mes.service.ObtainService;
 import java.time.LocalDateTime;
 
 @SpringBootTest
-@AutoConfigureMockMvc
-@Transactional
-@TestPropertySource(locations = "classpath:application-test.properties")
 public class ObtainRepositoryTest {
 
     @Autowired
@@ -44,8 +41,8 @@ public class ObtainRepositoryTest {
     @Test void test2(){
         Item item = new Item();
         item.setItemId(1L);
-        item.setItemCode("Cp-1");
-        item.setItemName("양배추즙");
+        item.setItemCode("Cp-2");
+        item.setItemName("흑마늘즙");
         item.setItemStat("완제품");
         itemRepository.save(item);
         System.out.println(item);
@@ -65,9 +62,9 @@ public class ObtainRepositoryTest {
 
         ObtainDTO obtainDTO = new ObtainDTO();
         obtainDTO.setObtainId(1L);
-        obtainDTO.setItemId(1L);
+        obtainDTO.setItemId(2L);
         obtainDTO.setItemName("양배추즙");
-        obtainDTO.setObtainAmount(1000L);
+        obtainDTO.setObtainAmount(3000L);
         obtainDTO.setCustomerRequestDate(LocalDateTime.now());
 
 

@@ -70,6 +70,7 @@ public class ObtainService {
     public void regObtain(ObtainDTO dto){
         Item item = itemService.findItem(dto.getItemName());
         getConfirmList();
+
         //제품명 저장
         dto.setItemId(item.getItemId());
         dto.setItem(item);
@@ -83,6 +84,7 @@ public class ObtainService {
         //지금 시각으로 수주일 저장
         LocalDateTime obtainDate = LocalDateTime.now();
         dto.setObtainDate(obtainDate);
+
         //수주 상태 저장
         dto.setObtainStat(false);
 

@@ -27,10 +27,16 @@ public class ObtainController {
     @PostMapping("/obtain/add")
     public void obtainAdd(@RequestBody ObtainDTO obtainDTO, Model model) {
         try {
-            System.out.println(obtainDTO);
+            // ObtainDTO에서 필요한 데이터 추출
+        obtainService.regObtain(obtainDTO);
+            // 필요한 로직 수행
+
+
+            // 처리 결과 반환
 
         } catch (IllegalStateException e) {
-            model.addAttribute("errorMessage", e.getMessage());
+            // 예외 처리
+            // ...
         }
 
     }
