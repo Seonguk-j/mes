@@ -6,6 +6,7 @@ import javax.persistence.*;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -29,4 +30,12 @@ public class Customer {
 
     @Column(name="customer_tel")
     private String customerTel;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "item_id1", referencedColumnName = "item_id")
+    private Item item1;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "item_id2", referencedColumnName = "item_id")
+    private Item item2;
 }

@@ -5,12 +5,10 @@ import lombok.*;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-@Entity
 @Getter
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
-@ToString
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Entity
+@ToString(exclude = {"obtain","process"})
 @Table(name = "production_management")
 public class ProductionManagement {
 
@@ -23,9 +21,8 @@ public class ProductionManagement {
     @JoinColumn(nullable = false, name = "obtain_id", referencedColumnName = "obtain_id")
     private Obtain obtain;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(nullable = false, name = "process_id", referencedColumnName = "process_id")
-    private Process process;
+    @Column(nullable = false, name="process")
+    private String process;
 
     @Column(nullable = false, name="process_start_time")
     private LocalDateTime processStartTime;
@@ -38,4 +35,14 @@ public class ProductionManagement {
 
     @Column(nullable = false, name="process_stat")
     private int processStat;
+
+    @Builder
+    public ProductionManagement(Obtain obtain,String process,LocalDateTime processStartTime,LocalDateTime processFinishTime,Long processAmount){
+        this.obtain = obtain;
+        this.process = process;
+        this.processStartTime = processStartTime;
+        this.processFinishTime = processFinishTime;
+        this.processAmount = processAmount;
+        this.processStat = 0;
+    }
 }

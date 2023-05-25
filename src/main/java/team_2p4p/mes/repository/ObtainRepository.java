@@ -1,13 +1,13 @@
 package team_2p4p.mes.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import team_2p4p.mes.entity.Obtain;
 
-<<<<<<< HEAD
-public interface ObtainRepository extends JpaRepository<Obtain, Long> {
+import java.util.List;
 
-=======
-public interface ObtainRepository extends JpaRepository<Obtain,Long> {
->>>>>>> main
+public interface ObtainRepository extends JpaRepository<Obtain,Long>,
+        QuerydslPredicateExecutor<Obtain>, ObtainRepositoryCustom {
+    List<Obtain> findByObtainStat(boolean bool);
 
 }

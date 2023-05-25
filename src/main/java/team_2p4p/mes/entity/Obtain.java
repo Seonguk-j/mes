@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -17,32 +18,42 @@ public class Obtain {
     @Id
     @Column(name="obtain_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long obtainId;                                  // 수주 id
+    private Long obtainId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(nullable = false, name = "item_id")
-    private Item item;                                     // 제품 id
+    private Item item;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(nullable = false, name = "customer_id")
-    private Customer customerId;                          // 고객 id
+    private Customer customer;
 
     @Column(nullable = false, name="obtain_amount")
-    private Long obtainAmount;                            // 제품 수량
+    private Long obtainAmount;
 
     @Column(nullable = false, name="obtain_date")
-    private LocalDateTime obtainDate;                     // 수주 날짜
+    private LocalDateTime obtainDate;
 
     @Column(name="customer_request_date")
-    private LocalDateTime customerRequestDate;             // 납기일
+    private LocalDateTime customerRequestDate;
 
-    @Column(nullable = false, name="expect_date")
-    private LocalDateTime expectDate;                   // 예상 납품일
+    @Column(nullable = true, name="expect_date")
+    private LocalDateTime expectDate;
 
     @Column(nullable = false, name="obtain_stat")
-    private boolean obtainStat;                         // 수주확정
+    private boolean obtainStat;
 
     @Column(name="obtain_stat_date")
-    private LocalDateTime obtainStatDate;               // 수주확정일
+    private LocalDateTime obtainStatDate;
 
+
+    public void setCustomerId(){}
+
+    public void updateStat(){
+        this.obtainStat = true;
+    }
+
+    public void updateConfirmTime(){
+        this.obtainStatDate = LocalDateTime.now();
+    }
 }
