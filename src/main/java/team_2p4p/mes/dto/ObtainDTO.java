@@ -1,6 +1,5 @@
 package team_2p4p.mes.dto;
 
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.modelmapper.ModelMapper;

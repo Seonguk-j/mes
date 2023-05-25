@@ -20,18 +20,12 @@ public class ProductionManagementServiceTest {
 
     Calculator cal = new Calculator();
 
-    @Test
-    public void setProductionPlanTest(){
 
+    @Test
+    public void confirm(){ // 생산계획생성후 수주테이블에 확정시간찍기
         ObtainDTO obtainDTO = new ObtainDTO();
         obtainDTO.setObtainId(6L);
-
-        productionManagementService.addProductionManagement(obtainDTO);
-    }
-
-    @Test
-    public void confirmAll(){
-
+        productionManagementService.confirmAndAddProductionManagement(obtainDTO);
     }
 
 
