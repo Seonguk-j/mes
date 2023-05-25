@@ -197,6 +197,14 @@ public class MesAll {
         System.out.println("투입시간" + fillPouchInputTimeList);
         System.out.println("생산완료시간" + fillPouchOutputTimeList);
     }
+    void infoFillStickProcessing(){
+        System.out.println("=============스틱충진===================");
+        System.out.println("투입회수" + fillStickCount);
+        System.out.println("투입량" + fillStickInputAmountList);
+        System.out.println("생산량" + fillStickOutputAmountList);
+        System.out.println("투입시간" + fillStickInputTimeList);
+        System.out.println("생산완료시간" + fillStickOutputTimeList);
+    }
 
     void infoCheckProcessing(){
         System.out.println("==============검사================");
@@ -222,6 +230,7 @@ public class MesAll {
         infoPreProcessing();
         infoLiquidSystem();
         infoFillPouchProcessing();
+        infoFillStickProcessing();
         infoCheckProcessing();
         infoPacking();
         System.out.println("==========예상납품일==========");

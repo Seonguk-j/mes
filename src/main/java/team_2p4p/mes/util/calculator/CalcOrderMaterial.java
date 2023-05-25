@@ -128,12 +128,12 @@ public class CalcOrderMaterial {
             int sendAmount = afterAmount - beforeAmount;
             mesAll.amount = sendAmount;
 
-            System.out.println("수주받아져 있는 제품의 총 양 : " + already);
-            System.out.println("추가 주문 양 : " + amount);
-            System.out.println("총 주문 양 : " + totalOrderAmount);
-            System.out.println("수주받아져 있는 제품을 발주시 양 : " + beforeAmount);
-            System.out.println("총 발주시 양 : " + afterAmount);
-            System.out.println("태영에게 보내야 할 양 : " + sendAmount);
+//            System.out.println("수주받아져 있는 제품의 총 양 : " + already);
+//            System.out.println("추가 주문 양 : " + amount);
+//            System.out.println("총 주문 양 : " + totalOrderAmount);
+//            System.out.println("수주받아져 있는 제품을 발주시 양 : " + beforeAmount);
+//            System.out.println("총 발주시 양 : " + afterAmount);
+//            System.out.println("태영에게 보내야 할 양 : " + sendAmount);
 
             if (totalOrderAmount <= maxOrder) {
                 mesAll.time = calcEstimateDate(itemId, now);
