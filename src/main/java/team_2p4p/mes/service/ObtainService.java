@@ -101,10 +101,23 @@ public class ObtainService {
     }
 
 
-    public void confirmAfterCal(){
+    public void confirmAfterObtainCal(){
         // 확정후
         // 1. 수주계획의 시간들이 전부 새로 계산이 된다.
         // 2. mesAll.setTime()을 mesAll의 출하가능시간이 기준이된다.
+        List<Obtain> entityList = obtainRepository.findByObtainStat(false); //false인 entity 리스트를 불러옴
+        List<ObtainDTO> dtoList = new ArrayList<>();
+        for(int i = 0; i < entityList.size(); i++){
+            dtoList.add(entityToDto(entityList.get(i))); // entity를 dto로 변환 후 dto List에 넣어줌
+            MesAll mesAll = CalcOrderMaterial.estimateDate(dtoList.get(i).getItemId(), Math.toIntExact(dtoList.get(i).getObtainAmount()), LocalDateTime.now());
+            cal.obtain(mesAll);
+            dtoList.get(i).setExpectDate(mesAll.getEstimateDate());
+            obtainRepository.save(dtoToEntity(dtoList.get(i)));
+        }
+
+
+
+
     }
 
     public Obtain dtoToEntity(ObtainDTO dto){

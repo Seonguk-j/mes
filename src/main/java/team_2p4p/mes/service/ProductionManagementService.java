@@ -157,5 +157,6 @@ public class ProductionManagementService {
     public void confirmAndAddProductionManagement(ObtainDTO dto){
         productionManagement(dto);
         obtainService.confirmObtain(dto); //생산일정을 짜고 t/f 등록
+        obtainService.confirmAfterObtainCal();
     }
 }

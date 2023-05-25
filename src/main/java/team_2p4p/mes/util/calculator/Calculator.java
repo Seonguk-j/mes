@@ -1,5 +1,6 @@
 package team_2p4p.mes.util.calculator;
 
+import net.bytebuddy.asm.Advice;
 import org.hibernate.loader.collection.SubselectOneToManyLoader;
 import team_2p4p.mes.util.process.*;
 
@@ -35,6 +36,7 @@ public class Calculator {
         }
 
         CheckProcessing(mesAll);
+
         packingPrecessing(mesAll);
         mesAll.setEstimateDate(mesAll.getPackingOutputTimeList().get(mesAll.getPackingOutputTimeList().size()-1)); //예상납품일
     }
@@ -426,9 +428,13 @@ public class Calculator {
             //검사 스케줄이 있을때
             if(mesAll.getItemId() == 1|| mesAll.getItemId() == 2){
                 // 즙일때
+                LocalDateTime lastTime = mesAll.getFillPouchOutputTimeList().get(0).minusMinutes(10);
                 mesAll.setCheckCount(mesAll.getFillPouchCount());
-                List<LocalDateTime> timeList = factory.getCheckProcessing().getConfirmList().get(factory.getCheckProcessing().getConfirmList().size()-1).getFillPouchOutputTimeList();
-                LocalDateTime lastTime = timeList.get(timeList.size()-1);
+                if(factory.getCheckProcessing().getConfirmList().get(factory.getCheckProcessing().getConfirmList().size()-1).getFillPouchOutputTimeList().isEmpty()){
+                }else{
+                    List<LocalDateTime> timeList = factory.getCheckProcessing().getConfirmList().get(factory.getCheckProcessing().getConfirmList().size()-1).getFillPouchOutputTimeList();
+                    lastTime = timeList.get(timeList.size()-1);
+                }
 
                 for(int i = 0; i < mesAll.getCheckCount(); i++){
 
@@ -462,8 +468,14 @@ public class Calculator {
             }else{
                 // 스틱일때 (검사 스케줄이 있을때)
                 mesAll.setCheckCount(mesAll.getFillStickCount());
-                List<LocalDateTime> timeList = factory.getCheckProcessing().getConfirmList().get(factory.getCheckProcessing().getConfirmList().size()-1).getFillStickOutputTimeList();
-                LocalDateTime lastTime = timeList.get(timeList.size()-1);
+                LocalDateTime lastTime = mesAll.getFillStickOutputTimeList().get(0).minusMinutes(10);
+                if(factory.getCheckProcessing().getConfirmList().get(factory.getCheckProcessing().getConfirmList().size()-1).getFillStickOutputTimeList().isEmpty()){
+
+                }else{
+                    List<LocalDateTime> timeList = factory.getCheckProcessing().getConfirmList().get(factory.getCheckProcessing().getConfirmList().size()-1).getFillStickOutputTimeList();
+                    lastTime = timeList.get(timeList.size()-1);
+                }
+
 
                 for(int i = 0; i < mesAll.getCheckCount(); i++){
 

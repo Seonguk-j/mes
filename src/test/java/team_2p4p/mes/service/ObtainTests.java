@@ -27,15 +27,11 @@ public class ObtainTests {
     public void regObtainTest(){
         ObtainDTO dto = new ObtainDTO();
         dto.setItemId(1L);
-        dto.setCustomerRequestDate(LocalDateTime.now().plusDays(10));
-        dto.setObtainAmount(3000L);
+        dto.setCustomerRequestDate(LocalDateTime.now().plusDays(20));
+        dto.setObtainAmount(2000L);
         dto.setCustomerId(1L);
 
         obtainService.regObtain(dto);
     }
-
-
-
-
 
 }
