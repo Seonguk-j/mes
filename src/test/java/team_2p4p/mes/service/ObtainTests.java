@@ -26,10 +26,10 @@ public class ObtainTests {
     @Test
     public void regObtainTest(){
         ObtainDTO dto = new ObtainDTO();
-        dto.setItemId(1L);
+        dto.setItemId(4L);
         dto.setCustomerRequestDate(LocalDateTime.now().plusDays(20));
-        dto.setObtainAmount(2000L);
-        dto.setCustomerId(1L);
+        dto.setObtainAmount(3000L);
+        dto.setCustomerId(2L);
 
         obtainService.regObtain(dto);
     }
