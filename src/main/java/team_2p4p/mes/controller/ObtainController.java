@@ -25,14 +25,18 @@ public class ObtainController {
     private final ObtainRepository obtainRepository;
 
     @PostMapping("/obtain/add")
-    public void obtainAdd(@RequestParam(name = "itemName") String itemName,@RequestParam(name = "obtainAmount") Long obtainAmount, Model model) {
+    public void obtainAdd(@RequestBody ObtainDTO obtainDTO, Model model) {
         try {
+            // ObtainDTO에서 필요한 데이터 추출
+        obtainService.regObtain(obtainDTO);
+            // 필요한 로직 수행
 
-            System.out.println(itemName);
-            System.out.println(obtainAmount);
+
+            // 처리 결과 반환
 
         } catch (IllegalStateException e) {
-            model.addAttribute("errorMessage", e.getMessage());
+            // 예외 처리
+            // ...
         }
 
     }
