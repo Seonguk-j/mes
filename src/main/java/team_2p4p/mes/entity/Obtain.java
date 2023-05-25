@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -36,7 +37,7 @@ public class Obtain {
     @Column(name="customer_request_date")
     private LocalDateTime customerRequestDate;
 
-    @Column(nullable = false, name="expect_date")
+    @Column(nullable = true, name="expect_date")
     private LocalDateTime expectDate;
 
     @Column(nullable = false, name="obtain_stat")
@@ -46,9 +47,7 @@ public class Obtain {
     private LocalDateTime obtainStatDate;
 
 
-    public void setCustomerId(){
-
-    }
+    public void setCustomerId(){}
 
     public void updateStat(){
         this.obtainStat = true;

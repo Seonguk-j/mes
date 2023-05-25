@@ -1,13 +1,10 @@
 package team_2p4p.mes.repository;
 
 
-import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.thymeleaf.util.StringUtils;
-import team_2p4p.mes.dto.SearchDto;
+import team_2p4p.mes.dto.SearchDTO;
 import team_2p4p.mes.entity.Obtain;
 import team_2p4p.mes.entity.QObtain;
 
@@ -50,7 +47,7 @@ public class ObtainRepositoryCustomImpl implements ObtainRepositoryCustom {
 
 
     @Override
-    public List<Obtain> getObtainList(SearchDto searchDto) {
+    public List<Obtain> getObtainList(SearchDTO searchDto) {
         List<Obtain> results = queryFactory
                 .selectFrom(QObtain.obtain)
                 .where(searchByLike(searchDto.getSearchBy(), searchDto.getSearchQuery()))

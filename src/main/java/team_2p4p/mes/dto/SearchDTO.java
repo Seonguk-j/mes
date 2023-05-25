@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class SearchDto {
+public class SearchDTO {
 
     private String searchDateType;
 

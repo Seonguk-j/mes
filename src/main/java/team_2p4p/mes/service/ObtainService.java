@@ -30,9 +30,12 @@ public class ObtainService {
 
     private final ObtainRepository obtainRepository;
     private final ItemRepository itemRepository;
+    private final ItemService itemService;
     private final CustomerRepository customerRepository;
+    private final CustomerService customerService;
 
     Calculator cal = new Calculator();
+
 
 
     public void getConfirmList(){
@@ -64,17 +67,33 @@ public class ObtainService {
     }
 
     public void regObtain(ObtainDTO dto){
-
+        Item item = itemService.findItem(dto.getItemName());
         getConfirmList();
+        //제품명 저장
+        dto.setItemId(item.getItemId());
+        dto.setItem(item);
+        System.out.println("수량:"+ dto.getObtainAmount());
 
+        //고객사 저장
+        Customer customer = customerService.customerFindbyItem(item);
+        dto.setCustomerId(customer.getCustomerId());
+        dto.setCustomer(customer);
+
+        //지금 시각으로 수주일 저장
         LocalDateTime obtainDate = LocalDateTime.now();
-        dto.setObtainStat(false);
         dto.setObtainDate(obtainDate);
+        //수주 상태 저장
+        dto.setObtainStat(false);
 
+        //예상납기일 계산
         MesAll obtainInfo = CalcOrderMaterial.estimateDate(dto.getItemId(), Math.toIntExact(dto.getObtainAmount()), obtainDate);
         cal.obtain(obtainInfo);
+        //예상납기일 저장
         dto.setExpectDate(obtainInfo.getEstimateDate());
-        Obtain obtain = dtoToEntity(dto);
+
+        //dto를 엔티티로 변환
+        System.out.println("dto 값:" + dto.createObtain());
+        Obtain obtain = dto.createObtain();
         obtainRepository.save(obtain);
     }
 

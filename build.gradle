@@ -42,6 +42,7 @@ dependencies {
 	annotationProcessor "com.querydsl:querydsl-apt:${queryDslVersion}" //  Querydsl 관련 코드 생성 기능 제공
 
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'org.modelmapper:modelmapper:2.4.4'
 }
 
 tasks.named('test') {

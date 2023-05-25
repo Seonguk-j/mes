@@ -26,6 +26,10 @@ public class ItemService {
     }
 
     public Item findItem(String name){
-    return  itemRepository.findByItemName(name);
+        return  itemRepository.findByItemName(name);
+    }
+
+    public Item itemFindbyId(Long id){
+        return itemRepository.findById(id).orElseThrow(() ->new IllegalArgumentException("아이템 데이터가 존재하지 않습니다"));
     }
 }

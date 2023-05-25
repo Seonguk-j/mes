@@ -9,6 +9,7 @@ import team_2p4p.mes.repository.CustomerRepository;
 import team_2p4p.mes.repository.ItemRepository;
 
 import javax.transaction.Transactional;
+import java.util.List;
 
 @Service
 @Transactional
@@ -29,5 +30,9 @@ public class CustomerService {
                 .build();
         System.out.println(customer);
         customerRepository.save(customer);
+    }
+
+    public Customer customerFindbyItem(Item item){
+        return customerRepository.findByItem1OrItem2(item);
     }
 }
