@@ -25,10 +25,11 @@ public class ObtainController {
     private final ObtainRepository obtainRepository;
 
     @PostMapping("/obtain/add")
-    public void obtainAdd(@RequestBody ObtainDTO obtainDTO, Model model) {
+    public void obtainAdd(@RequestParam(name = "itemName") String itemName,@RequestParam(name = "obtainAmount") Long obtainAmount, Model model) {
         try {
-            obtainService.regObtain(obtainDTO);
-            System.out.println(obtainDTO);
+
+            System.out.println(itemName);
+            System.out.println(obtainAmount);
 
         } catch (IllegalStateException e) {
             model.addAttribute("errorMessage", e.getMessage());
