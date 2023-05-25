@@ -2,6 +2,7 @@ package team_2p4p.mes.util.calculator;
 
 import net.bytebuddy.asm.Advice;
 import org.hibernate.loader.collection.SubselectOneToManyLoader;
+import org.thymeleaf.spring5.processor.SpringInputCheckboxFieldTagProcessor;
 import team_2p4p.mes.util.process.*;
 
 import java.time.LocalDateTime;
@@ -38,6 +39,29 @@ public class Calculator {
         CheckProcessing(mesAll);
 
         packingPrecessing(mesAll);
+        System.out.println("왜????????");
+        System.out.println("왜????????");
+        System.out.println("왜????????");
+        System.out.println("왜????????");
+        System.out.println("왜????????");
+        System.out.println("왜????????");
+        System.out.println("왜????????");
+        System.out.println("왜????????");
+        System.out.println("왜????????");
+        System.out.println("왜????????");
+        System.out.println(mesAll.getPackingInputTimeList());
+        System.out.println(mesAll.getPackingOutputTimeList());
+        System.out.println("왜????????");
+        System.out.println("왜????????");
+        System.out.println("왜????????");
+        System.out.println("왜????????");
+        System.out.println("왜????????");
+        System.out.println("왜????????");
+        System.out.println("왜????????");
+        System.out.println("왜????????");
+        System.out.println("왜????????");
+
+
         mesAll.setEstimateDate(mesAll.getPackingOutputTimeList().get(mesAll.getPackingOutputTimeList().size()-1)); //예상납품일
     }
 
@@ -377,6 +401,8 @@ public class Calculator {
     // 검사
     MesAll CheckProcessing(MesAll mesAll) {
         // 0.72초당 1개씩 생산
+        System.out.println("fillPouchCount : " + mesAll.getFillPouchCount());
+        System.out.println("fillStickCount : " + mesAll.getFillStickCount());
         if (factory.getCheckProcessing().getConfirmList().isEmpty()) {
             //검사공정이 비었을때
             if (mesAll.getItemId() == 1 || mesAll.getItemId() == 2) {
@@ -404,6 +430,8 @@ public class Calculator {
 
             } else {
                 // 스틱일떄
+                mesAll.setCheckCount(mesAll.getFillStickCount());
+
                 for (int i = 0; i < mesAll.getCheckCount(); i++) {
                     mesAll.getCheckInputAmountList().add(mesAll.getFillStickOutputAmountList().get(i));
                     mesAll.getCheckOutputAmountList().add(mesAll.getCheckInputAmountList().get(i));
@@ -516,8 +544,8 @@ public class Calculator {
         int ea = mesAll.getItemId() <= 2?30:25;
         int box = 0;
 
-
         mesAll.setPackingCount(mesAll.getCheckCount());
+        System.out.println("포장 for문 돌아가는수 : " + mesAll.getPackingCount());
         if(factory.getPacking().getConfirmList().isEmpty()) {
             for(int i = 0; i < mesAll.getPackingCount(); i++){
                 box = mesAll.getCheckOutputAmountList().get(i)/ea;
@@ -747,7 +775,7 @@ public class Calculator {
 
 
     void liquidExcpect(MesAll mesAll, LiquidSystem liquidSystem, int leadTime, int amount,int i){
-        if(mesAll.getItemId() == 3){
+        if(mesAll.getItemId() > 2){
             if(i == 0){
                 //첫번째 투입일때
                 if(liquidSystem.getConfirmList().isEmpty()){
