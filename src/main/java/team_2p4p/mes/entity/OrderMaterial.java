@@ -35,4 +35,17 @@ public class OrderMaterial {
 
     @Column(nullable = false, name="import_expect_date")
     private LocalDateTime importExpectDate;
+
+    @Column(nullable = false, name="order_stat")
+    private int orderStat;
+
+    public void updateOrderMaterial(OrderMaterial orderMaterial, Long orderItemAmount,LocalDateTime orderDate, LocalDateTime importExpectDate, int orderStat) {
+        this.orderId = getOrderId();
+        this.item = orderMaterial.getItem();
+        this.enterprise = orderMaterial.getEnterprise();
+        this.orderItemAmount = orderItemAmount;
+        this.orderDate = orderDate;
+        this.importExpectDate = importExpectDate;
+        this.orderStat = orderStat;
+    }
 }

@@ -3,7 +3,6 @@ package team_2p4p.mes.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
-import team_2p4p.mes.dto.ProductDto;
 import team_2p4p.mes.entity.Item;
 import team_2p4p.mes.entity.Lot;
 import team_2p4p.mes.entity.Product;
@@ -23,11 +22,13 @@ public class ProductService {
     public Long productStock(Long itemId) {
         List<Product> productList = productRepository.findByItemItemId(itemId);
         Long stock = 0L;
-        for (Product product : productList) {
-            if(!product.isExportStat())
-                stock += product.getProductStock();
-            else
-                stock -= product.getProductStock();
+        if(!productList.isEmpty()) {
+            for (Product product : productList) {
+                if (!product.isExportStat())
+                    stock += product.getProductStock();
+                else
+                    stock -= product.getProductStock();
+            }
         }
         return stock;
     }
@@ -35,5 +36,10 @@ public class ProductService {
     public Product addMinusProductStock(Item item, Long stock, LocalDateTime makeDate, Lot lot) {
         Product product = new Product(null, item, stock, makeDate, true, lot);
         return productRepository.save(product);
+    }
+
+    public Product lastStock(Long itemId) {
+        List<Product> productList = productRepository.findByItemItemId(itemId);
+        return productList.get(productList.size() - 1);
     }
 }

@@ -9,4 +9,5 @@ public class OrderMaterialDto {
     private LocalDateTime importExpectDate;
     private Long itemId;
     private Long enterpriseId;
+    private boolean orderStat;
 }
