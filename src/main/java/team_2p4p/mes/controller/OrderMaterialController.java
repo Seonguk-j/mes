@@ -23,10 +23,10 @@ public class OrderMaterialController {
     private final OrderMaterialRepository orderMaterialRepository;
 
 
-    @GetMapping("/OrderMaterial/list")
-    public List<OrderMaterial> OrderMaterials(){
-        List<OrderMaterial> OrderMaterialList = orderMaterialRepository.findAll();
-        return OrderMaterialList;
+    @GetMapping("/orderMaterial/list")
+    public List<OrderMaterial> orderMaterials(){
+        List<OrderMaterial> orderMaterialList = orderMaterialRepository.findAll();
+        return orderMaterialList;
 
 
     }
