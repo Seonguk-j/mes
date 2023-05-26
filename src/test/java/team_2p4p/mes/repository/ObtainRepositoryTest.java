@@ -42,16 +42,11 @@ public class ObtainRepositoryTest {
     @Test
     void test2(){
 
-
-
         ObtainDTO obtainDTO = new ObtainDTO();
 
         obtainDTO.setItemName("양배추즙");
         obtainDTO.setObtainAmount(3000L);
-        obtainDTO.setCustomerRequestDate(LocalDateTime.now());
-
-
-
+        obtainDTO.setCustomerRequestDate(LocalDateTime.now().plusDays(20));
         obtainService.regObtain(obtainDTO);
 
     }
