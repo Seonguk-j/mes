@@ -33,7 +33,7 @@ public class ProductionManagementController {
     //생산 실적 조회
     @GetMapping("/productionperformance/list")
     public List<ProductionManagement> productionperformance(){
-        return productionManagementService.classification1();
+        return productionManagementService.classification2();
     }
 
 }

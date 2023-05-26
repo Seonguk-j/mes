@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import team_2p4p.mes.dto.ItemDTO;
 import team_2p4p.mes.dto.LotLogDTO;
 import team_2p4p.mes.dto.ObtainDTO;
-import team_2p4p.mes.dto.OrderMaterialDto;
 import team_2p4p.mes.entity.LotLog;
 import team_2p4p.mes.entity.Obtain;
 import team_2p4p.mes.entity.ProductionManagement;
