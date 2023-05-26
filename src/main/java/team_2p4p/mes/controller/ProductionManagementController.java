@@ -24,10 +24,16 @@ public class ProductionManagementController {
 
     private final ProductionManagementService productionManagementService;
 
-
+    //생산 일정 조회
     @GetMapping("/productionschedule/list")
-    public List<ProductionManagement> productionManagementList(){
+    public List<ProductionManagement> productionschedule(){
         return productionManagementService.classification0();
+    }
+
+    //생산 실적 조회
+    @GetMapping("/productionperformance/list")
+    public List<ProductionManagement> productionperformance(){
+        return productionManagementService.classification1();
     }
 
 }

@@ -177,4 +177,22 @@ public class ProductionManagementService {
                 .collect(Collectors.toList());
     return filteredList;
     }
+
+    public List<ProductionManagement> classification1(){
+        List<ProductionManagement> productionManagementList = productionManagementRepository.findAll();
+
+        List<ProductionManagement> filteredList = productionManagementList.stream()
+                .filter(productionManagement -> productionManagement.getProcessStat() == 1)
+                .collect(Collectors.toList());
+        return filteredList;
+    }
+
+    public List<ProductionManagement> classification2(){
+        List<ProductionManagement> productionManagementList = productionManagementRepository.findAll();
+
+        List<ProductionManagement> filteredList = productionManagementList.stream()
+                .filter(productionManagement -> productionManagement.getProcessStat() == 2)
+                .collect(Collectors.toList());
+        return filteredList;
+    }
 }
