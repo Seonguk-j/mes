@@ -20,24 +20,20 @@ public class LotLogDTO {
 
     // 수주 Id
     private Long lotLogId;
-
     // 제품 번호
     private Item item;
-
+    private Long itemId;
     // 공정
     private String process;
-
     // 투입물 종류
     private String inputKind;
-
     // 로트 상태
     private boolean lotStat;
-
     // 인풋 시간
     private LocalDateTime inputTime;
     // 아웃풋 시간
     private LocalDateTime  outputTime;
-
+    // 로트
     private String lot;
     //부모 로그이력
     private long lotPLogId1;

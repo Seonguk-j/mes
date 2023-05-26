@@ -3,6 +3,7 @@ package team_2p4p.mes.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
+import team_2p4p.mes.dto.ItemDTO;
 import team_2p4p.mes.dto.LotLogDTO;
 import team_2p4p.mes.dto.ObtainDTO;
 import team_2p4p.mes.entity.LotLog;
@@ -28,8 +29,8 @@ public class LotLogService {
     private final LotLogRepository lotLogRepository;
     private final ObtainService obtainService;
     private final ObtainRepository obtainRepository;
-    private final ItemRepository itemRepository;
-
+    private final CalcOrderMaterial calcOrderMaterial;
+    private final ItemService itemService;
     Calculator cal = new Calculator();
 
     public void recordLot(ObtainDTO dto){
@@ -38,22 +39,23 @@ public class LotLogService {
 
         dto = obtainService.entityToDto(obtainRepository.findById(dto.getObtainId()).orElseThrow());
         // id로 해당 수주DTO를 찾아온다.
-        MesAll mesAll = CalcOrderMaterial.estimateDate(dto.getItemId(), Math.toIntExact(dto.getObtainAmount()), LocalDateTime.now());
+        MesAll mesAll = calcOrderMaterial.estimateDate(dto.getItemId(), Math.toIntExact(dto.getObtainAmount()), LocalDateTime.now());
         cal.obtain(mesAll);
         // mesAll에 db값을 꺼내서 해당 mesAll을 찾아온다.
 
         String dateString = "";
-
         // 발주 로트
+        //itemid inputkind 안들어갔음
         LotLogDTO orderLot = new LotLogDTO();
-        orderLot.setItem(dto.getItem());
         orderLot.setProcess("입고");
-        orderLot.setInputKind(dto.getItemName());
+        orderLot.setItem(itemService.findItemById(dto.getItemId()));
+        orderLot.setInputKind(orderLot.getItem().getItemName());
+        orderLot.setItemId(orderLot.getItem().getItemId());
         orderLot.setLotStat(false);
         orderLot.setInputTime(mesAll.getTime());
         orderLot.setOutputTime(mesAll.getInputMeasurementTime().minusMinutes(20));
         dateString = (orderLot.getOutputTime().format(DateTimeFormatter.ofPattern("yyyyMMdd"))).substring(2);
-        orderLot.setLot("WH-"+dateString+"-"+mesAll.getAmount());
+        orderLot.setLot("WH-"+dateString+"-"+(int)(mesAll.getAmount()));
         LotLog lotLog = dtoToEntity(orderLot);
         lotLogRepository.save(lotLog);
 

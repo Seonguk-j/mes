@@ -23,6 +23,7 @@ public class ProductionManagementService {
     private final ObtainService obtainService;
     private final ObtainRepository obtainRepository;
     private final CalcOrderMaterial calcOrderMaterial;
+    private final LotLogService lotLogService;
 
     Calculator cal = new Calculator();
     public void productionManagement(ObtainDTO dto) {
@@ -159,6 +160,7 @@ public class ProductionManagementService {
 
     public void confirmAndAddProductionManagement(ObtainDTO dto){
         productionManagement(dto);
+        lotLogService.recordLot(dto);
         obtainService.confirmObtain(dto); //생산일정을 짜고 t/f 등록
         obtainService.confirmAfterObtainCal();
     }
