@@ -49,8 +49,7 @@ public class CalcOrderTest {
         itemRepository.save(item);
 
 
-//        itemService.saveItem("CP-001", "양배추즙", "완제품");
-
+        itemService.saveItem("CP-001", "양배추즙", "완제품");
         itemService.saveItem("CP-002", "흑마늘즙", "완제품" );
         itemService.saveItem("CP-003", "석류 젤리스틱", "완제품" );
         itemService.saveItem("CP-004", "매실 젤리스틱", "완제품");

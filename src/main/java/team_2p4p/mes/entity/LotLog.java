@@ -1,5 +1,6 @@
 package team_2p4p.mes.entity;
 
+import com.querydsl.core.types.Order;
 import lombok.*;
 
 import javax.persistence.*;
@@ -27,8 +28,8 @@ public class LotLog {
     private Item item;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "material_id")
-    private Material material;
+    @JoinColumn(name = "order_id")
+    private OrderMaterial orderMaterial;
 
     @Column(name="input_kind")
     private String inputKind;

@@ -35,6 +35,7 @@ public class LotLogDTO {
     private LocalDateTime  outputTime;
     // 로트
     private String lot;
+    private String orderId;
     //부모 로그이력
     private long lotPLogId1;
     private long lotPLogId2;

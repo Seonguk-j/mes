@@ -6,12 +6,14 @@ import org.springframework.stereotype.Service;
 import team_2p4p.mes.dto.ItemDTO;
 import team_2p4p.mes.dto.LotLogDTO;
 import team_2p4p.mes.dto.ObtainDTO;
+import team_2p4p.mes.dto.OrderMaterialDto;
 import team_2p4p.mes.entity.LotLog;
 import team_2p4p.mes.entity.Obtain;
 import team_2p4p.mes.entity.ProductionManagement;
 import team_2p4p.mes.repository.ItemRepository;
 import team_2p4p.mes.repository.LotLogRepository;
 import team_2p4p.mes.repository.ObtainRepository;
+import team_2p4p.mes.repository.OrderMaterialRepository;
 import team_2p4p.mes.util.calculator.CalcOrderMaterial;
 import team_2p4p.mes.util.calculator.Calculator;
 import team_2p4p.mes.util.calculator.MesAll;
@@ -31,6 +33,7 @@ public class LotLogService {
     private final ObtainRepository obtainRepository;
     private final CalcOrderMaterial calcOrderMaterial;
     private final ItemService itemService;
+    private final OrderMaterialRepository orderMaterialRepository;
     Calculator cal = new Calculator();
 
     public void recordLot(ObtainDTO dto){
@@ -57,6 +60,7 @@ public class LotLogService {
         dateString = (orderLot.getOutputTime().format(DateTimeFormatter.ofPattern("yyyyMMdd"))).substring(2);
         orderLot.setLot("WH-"+dateString+"-"+(int)(mesAll.getAmount()));
         LotLog lotLog = dtoToEntity(orderLot);
+        OrderMaterialDto orderMaterialDto = orderMaterialRepository.findById()
         lotLogRepository.save(lotLog);
 
 //        //1 원료개량

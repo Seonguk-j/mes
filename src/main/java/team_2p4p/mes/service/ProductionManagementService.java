@@ -24,6 +24,7 @@ public class ProductionManagementService {
     private final ObtainRepository obtainRepository;
     private final CalcOrderMaterial calcOrderMaterial;
     private final LotLogService lotLogService;
+    private final CalcOrderMaterial calcOrderMaterialService;
 
     Calculator cal = new Calculator();
     public void productionManagement(ObtainDTO dto) {
@@ -160,6 +161,8 @@ public class ProductionManagementService {
 
     public void confirmAndAddProductionManagement(ObtainDTO dto){
         productionManagement(dto);
+        dto = obtainService.entityToDto(obtainRepository.findById(dto.getObtainId()).orElseThrow());
+        calcOrderMaterialService.test(dto.getItemId(), Math.toIntExact(dto.getObtainAmount()));
         lotLogService.recordLot(dto);
         obtainService.confirmObtain(dto); //생산일정을 짜고 t/f 등록
         obtainService.confirmAfterObtainCal();
