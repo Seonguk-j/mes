@@ -69,15 +69,7 @@ public class ReferenceRepositoryTests {
         itemService.saveItem("OP-009", "박스", "원자재");
     }
 
-    @Test
-    public void setUp(){
-        facility();
-        process();
-        enterprise();
-        customer();
-        bom();
-        routing();
-    }
+
     @Test
     public void facility(){
     Item item = itemService.findItem("양배추");
