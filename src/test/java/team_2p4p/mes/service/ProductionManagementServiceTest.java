@@ -24,7 +24,7 @@ public class ProductionManagementServiceTest {
     @Test
     public void confirm(){ // 생산계획생성후 수주테이블에 확정시간찍기
         ObtainDTO obtainDTO = new ObtainDTO();
-        obtainDTO.setObtainId(12L);
+        obtainDTO.setObtainId(17L);
         productionManagementService.confirmAndAddProductionManagement(obtainDTO);
     }
 
