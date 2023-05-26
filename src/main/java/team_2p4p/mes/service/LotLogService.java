@@ -60,7 +60,6 @@ public class LotLogService {
         dateString = (orderLot.getOutputTime().format(DateTimeFormatter.ofPattern("yyyyMMdd"))).substring(2);
         orderLot.setLot("WH-"+dateString+"-"+(int)(mesAll.getAmount()));
         LotLog lotLog = dtoToEntity(orderLot);
-        OrderMaterialDto orderMaterialDto = orderMaterialRepository.findById()
         lotLogRepository.save(lotLog);
 
 //        //1 원료개량

@@ -69,6 +69,15 @@ public class ReferenceRepositoryTests {
     }
 
     @Test
+    public void setUp(){
+        facility();
+        process();
+        enterprise();
+        customer();
+        bom();
+        routing();
+    }
+    @Test
     public void facility(){
     Item item = itemService.findItem("양배추");
 //        System.out.println(item.getItemName());
