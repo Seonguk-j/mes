@@ -47,7 +47,7 @@ public class ObtainRepositoryCustomImpl implements ObtainRepositoryCustom {
 
     private BooleanExpression searchByLike(String searchBy, String searchQuery) {
 
-        if (StringUtils.isBlank(searchQuery)) { // 검색어가 없는 경우
+        if (StringUtils.isEmpty(searchQuery)) { // 검색어가 없는 경우
             return null; // null을 반환하여 전체를 조회하도록 합니다.
         }
 

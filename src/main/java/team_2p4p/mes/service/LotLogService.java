@@ -39,6 +39,7 @@ public class LotLogService {
         dto = obtainService.entityToDto(obtainRepository.findById(dto.getObtainId()).orElseThrow());
         // id로 해당 수주DTO를 찾아온다.
         MesAll mesAll = calcOrderMaterial.estimateDate(dto.getItemId(), Math.toIntExact(dto.getObtainAmount()), LocalDateTime.now());
+        calcOrderMaterial.test(dto.getItemId(), Math.toIntExact(dto.getObtainAmount()));
         cal.obtain(mesAll);
         // mesAll에 db값을 꺼내서 해당 mesAll을 찾아온다.
 
