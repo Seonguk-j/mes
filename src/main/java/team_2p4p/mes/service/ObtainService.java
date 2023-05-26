@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import team_2p4p.mes.dto.ObtainDTO;
+import team_2p4p.mes.dto.SearchDTO;
 import team_2p4p.mes.entity.Customer;
 import team_2p4p.mes.entity.Item;
 import team_2p4p.mes.entity.Obtain;
@@ -87,6 +88,8 @@ public class ObtainService {
 
         //수주 상태 저장
         dto.setObtainStat(false);
+
+        //고객사 요청일 저장
 
         //예상납기일 계산
         MesAll obtainInfo = CalcOrderMaterial.estimateDate(dto.getItemId(), Math.toIntExact(dto.getObtainAmount()), obtainDate);
@@ -174,5 +177,7 @@ public class ObtainService {
         return dto;
     }
 
-
+    public List<Obtain> getObtainList(SearchDTO searchDTO){
+        return obtainRepository.getObtainList(searchDTO);
+    }
 }
