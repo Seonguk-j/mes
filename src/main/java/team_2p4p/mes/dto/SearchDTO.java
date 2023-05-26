@@ -7,7 +7,9 @@ import lombok.Setter;
 @Setter
 public class SearchDTO {
 
-    private String searchDateType;
+    private String searchAfterDateType;
+
+    private String searchBeforeDateType;
 
     private String searchBy;
 

@@ -33,7 +33,6 @@ public class ObtainTests {
         obtainDTO.setObtainAmount(3000L);
         obtainDTO.setCustomerRequestDate(LocalDateTime.now().plusDays(20));
 
-
         obtainService.regObtain(obtainDTO);
 
     }

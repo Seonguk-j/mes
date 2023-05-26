@@ -9,6 +9,9 @@ import team_2p4p.mes.entity.Obtain;
 import team_2p4p.mes.entity.QObtain;
 
 import javax.persistence.EntityManager;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class ObtainRepositoryCustomImpl implements ObtainRepositoryCustom {
@@ -19,28 +22,41 @@ public class ObtainRepositoryCustomImpl implements ObtainRepositoryCustom {
         this.queryFactory = new JPAQueryFactory(em);
     }
 
-//    private BooleanExpression regDtsAfter(String searchDateType) {
-//        LocalDate date = LocalDate.now();
-//        if (StringUtils.equals("all", searchDateType) || searchDateType == null) {
-//            return null;
-//        } else if (StringUtils.equals("1d", searchDateType)) {
-//            date = date.minusDays(1);
-//        } else if (StringUtils.equals("1w", searchDateType)) {
-//            date = date.minusWeeks(1);
-//        } else if (StringUtils.equals("1m", searchDateType)) {
-//            date = date.minusMonths(1);
-//        } else if (StringUtils.equals("6m", searchDateType)) {
-//            date = date.minusMonths(6);
-//        }
-//        return QPost.post.regTime.after(date);
-//    }
+    private BooleanExpression regDtsAfter(String searchAfterDateType) {
+        LocalDate date = LocalDate.now();
+        if (StringUtils.equals("all", searchAfterDateType) || searchAfterDateType == null) {
+            return null;
+        } else {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            LocalDateTime parsedDate = LocalDate.parse(searchAfterDateType, formatter).atStartOfDay();
+            return QObtain.obtain.customerRequestDate.after(parsedDate);
+        }
+    }
+
+    private BooleanExpression regDtsBefore(String searchBeforeDateType) {
+        LocalDate date = LocalDate.now();
+        if (StringUtils.equals("all", searchBeforeDateType) || searchBeforeDateType == null) {
+            return null;
+        } else {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            LocalDateTime parsedDate = LocalDate.parse(searchBeforeDateType, formatter).atStartOfDay();
+            return QObtain.obtain.customerRequestDate.before(parsedDate);
+        }
+    }
+
 
     private BooleanExpression searchByLike(String searchBy, String searchQuery) {
 
+        if (StringUtils.isEmpty(searchQuery)) { // 검색어가 없는 경우
+            return null; // null을 반환하여 전체를 조회하도록 합니다.
+        }
+
         if (StringUtils.equals("제품명", searchBy)) {
-            return QObtain.obtain.item.itemName.like("%" + searchQuery + "%");
+            if(searchBy.equals(null)) return  null;
+            else  return QObtain.obtain.item.itemName.like("%" + searchQuery + "%");
         } else if (StringUtils.equals("업체명", searchBy)) {
-            return QObtain.obtain.customer.customerName.like("%" + searchQuery + "%");
+            if(searchBy.equals(null)) return  null;
+            else return QObtain.obtain.customer.customerName.like("%" + searchQuery + "%");
         }
         return null;
     }
@@ -50,7 +66,9 @@ public class ObtainRepositoryCustomImpl implements ObtainRepositoryCustom {
     public List<Obtain> getObtainList(SearchDTO searchDto) {
         List<Obtain> results = queryFactory
                 .selectFrom(QObtain.obtain)
-                .where(searchByLike(searchDto.getSearchBy(), searchDto.getSearchQuery()))
+                .where(regDtsAfter(searchDto.getSearchAfterDateType()),
+                        regDtsBefore(searchDto.getSearchAfterDateType()),
+                        searchByLike(searchDto.getSearchBy(), searchDto.getSearchQuery()))
                 .orderBy(QObtain.obtain.obtainId.desc())
                 .fetch();
 
