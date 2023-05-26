@@ -71,9 +71,6 @@ public class OrderMaterialService {
         orderMaterial.updateOrderMaterial(orderMaterial, amount, orderDate, importExpectDate, 1);
         return orderMaterialRepository.save(orderMaterial);
     }
-// orderMaterial.getOrderItemAmount() +
-    // 내가 이걸 왜 넣어놨을까?
-
 
     public List<OrderMaterial> todayOrderMaterial() {
         LocalDate today = LocalDate.now();
@@ -84,6 +81,14 @@ public class OrderMaterialService {
 //                outputOrderMaterialList.add(orderMaterial);
 //        }
         return orderMaterialList;
+    }
+
+    public long findOrderId(Long itemId) {
+        if (!orderMaterialRepository.findByItemItemId(itemId).isEmpty()) {
+            List<OrderMaterial> orderMaterialList = orderMaterialRepository.findByItemItemId(itemId);
+            return orderMaterialList.get(orderMaterialList.size() - 1).getOrderId();
+        }
+        return -1;
     }
 
 }

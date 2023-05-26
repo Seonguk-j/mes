@@ -41,14 +41,6 @@ public class CalcOrderTest {
     private ItemService itemService;
     @Test
     public void findAll() {
-        Item item = new Item();
-        item.setItemId(1L);
-        item.setItemCode("Cp-1");
-        item.setItemName("양배추즙");
-        item.setItemStat("완제품");
-        itemRepository.save(item);
-
-
         itemService.saveItem("CP-001", "양배추즙", "완제품");
         itemService.saveItem("CP-002", "흑마늘즙", "완제품" );
         itemService.saveItem("CP-003", "석류 젤리스틱", "완제품" );
@@ -66,21 +58,22 @@ public class CalcOrderTest {
         itemService.saveItem("OP-005", "정제수", "원자재");
         itemService.saveItem("OP-006", "콜라겐", "원자재");
         itemService.saveItem("OP-007", "포장지", "원자재");
-        itemService.saveItem("OP-008", "박스", "원자재");
+        itemService.saveItem("OP-008", "스틱", "원자재");
+        itemService.saveItem("OP-009", "박스", "원자재");
 
-        enterpriseService.saveEnterprise(itemService.findItemById(1L), "에이농장","2Day // 12:00 이전 주문");
-        enterpriseService.saveEnterprise(itemService.findItemById(2L), "에이농장","2Day // 12:00 이전 주문");
-        enterpriseService.saveEnterprise(itemService.findItemById(3L), "성욱농협","3Day // 15:00 이전 주문");
-        enterpriseService.saveEnterprise(itemService.findItemById(4L), "성욱농협","3Day // 15:00 이전 주문");
-        enterpriseService.saveEnterprise(itemService.findItemById(5L), "성욱농협","3Day // 15:00 이전 주문");
-        enterpriseService.saveEnterprise(itemService.findItemById(6L), "불고미포장","0 // 창고");
-        enterpriseService.saveEnterprise(itemService.findItemById(7L), "불고미포장","0 // 창고");
-        enterpriseService.saveEnterprise(itemService.findItemById(8L), "불고미포장","0 // 창고");
+        enterpriseService.saveEnterprise(itemService.findItemById(9L), "에이농장","2Day // 12:00 이전 주문");
+        enterpriseService.saveEnterprise(itemService.findItemById(10L), "에이농장","2Day // 12:00 이전 주문");
+        enterpriseService.saveEnterprise(itemService.findItemById(11L), "성욱농협","3Day // 15:00 이전 주문");
+        enterpriseService.saveEnterprise(itemService.findItemById(12L), "성욱농협","3Day // 15:00 이전 주문");
+        enterpriseService.saveEnterprise(itemService.findItemById(14L), "성욱농협","3Day // 15:00 이전 주문");
+        enterpriseService.saveEnterprise(itemService.findItemById(15L), "불고미포장","0 // 창고");
+        enterpriseService.saveEnterprise(itemService.findItemById(16L), "불고미포장","0 // 창고");
+        enterpriseService.saveEnterprise(itemService.findItemById(17L), "불고미포장","0 // 창고");
 
 
         Product product = new Product();
         product.setProductId(1L);
-        product.setItem(item);
+        product.setItem(itemService.findItemById(1L));
         product.setProductStock(1000L);
         product.setMakeDate(LocalDateTime.now());
         product.setExportStat(false);
