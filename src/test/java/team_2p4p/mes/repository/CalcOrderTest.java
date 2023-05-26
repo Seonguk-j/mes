@@ -88,7 +88,14 @@ public class CalcOrderTest {
         productRepository.save(product);
 
         calcOrderMaterial.test(1L, 1500);
-        calcOrderMaterial.test(2L, 1325);
+        calcOrderMaterial.test(2L, 1320);
+        calcOrderMaterial.test(3L, 1320);
+        calcOrderMaterial.test(2L, 1600);
+        calcOrderMaterial.test(4L, 1325);
+        calcOrderMaterial.test(1L, 1250);
+        calcOrderMaterial.test(1L, 2500);
+        calcOrderMaterial.test(3L, 160);
+        calcOrderMaterial.test(1L, 1250);
 //
         calcOrderMaterial.morningOrderMaterialSchedule();
         calcOrderMaterial.afternoonOrderMaterialSchedule();

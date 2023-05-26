@@ -29,6 +29,7 @@ public class LotLogService {
     private final ObtainService obtainService;
     private final ObtainRepository obtainRepository;
     private final ItemRepository itemRepository;
+    private final CalcOrderMaterial calcOrderMaterial;
 
     Calculator cal = new Calculator();
 
@@ -38,7 +39,7 @@ public class LotLogService {
 
         dto = obtainService.entityToDto(obtainRepository.findById(dto.getObtainId()).orElseThrow());
         // id로 해당 수주DTO를 찾아온다.
-        MesAll mesAll = CalcOrderMaterial.estimateDate(dto.getItemId(), Math.toIntExact(dto.getObtainAmount()), LocalDateTime.now());
+        MesAll mesAll = calcOrderMaterial.estimateDate(dto.getItemId(), Math.toIntExact(dto.getObtainAmount()), LocalDateTime.now());
         cal.obtain(mesAll);
         // mesAll에 db값을 꺼내서 해당 mesAll을 찾아온다.
 

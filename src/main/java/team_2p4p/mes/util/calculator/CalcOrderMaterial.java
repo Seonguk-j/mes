@@ -10,6 +10,7 @@ package team_2p4p.mes.util.calculator;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import team_2p4p.mes.entity.Item;
 import team_2p4p.mes.entity.OrderMaterial;
@@ -321,52 +322,52 @@ public class CalcOrderMaterial {
         return needItem;
     }
 
-    // 재고와 필요 자재 량을 비교하여 주문 해야하는 양을 계산하는 매소드
-    // 재고가 부족한 경우 mesAll.orderList에 (필요량 - 재고량)을 추가
-    // 재고가 충분한 경우 재고량 소진(추후 다른 아이템을 수주 받을 경우 재고 혼동 방지를 위함)
-    void compareStockedItem(long itemId, int amount) {
-        Map<String, Object> needItem = needItem(itemId, amount);
-        int material = Integer.parseInt(String.valueOf(needItem.get("material")));
-        int pouch = Integer.parseInt(String.valueOf(needItem.get("pouch")));
-        int collagen;
-        int box = Integer.parseInt(String.valueOf(needItem.get("box")));
-
-//      System.out.println("material : " + material);
-        if (itemId == 1) {
-            MesAll.orderList[1] += material;
-            if (MesAll.stockPouch < pouch) {      // 파우치재고가 부족한 경우
-                MesAll.orderList[6] += (pouch - MesAll.stockPouch);
-            } else
-                MesAll.stockPouch -= pouch;
-        } else if (itemId == 2) {
-            MesAll.orderList[2] += material;
-            if (MesAll.stockPouch < pouch) {      // 파우치재고가 부족한 경우
-                MesAll.orderList[6] += (pouch - MesAll.stockPouch);
-            } else
-                MesAll.stockPouch -= pouch;
-        } else if (itemId == 3) {
-            MesAll.orderList[3] += material;
-        } else {
-            MesAll.orderList[4] += material;
-        }
-
-        if (itemId > 2) {
-            collagen = Integer.parseInt(String.valueOf(needItem.get("collagen")));
-            if (MesAll.stockCollagen < collagen) {      // 콜라겐재고가 부족한 경우
-                MesAll.orderList[5] += collagen - MesAll.stockCollagen;
-            } else
-                MesAll.stockCollagen -= collagen;
-            if (MesAll.stockStickPouch < pouch) {      // 파우치스틱재고가 부족한 경우
-                MesAll.orderList[7] += pouch - MesAll.stockStickPouch;
-            } else
-                MesAll.stockStickPouch -= pouch;
-        }
-
-        if (MesAll.stockBox < box) {               // 박스재고가 부족한 경우
-            MesAll.orderList[8] += box - MesAll.stockBox;
-        } else
-            MesAll.stockBox -= box;
-    }
+//    // 재고와 필요 자재 량을 비교하여 주문 해야하는 양을 계산하는 매소드
+//    // 재고가 부족한 경우 mesAll.orderList에 (필요량 - 재고량)을 추가
+//    // 재고가 충분한 경우 재고량 소진(추후 다른 아이템을 수주 받을 경우 재고 혼동 방지를 위함)
+//    void compareStockedItem(long itemId, int amount) {
+//        Map<String, Object> needItem = needItem(itemId, amount);
+//        int material = Integer.parseInt(String.valueOf(needItem.get("material")));
+//        int pouch = Integer.parseInt(String.valueOf(needItem.get("pouch")));
+//        int collagen;
+//        int box = Integer.parseInt(String.valueOf(needItem.get("box")));
+//
+////      System.out.println("material : " + material);
+//        if (itemId == 1) {
+//            MesAll.orderList[1] += material;
+//            if (MesAll.stockPouch < pouch) {      // 파우치재고가 부족한 경우
+//                MesAll.orderList[6] += (pouch - MesAll.stockPouch);
+//            } else
+//                MesAll.stockPouch -= pouch;
+//        } else if (itemId == 2) {
+//            MesAll.orderList[2] += material;
+//            if (MesAll.stockPouch < pouch) {      // 파우치재고가 부족한 경우
+//                MesAll.orderList[6] += (pouch - MesAll.stockPouch);
+//            } else
+//                MesAll.stockPouch -= pouch;
+//        } else if (itemId == 3) {
+//            MesAll.orderList[3] += material;
+//        } else {
+//            MesAll.orderList[4] += material;
+//        }
+//
+//        if (itemId > 2) {
+//            collagen = Integer.parseInt(String.valueOf(needItem.get("collagen")));
+//            if (MesAll.stockCollagen < collagen) {      // 콜라겐재고가 부족한 경우
+//                MesAll.orderList[5] += collagen - MesAll.stockCollagen;
+//            } else
+//                MesAll.stockCollagen -= collagen;
+//            if (MesAll.stockStickPouch < pouch) {      // 파우치스틱재고가 부족한 경우
+//                MesAll.orderList[7] += pouch - MesAll.stockStickPouch;
+//            } else
+//                MesAll.stockStickPouch -= pouch;
+//        }
+//
+//        if (MesAll.stockBox < box) {               // 박스재고가 부족한 경우
+//            MesAll.orderList[8] += box - MesAll.stockBox;
+//        } else
+//            MesAll.stockBox -= box;
+//    }
 
     // 각 자재별 최소, 최대 주문량
     static int[] minMaxOrder(long itemId) {
@@ -411,37 +412,37 @@ public class CalcOrderMaterial {
 
 
 
-
-    // 23.05.24 수정중
-    // 재고와 비교하여 필요한 원자재 주문 매소드(재고와 비교는 이전 과정에서 이미 진행됨)
-    // 주문량이 최대 주문량을 넘어설 경우, 금일 시점으로 최대주문량만 주문 후 나머지 양은 데이터베이스에 저장해 둬야함.
-    // (현재 mesAll.orderList를 주문필요량을 저장하는 데이터 베이스로 가정)
-    void orderItem(long itemId) {
-        LocalDateTime time = LocalDateTime.now();      // 발주시간
-        int amount = MesAll.orderList[(int) itemId];   // 주문량
-
-        int[] range = minMaxOrder(itemId);            // range[0] : 최소 주문량, range[1] : 최대 주문량
-
-        if (amount < range[1]) {
-            if (amount % range[0] == 0) {
-                MesAll.todayOrderList[(int) itemId] = amount;
-            } else {
-                MesAll.todayOrderList[(int) itemId] = (amount / range[0] + 1) * range[0];
-            }
-            MesAll.orderList[(int) itemId] = 0;
-        } else {
-            // 필요주문량(orderList) 에 금일 주문량(todayOrderList) 빼줌.
-            MesAll.todayOrderList[(int) itemId] = range[1];
-            MesAll.orderList[(int) itemId] -= range[1];
-        }
-
-        // db(발주관리)저장 필요
-        // 현재 메인재료에 대해서만 넘겨줌.
-        if (itemId == mesAll.itemId) {
-            LocalDateTime importExpectDate = calcEstimateDate(itemId, time);
-            mesAll.time = importExpectDate;
-        }
-    }
+//
+//    // 23.05.24 수정중
+//    // 재고와 비교하여 필요한 원자재 주문 매소드(재고와 비교는 이전 과정에서 이미 진행됨)
+//    // 주문량이 최대 주문량을 넘어설 경우, 금일 시점으로 최대주문량만 주문 후 나머지 양은 데이터베이스에 저장해 둬야함.
+//    // (현재 mesAll.orderList를 주문필요량을 저장하는 데이터 베이스로 가정)
+//    void orderItem(long itemId) {
+//        LocalDateTime time = LocalDateTime.now();      // 발주시간
+//        int amount = MesAll.orderList[(int) itemId];   // 주문량
+//
+//        int[] range = minMaxOrder(itemId);            // range[0] : 최소 주문량, range[1] : 최대 주문량
+//
+//        if (amount < range[1]) {
+//            if (amount % range[0] == 0) {
+//                MesAll.todayOrderList[(int) itemId] = amount;
+//            } else {
+//                MesAll.todayOrderList[(int) itemId] = (amount / range[0] + 1) * range[0];
+//            }
+//            MesAll.orderList[(int) itemId] = 0;
+//        } else {
+//            // 필요주문량(orderList) 에 금일 주문량(todayOrderList) 빼줌.
+//            MesAll.todayOrderList[(int) itemId] = range[1];
+//            MesAll.orderList[(int) itemId] -= range[1];
+//        }
+//
+//        // db(발주관리)저장 필요
+//        // 현재 메인재료에 대해서만 넘겨줌.
+//        if (itemId == mesAll.itemId) {
+//            LocalDateTime importExpectDate = calcEstimateDate(itemId, time);
+//            mesAll.time = importExpectDate;
+//        }
+//    }
 
     // 원자재 주문은 11:59, 14:59에 일괄주문으로 지정
     // 원자재 주문은 평일만 가능
@@ -482,6 +483,7 @@ public class CalcOrderMaterial {
 
 
     // test
+    @Scheduled(cron = "11 55 0 * * ?")   // 매일 12시 전에 실행
     public void morningOrderMaterialSchedule() {
         if(LocalDateTime.now().getDayOfWeek().getValue() <= 5) {
             // 발주대기 아이템중 itemId가 1보다 크거나 같고 2보다 작거나 같은 아이템 가져옴
@@ -491,6 +493,7 @@ public class CalcOrderMaterial {
         }
     }
 
+    @Scheduled(cron = "14 55 0 * * ?")   // 매일 15시 전에 실행
     public void afternoonOrderMaterialSchedule() {
         if(LocalDateTime.now().getDayOfWeek().getValue() <= 5) {
             for (int i = 3; i <= 4; i++) {
