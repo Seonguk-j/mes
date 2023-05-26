@@ -1,35 +1,28 @@
-package team_2p4p.mes.util.calculator;
-
-import org.hibernate.annotations.Check;
-import team_2p4p.mes.util.process.*;
-
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-
-public class Test {
-    public static void main(String[] args) {
+//package team_2p4p.mes.util.calculator;
+//
+//import lombok.RequiredArgsConstructor;
+//import org.hibernate.annotations.Check;
+//import org.springframework.beans.factory.annotation.Autowired;
+//import team_2p4p.mes.util.process.*;
+//
+//import java.time.LocalDateTime;
+//@RequiredArgsConstructor
+//public class Test {
+//    private final CalcOrderMaterial calcOrderMaterial;
+//
+//    public static void main(String[] args) {
 //        MesAll obtain1 = new MesAll();
 //        Calculator cal = new Calculator();
 //        MesAll obtain2 = new MesAll();
-//        obtain1 = CalcOrderMaterial.estimateDate(1L, 3000, LocalDateTime.now());
-//        obtain2 = CalcOrderMaterial.estimateDate(2L, 2000, LocalDateTime.now());
-//        MesAll obtain3 = CalcOrderMaterial.estimateDate(3L, 2000, LocalDateTime.now());
-//        MesAll obtain4 = CalcOrderMaterial.estimateDate(4L, 2000, LocalDateTime.now());
+//        obtain1 = calcOrderMaterial.estimateDate(1L, 3000, LocalDateTime.now());
+//        obtain2 = calcOrderMaterial.estimateDate(1L, 3000, LocalDateTime.now());
 //
 //        cal.obtain(obtain1);
 //        cal.confirmObtain(obtain1);
-//        cal.obtain(obtain2);
-//        cal.confirmObtain(obtain2);
-//        cal.obtain(obtain3);
-//        cal.confirmObtain(obtain3);
-//        cal.obtain(obtain4);
-//
 //        obtain1.infoAll();
+//        cal.obtain(obtain2);
 //        obtain2.infoAll();
-//        obtain3.infoAll();
-//        obtain4.infoAll();
-        String dateString = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-        System.out.println(dateString.substring(2));
-    }
-}
-
+//
+//    }
+//}
+//
