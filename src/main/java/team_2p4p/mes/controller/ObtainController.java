@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import team_2p4p.mes.dto.ObtainDTO;
+import team_2p4p.mes.dto.SearchDTO;
 import team_2p4p.mes.entity.Process;
 import team_2p4p.mes.entity.*;
 import team_2p4p.mes.repository.*;
@@ -45,4 +46,11 @@ public class ObtainController {
         List<Obtain> obtainList = obtainRepository.findAll();
         return obtainList;
     }
+    @PostMapping("/obtain/search/list")
+    public List<Obtain> obtainSearch(@RequestBody SearchDTO searchDTO){
+        System.out.println("searchBy; "+ searchDTO.getSearchBy());
+        System.out.println("검색 결과:" + obtainService.getObtainList(searchDTO));
+        return obtainService.getObtainList(searchDTO);
+    }
 }
+
