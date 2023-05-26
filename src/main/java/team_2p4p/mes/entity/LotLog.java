@@ -27,9 +27,6 @@ public class LotLog {
     @JoinColumn(name = "item_id")
     private Item item;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id")
-    private OrderMaterial orderMaterial;
 
     @Column(name="input_kind")
     private String inputKind;
