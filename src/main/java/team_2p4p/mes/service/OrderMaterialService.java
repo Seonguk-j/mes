@@ -56,6 +56,10 @@ public class OrderMaterialService {
         return orderMaterialRepository.save(orderMaterial);
     }
 
+    public OrderMaterial saveFinishOrderMaterial(OrderMaterial orderMaterial){
+        orderMaterial.updateOrderMaterial(orderMaterial, orderMaterial.getOrderItemAmount(), orderMaterial.getOrderDate(), orderMaterial.getImportExpectDate(), 2);
+        return orderMaterialRepository.save(orderMaterial);
+    }
 
     @Nullable
     public OrderMaterial checkOrderMaterial(Long itemId) {
@@ -75,11 +79,6 @@ public class OrderMaterialService {
     public List<OrderMaterial> todayOrderMaterial() {
         LocalDate today = LocalDate.now();
         List<OrderMaterial> orderMaterialList = orderMaterialRepository.findByOrderDate(today);
-//        List<OrderMaterial> outputOrderMaterialList = new ArrayList<>();
-//        for(OrderMaterial orderMaterial : orderMaterialList) {
-//            if(orderMaterial.getOrderStat() == 1)
-//                outputOrderMaterialList.add(orderMaterial);
-//        }
         return orderMaterialList;
     }
 
@@ -89,6 +88,11 @@ public class OrderMaterialService {
             return orderMaterialList.get(orderMaterialList.size() - 1).getOrderId();
         }
         return -1;
+    }
+
+    public List<OrderMaterial> finishOrderMaterial() {
+        List<OrderMaterial> orderMaterialList = orderMaterialRepository.findByImportExpectDate(LocalDate.now());
+        return orderMaterialList;
     }
 
 }

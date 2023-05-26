@@ -9,4 +9,6 @@ import java.util.List;
 public interface MaterialRepository extends JpaRepository<Material, Long> {
     @Nullable
     public List<Material> findByItemItemId(Long itemId);
+
+    public List<Material> findByMaterialStatAndItemItemId(int materialStat, Long itemId);
 }

@@ -34,5 +34,14 @@ public class Material {
     private LocalDateTime warehouseDate;
 
     @Column(nullable = false, name="material_stat")
-    private boolean materialStat;
+    private int materialStat;
+
+    public void updateMaterial(int materialStat, LocalDateTime warehouseDate){
+        this.materialId = getMaterialId();
+        this.orderMaterial = getOrderMaterial();
+        this.item = getItem();
+        this.materialStock = getMaterialStock();
+        this.warehouseDate = warehouseDate;
+        this.materialStat = materialStat;
+    }
 }
