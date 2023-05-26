@@ -13,6 +13,8 @@ import team_2p4p.mes.util.calculator.MesAll;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -165,5 +167,14 @@ public class ProductionManagementService {
         lotLogService.recordLot(dto);
         obtainService.confirmObtain(dto); //생산일정을 짜고 t/f 등록
         obtainService.confirmAfterObtainCal();
+    }
+
+    public List<ProductionManagement> classification0(){
+        List<ProductionManagement> productionManagementList = productionManagementRepository.findAll();
+
+        List<ProductionManagement> filteredList = productionManagementList.stream()
+                .filter(productionManagement -> productionManagement.getProcessStat() == 0)
+                .collect(Collectors.toList());
+    return filteredList;
     }
 }
