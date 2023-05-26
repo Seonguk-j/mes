@@ -55,6 +55,7 @@ public class ProductionManagementService {
         // mesAll에 db값을 꺼내서 해당 mesAll을 찾아온다.
         Obtain obtain = obtainService.dtoToEntity(dto);
 
+
         //1 원료개량
         ProductionManagement measurementPlan = ProductionManagement.builder()
                 .obtain(obtain)

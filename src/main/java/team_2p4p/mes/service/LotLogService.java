@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import team_2p4p.mes.dto.ItemDTO;
 import team_2p4p.mes.dto.LotLogDTO;
 import team_2p4p.mes.dto.ObtainDTO;
-import team_2p4p.mes.dto.OrderMaterialDto;
 import team_2p4p.mes.entity.LotLog;
 import team_2p4p.mes.entity.Obtain;
 import team_2p4p.mes.entity.ProductionManagement;
@@ -17,10 +16,13 @@ import team_2p4p.mes.repository.OrderMaterialRepository;
 import team_2p4p.mes.util.calculator.CalcOrderMaterial;
 import team_2p4p.mes.util.calculator.Calculator;
 import team_2p4p.mes.util.calculator.MesAll;
+import team_2p4p.mes.util.process.PreProcessing;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @Transactional
@@ -33,7 +35,6 @@ public class LotLogService {
     private final ObtainRepository obtainRepository;
     private final CalcOrderMaterial calcOrderMaterial;
     private final ItemService itemService;
-    private final OrderMaterialRepository orderMaterialRepository;
     Calculator cal = new Calculator();
 
     public void recordLot(ObtainDTO dto){
@@ -48,72 +49,94 @@ public class LotLogService {
         // mesAll에 db값을 꺼내서 해당 mesAll을 찾아온다.
 
         String dateString = "";
-        // 발주 로트
+
+        LotLog lotLog;
+
+        // 입고 로트
         //itemid inputkind 안들어갔음
         LotLogDTO orderLot = new LotLogDTO();
+
         orderLot.setProcess("입고");
         orderLot.setItem(itemService.findItemById(dto.getItemId()));
-        orderLot.setInputKind(orderLot.getItem().getItemName());
+        String wareHouseKind = (orderLot.getItem().getItemId()==1)?"양배추":(orderLot.getItem().getItemId()==2)?"흑마늘":(orderLot.getItem().getItemId()==3)?"석류농축액":"매실농축액";
+        orderLot.setInputKind(wareHouseKind);
         orderLot.setItemId(orderLot.getItem().getItemId());
         orderLot.setLotStat(false);
         orderLot.setInputTime(mesAll.getTime());
         orderLot.setOutputTime(mesAll.getInputMeasurementTime().minusMinutes(20));
-        dateString = (orderLot.getOutputTime().format(DateTimeFormatter.ofPattern("yyyyMMdd"))).substring(2);
+        dateString = (orderLot.getOutputTime().format(DateTimeFormatter.ofPattern("yyyyMMddhhmm"))).substring(2);
         orderLot.setLot("WH-"+dateString+"-"+(int)(mesAll.getAmount()));
-        LotLog lotLog = dtoToEntity(orderLot);
-//        OrderMaterialDto orderMaterialDto = orderMaterialRepository.findById();
-        lotLogRepository.save(lotLog);
-
-//        //1 원료개량
-//        LotLogDTO measurementLot = new LotLogDTO();
-//        measurementLot.setItem(dto.getItem());
-//        measurementLot.setProcess("원료계량");
-//        measurementLot.setInputKind(dto.getItemName());
-//        measurementLot.setLotStat(false);
-//        measurementLot.setInputTime(mesAll.getInputMeasurementTime());
-//        measurementLot.setOutputTime(mesAll.getOutputMeasurementTime());
-//        dateString = (orderLot.getOutputTime().format(DateTimeFormatter.ofPattern("yyyyMMdd"))).substring(2);
-//        measurementLot.setLot("MS-"+dateString+"-"+mesAll.getMeasurementAmount());
+        lotLog = dtoToEntity(orderLot);
+        long warehouseId = lotLogRepository.save(lotLog).getLotLogId();
 
 
 
-//        //2 전처리
-//        for (int i = 0; i < mesAll.getPreProcessingCount(); i++) {
-//            ProductionManagement preProcessLot = ProductionManagement.builder()
-//                    .obtain(obtain)
-//                    .processAmount((long) mesAll.getPreProcessingAmountList().get(i))
-//                    .processStartTime(mesAll.getInputPreProcessingTimeList().get(i))
-//                    .processFinishTime(mesAll.getOutputPreProcessingTimeList().get(i))
-//                    .process("전처리")
-//                    .build();
-//            lotLogRepository.save(preProcessPlan);
-//        }
-//
-//
-//        // 3 액체제조 시스템1
-//        for (int i = 0; i < mesAll.getLiquidSystemCount1(); i++) {
-//            ProductionManagement liquidProcess1Lot = ProductionManagement.builder()
-//                    .obtain(obtain)
-//                    .processAmount((long) mesAll.getLiquidSystemInputAmountList1().get(i))
-//                    .processStartTime(mesAll.getLiquidSystemInputTimeList1().get(i))
-//                    .processFinishTime(mesAll.getLiquidSystemOutputTimeList1().get(i))
-//                    .process("액체제조 시스템 1")
-//                    .build();
-//            lotLogRepository.save(liquidProcess1Plan);
-//        }
-//
-//
-//        // 4 액체제조 시스템2
-//        for (int i = 0; i < mesAll.getLiquidSystemCount2(); i++) {
-//            ProductionManagement liquidProcess2Lot = ProductionManagement.builder()
-//                    .obtain(obtain)
-//                    .processAmount((long) mesAll.getLiquidSystemInputAmountList2().get(i))
-//                    .processStartTime(mesAll.getLiquidSystemInputTimeList2().get(i))
-//                    .processFinishTime(mesAll.getLiquidSystemOutputTimeList2().get(i))
-//                    .process("액체제조 시스템 2")
-//                    .build();
-//            lotLogRepository.save(liquidProcess2Plan);
-//        }
+
+        //1 원료개량 로트
+        LotLogDTO measurementLot = new LotLogDTO();
+        measurementLot.setProcess("원료계량");
+        measurementLot.setItem(itemService.findItemById(dto.getItemId()));
+        String measurementKind = (orderLot.getItem().getItemId()==1)?"양배추":(orderLot.getItem().getItemId()==2)?"흑마늘":(orderLot.getItem().getItemId()==3)?"석류농축액":"매실농축액";
+        measurementLot.setInputKind(measurementKind);
+        measurementLot.setLotStat(false);
+        measurementLot.setInputTime(mesAll.getInputMeasurementTime());
+        measurementLot.setOutputTime(mesAll.getOutputMeasurementTime());
+        dateString = (measurementLot.getOutputTime().format(DateTimeFormatter.ofPattern("yyyyMMddhhmm"))).substring(2);
+        measurementLot.setLot("MS-"+dateString+"-"+(int)mesAll.getMeasurementAmount());
+        measurementLot.setLotPLogId1(warehouseId);
+        lotLog = dtoToEntity(measurementLot);
+        long measurementId = lotLogRepository.save(lotLog).getLotLogId();
+
+
+        List<Long> preProcessingLotIdList = new ArrayList<>();
+        //2 전처리 로트
+        String preInputKind = (orderLot.getItem().getItemId()==1)?"양배추":(orderLot.getItem().getItemId()==2)?"흑마늘":(orderLot.getItem().getItemId()==3)?"석류농축액":"매실농축액";
+        for (int i = 0; i < mesAll.getPreProcessingCount(); i++) {
+            LotLogDTO preProcessLot = new LotLogDTO();
+            preProcessLot.setProcess("전처리");
+            preProcessLot.setItem(itemService.findItemById(dto.getItemId()));
+            preProcessLot.setInputKind(preInputKind);
+            preProcessLot.setLotStat(false);
+            preProcessLot.setInputTime(mesAll.getInputPreProcessingTimeList().get(i));
+            preProcessLot.setOutputTime(mesAll.getOutputPreProcessingTimeList().get(i));
+            dateString = (preProcessLot.getOutputTime().format(DateTimeFormatter.ofPattern("yyyyMMddhhmm"))).substring(2);
+            preProcessLot.setLot("PP-"+dateString+"-"+mesAll.getPreProcessingAmountList().get(i));
+            preProcessLot.setLotPLogId1(measurementId);
+            lotLog = dtoToEntity(preProcessLot);
+            preProcessingLotIdList.add(lotLogRepository.save(lotLog).getLotLogId());
+        }
+
+
+        List<Long> Liquid1LotIdList = new ArrayList<>();
+        String liquid1Kind = (orderLot.getItem().getItemId()==1)?"양배추 추출액":(orderLot.getItem().getItemId()==2)?"흑마늘 추출액":(orderLot.getItem().getItemId()==3)?"석류농축액":"매실농축액";
+
+        int liquidJ1 = 0;
+        //3 액체제조 시스템1 로트
+        for (int i = 0; i < mesAll.getLiquidSystemCount1(); i++) {
+            LotLogDTO liquid1Lot = new LotLogDTO();
+            liquid1Lot.setProcess("액체제조기1");
+            liquid1Lot.setItem(itemService.findItemById(dto.getItemId()));
+            liquid1Lot.setInputKind(liquid1Kind);
+            liquid1Lot.setLotStat(false);
+            liquid1Lot.setInputTime(mesAll.getLiquidSystemInputTimeList1().get(i));
+            liquid1Lot.setOutputTime(mesAll.getLiquidSystemOutputTimeList1().get(i));
+            dateString = (liquid1Lot.getOutputTime().format(DateTimeFormatter.ofPattern("yyyyMMddhhmm"))).substring(2);
+            liquid1Lot.setLot("L1-"+dateString+"-"+(int)mesAll.getLiquidSystemOutputAmountList1().get(i));
+            if(mesAll.getWhereList().get(0) == 1){
+                //첫번째가 기계 1로 들어갔을때
+                liquid1Lot.setLotPLogId1(preProcessingLotIdList.get(liquidJ1));
+                liquidJ1 += 2;
+            }else{
+                liquid1Lot.setLotPLogId1(preProcessingLotIdList.get(liquidJ1+1));
+                liquidJ1 += 2;
+            }
+
+            lotLog = dtoToEntity(liquid1Lot);
+            Liquid1LotIdList.add(lotLogRepository.save(lotLog).getLotLogId());
+        }
+
+
+
 //
 //        // 5,6 충진
 //        if (mesAll.getItemId() <= 2) {
@@ -206,4 +229,7 @@ public class LotLogService {
 
         return dto;
     }
+
+
+
 }
