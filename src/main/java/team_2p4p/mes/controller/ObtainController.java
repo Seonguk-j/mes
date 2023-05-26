@@ -31,16 +31,20 @@ public class ObtainController {
             // ObtainDTO에서 필요한 데이터 추출
         obtainService.regObtain(obtainDTO);
             // 필요한 로직 수행
-
-
             // 처리 결과 반환
 
         } catch (IllegalStateException e) {
             // 예외 처리
             // ...
         }
-
     }
+
+    @DeleteMapping("/obtain/delete/{obtainNum}")
+    public List<Obtain> ObtainDelete(@PathVariable Long obtainNum){
+        obtainService.deleteObtainByObtainId(obtainNum);
+        return obtainRepository.findAll();
+    }
+
     @GetMapping("/obtain/list")
     public List<Obtain> obtains(){
         List<Obtain> obtainList = obtainRepository.findAll();
