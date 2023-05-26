@@ -17,7 +17,7 @@ public class ProductionManagement {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long productionManagementId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(nullable = false, name = "obtain_id", referencedColumnName = "obtain_id")
     private Obtain obtain;
 
