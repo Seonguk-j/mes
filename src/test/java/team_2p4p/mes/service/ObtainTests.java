@@ -29,9 +29,10 @@ public class ObtainTests {
     @Test void regObtainTest(){
 
         ObtainDTO obtainDTO = new ObtainDTO();
-        obtainDTO.setItemName("매실 젤리스틱");
+        obtainDTO.setItemName("석류 젤리스틱");
         obtainDTO.setObtainAmount(3000L);
         obtainDTO.setCustomerRequestDate(LocalDateTime.now());
+
 
         obtainService.regObtain(obtainDTO);
 

@@ -110,8 +110,26 @@ public class Calculator {
 
                 } else {
                     //전처리 확정리스트에 대기목록이 있을때
-                    List<LocalDateTime> list = factory.getPreProcessing().getConfirmList().get(factory.getPreProcessing().getConfirmList().size() - 1).getOutputPreProcessingTimeList();
-                    LocalDateTime lastTime = list.get(list.size()-1);
+
+                    LocalDateTime lastTime;
+
+                    if(factory.getPreProcessing().getConfirmList().get(factory.getPreProcessing().getConfirmList().size() - 1).getItemId() <= 2){
+                        List<LocalDateTime> list = factory.getPreProcessing().getConfirmList().get(factory.getPreProcessing().getConfirmList().size() - 1).getOutputPreProcessingTimeList();
+                        lastTime = list.get(list.size()-1);
+                    }else{
+                        int j = factory.getPreProcessing().getConfirmList().size() - 1;
+                        while (true){
+
+                            if(factory.getPreProcessing().getConfirmList().get(j).getItemId() <= 2){
+                                List<LocalDateTime> list  = factory.getPreProcessing().getConfirmList().get(j).getOutputPreProcessingTimeList();
+                                lastTime = list.get(list.size()-1);
+                                break;
+                            }
+                            j--;
+                        }
+                    }
+
+
                     if(lastTime.isAfter(mesAll.getOutputMeasurementTime())){
                         mesAll.getInputPreProcessingTimeList().add(inputTimeCheck(preprocessingLeadTime,lastTime));
                     }else{
@@ -237,8 +255,17 @@ public class Calculator {
             }
         }else{
             //충진기의 스케줄이 있을때
-            List<LocalDateTime> list = factory.getFillPouchProcessing().getConfirmList().get(factory.getFillPouchProcessing().getConfirmList().size() - 1).getFillPouchOutputTimeList();
-            LocalDateTime lastTime = list.get(list.size()-1);
+            LocalDateTime lastTime;
+            int j = factory.getFillPouchProcessing().getConfirmList().size() - 1;
+
+            while (true){
+                if(factory.getFillPouchProcessing().getConfirmList().get(j).getFillPouchCount()!=0){
+                    List<LocalDateTime> list = factory.getFillPouchProcessing().getConfirmList().get(j).getFillPouchOutputTimeList();
+                    lastTime = list.get(list.size()-1);
+                    break;
+                }
+                j--;
+            }
 
             for(int i = 0; i < mesAll.getFillPouchCount(); i++){
                 ml = mesAll.getLiquidSystemOutputAmountList().get(i) * 1000;
@@ -246,9 +273,8 @@ public class Calculator {
                 fillTime = (ml/80) * (long) (1.02855 * 1_000_000_000);
                 if(i == 0){
                     // 스케줄이 끝나는 시간과 전공전 끝나는 시간을 비교
-                    List<LocalDateTime> timeList = factory.getFillPouchProcessing().getConfirmList().get(factory.getFillPouchProcessing().getConfirmList().size()-1).getFillPouchOutputTimeList();
 
-                    if(mesAll.getLiquidSystemOutputTimeList().get(i).isAfter(timeList.get(timeList.size()-1))){
+                    if(mesAll.getLiquidSystemOutputTimeList().get(i).isAfter(lastTime)){
                         // 이번 수주의 액체제조가 스케줄 리스트의 맨마지막 끝나는 시간보다 늦게 끝나면?
                         // 이번 수주의 액체제조가 기준이 된다.
                         mesAll.getFillPouchInputTimeList().add(inputTimeCheck(fillProcessingLeadTime, mesAll.getLiquidSystemOutputTimeList().get(i)));
@@ -257,7 +283,7 @@ public class Calculator {
                         mesAll.getFillPouchOutputAmountList().add(ml/80);
                     }else{
                         //스케줄이 더 늦게 끝난다면?
-                        mesAll.getFillPouchInputTimeList().add(inputTimeCheck(fillProcessingLeadTime, timeList.get(timeList.size()-1)));
+                        mesAll.getFillPouchInputTimeList().add(inputTimeCheck(fillProcessingLeadTime, lastTime));
                         mesAll.getFillPouchOutputTimeList().add(mesAll.getFillPouchInputTimeList().get(i).plusNanos(fillTime));
                         mesAll.getFillPouchInputAmountList().add(mesAll.getLiquidSystemOutputAmountList().get(i));
                         mesAll.getFillPouchOutputAmountList().add(ml/80);
@@ -328,9 +354,18 @@ public class Calculator {
             }
         }else{
             //충진기의 스케줄이 있을때
-            List<LocalDateTime> list = factory.getFillStickProcessing().getConfirmList().get(factory.getFillStickProcessing().getConfirmList().size() - 1).getFillStickOutputTimeList();
-            LocalDateTime lastTime = list.get(list.size()-1);
-            mesAll.getFillStickInputTimeList().add(inputTimeCheck(fillProcessingLeadTime,lastTime));
+
+            LocalDateTime lastTime;
+            int j = factory.getFillStickProcessing().getConfirmList().size() - 1;
+
+            while (true){
+                if(factory.getFillStickProcessing().getConfirmList().get(j).getFillStickCount()!=0){
+                    List<LocalDateTime> list = factory.getFillStickProcessing().getConfirmList().get(j).getFillStickOutputTimeList();
+                    lastTime = list.get(list.size()-1);
+                    break;
+                }
+                j--;
+            }
 
             for(int i = 0; i < mesAll.getFillStickCount(); i++){
                 ml = mesAll.getLiquidSystemOutputAmountList().get(i) * 1000;
@@ -338,8 +373,7 @@ public class Calculator {
                 fillTime = (ml/15) * (long) (1.2  * 1_000_000_000);
                 if(i == 0){
                     // 스케줄이 끝나는 시간과 전공전 끝나는 시간을 비교
-                    List<LocalDateTime> timeList = factory.getFillStickProcessing().getConfirmList().get(factory.getFillStickProcessing().getConfirmList().size()-1).getFillStickOutputTimeList();
-                    if(mesAll.getLiquidSystemOutputTimeList().get(i).isAfter(timeList.get(timeList.size()-1))){
+                    if(mesAll.getLiquidSystemOutputTimeList().get(i).isAfter(lastTime)){
                         //액체제조가 더 늦게 끝나면?
                         mesAll.getFillStickInputTimeList().add(inputTimeCheck(fillProcessingLeadTime, mesAll.getLiquidSystemOutputTimeList().get(i)));
                         mesAll.getFillStickOutputTimeList().add(mesAll.getFillStickInputTimeList().get(i).plusNanos(fillTime));
@@ -347,7 +381,7 @@ public class Calculator {
                         mesAll.getFillStickOutputAmountList().add(ml/15);
                     }else{
                         //스케줄이 더 늦게 끝난다면?
-                        mesAll.getFillStickInputTimeList().add(inputTimeCheck(fillProcessingLeadTime, timeList.get(timeList.size()-1)));
+                        mesAll.getFillStickInputTimeList().add(inputTimeCheck(fillProcessingLeadTime, lastTime));
                         mesAll.getFillStickOutputTimeList().add(mesAll.getFillStickInputTimeList().get(i).plusNanos(fillTime));
                         mesAll.getFillStickInputAmountList().add(mesAll.getLiquidSystemOutputAmountList().get(i));
                         mesAll.getFillStickOutputAmountList().add(ml/15);
@@ -746,6 +780,8 @@ public class Calculator {
                     inputLiquidMachine1(mesAll,leadTime,i,amount,mesAll.getOutputMeasurementTime());
                 }else {
                     // 확정 스케줄이 있을때
+                    System.out.println("왜 2로 안들어감 ???? " + liquidSystem.getConfirmList().get(liquidSystem.getConfirmList().size()-1).getLiquidSystemCount2());
+
                     if(liquidSystem.getConfirmList().get(liquidSystem.getConfirmList().size()-1).getLiquidSystemCount1()==0){
                         // 기계 1이 비었으면 기계1투입(직전 수주에서 없기때문에 그전의 수주에서 가져와야된다) (직전 수주에서 기계 2의 스케줄이 있는상황)
 
@@ -765,7 +801,8 @@ public class Calculator {
                             inputLiquidMachine1(mesAll,leadTime,i,amount,mesAll.getOutputMeasurementTime());
                         }
 
-                    }else if (liquidSystem.getConfirmList().get(liquidSystem.getConfirmList().size()-1).getLiquidSystemCount2()==0){
+                    }else if (liquidSystem.getConfirmList().get(liquidSystem.getConfirmList().size()-1).getLiquidSystemCount2()==0) {
+
                         // 기계 2가 비었으면 기계2투입 (기계 1은 스케줄이 있는상황)
                         // 직전 확정에서 2가 없으면 그전 확정도 따져봐야함
                         System.out.println("2로 들어옴");
@@ -792,6 +829,9 @@ public class Calculator {
                         List<LocalDateTime> machine2List = liquidSystem.getConfirmList().get(liquidSystem.getConfirmList().size() - 1).getLiquidSystemOutputTimeList2(); //액체제조 확정리스트 맨마지막의 아웃풋 타임리스트
                         LocalDateTime machine1LastTime = machine1List.get(machine1List.size()-1);//기계 1 끝나는시간
                         LocalDateTime machine2LastTime = machine2List.get(machine2List.size()-1); //기계 2 끝나는 시간
+
+                        System.out.println("머신 1라스트" + machine1LastTime);
+                        System.out.println("머신 2라스트" + machine2LastTime);
 
                         if(machine1LastTime.isBefore(machine2LastTime)) {
                             // 기계1이 먼저끝날때
@@ -885,10 +925,11 @@ public class Calculator {
 
                     }else if (liquidSystem.getConfirmList().get(liquidSystem.getConfirmList().size()-1).getLiquidSystemCount2()==0){
                         // 기계 2가 비었으면 기계2투입 (기계 1은 스케줄이 있는상황)
+                        // 기계 2는 그 전의 수주정보에서 가져와야 된다.
                         inputLiquidMachine2(mesAll,leadTime,i,amount,mesAll.getOutputPreProcessingTimeList().get(i));
                         if(liquidSystem.getConfirmList().size() >= 2){
 
-                            LocalDateTime lastTime = liquidSystem.getConfirmList().get(liquidSystem.getConfirmList().size()-2).getLiquidSystemOutputTimeList2().get(liquidSystem.getConfirmList().get(liquidSystem.getConfirmList().size()-2).getLiquidSystemOutputTimeList1().size()-1);
+                            LocalDateTime lastTime = liquidSystem.getConfirmList().get(liquidSystem.getConfirmList().size()-2).getLiquidSystemOutputTimeList2().get(liquidSystem.getConfirmList().get(liquidSystem.getConfirmList().size()-2).getLiquidSystemOutputTimeList2().size()-1);
 
                             if(lastTime.isAfter(mesAll.getOutputMeasurementTime())){
                                 inputLiquidMachine1(mesAll,leadTime,i,amount,lastTime);
@@ -939,9 +980,21 @@ public class Calculator {
                             inputLiquidMachine2(mesAll,leadTime,i,amount,mesAll.getOutputPreProcessingTimeList().get(i));
                         }
                     }else{
-                            // 기계 2 스케줄 완료 후 투입
-                            List<LocalDateTime> machine2List = liquidSystem.getConfirmList().get(liquidSystem.getConfirmList().size() - 1).getLiquidSystemOutputTimeList2(); //액체제조 확정리스트 맨마지막의 아웃풋 타임리스트
-                            LocalDateTime machine2LastTime = machine2List.get(machine2List.size()-1); //기계 2 끝나는 시간
+                            //첫번째 기계가 투입 1임 그런데 기계 2가 끝났는지 확인해야될때
+
+                        LocalDateTime machine2LastTime; //기계 2 끝나는 시간
+                        int j = liquidSystem.getConfirmList().size() - 1;
+
+                        while(true){
+
+                            if(liquidSystem.getConfirmList().get(j).getLiquidSystemCount2()!=0){
+                                List<LocalDateTime> machine2List = liquidSystem.getConfirmList().get(j).getLiquidSystemOutputTimeList2(); //액체제조 확정리스트 맨마지막의 아웃풋 타임리스트
+                                machine2LastTime = machine2List.get(machine2List.size()-1);
+                                break;
+                            }
+                            j--;
+                        }
+
 
                             if(mesAll.getItemId() == 2){
                                 //흑마늘 일때
@@ -962,8 +1015,19 @@ public class Calculator {
                 }else {
                     // 첫번째 투입이 기계 2일때
                     // 기계 1 스케줄 완료 후 투입
-                    List<LocalDateTime> machine1List = liquidSystem.getConfirmList().get(liquidSystem.getConfirmList().size() - 1).getLiquidSystemOutputTimeList1(); //액체제조 확정리스트 맨마지막의 아웃풋 타임리스트
-                    LocalDateTime machine1LastTime = machine1List.get(machine1List.size() - 1); //기계 1 끝나는 시간
+
+                    LocalDateTime machine1LastTime;
+                    int j = liquidSystem.getConfirmList().size() - 1;
+
+                    while(true){
+
+                        if(liquidSystem.getConfirmList().get(j).getLiquidSystemCount2()!=0){
+                            List<LocalDateTime> machine1List = liquidSystem.getConfirmList().get(j).getLiquidSystemOutputTimeList1(); //액체제조 확정리스트 맨마지막의 아웃풋 타임리스트
+                            machine1LastTime = machine1List.get(machine1List.size()-1);
+                            break;
+                        }
+                        j--;
+                    }
 
                     // 기계 1이 스케줄 완료 비교 후 기계1투입
                     if (mesAll.getItemId() == 2) {
