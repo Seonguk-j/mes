@@ -184,4 +184,8 @@ public class ObtainService {
     public List<Obtain> getObtainList(SearchDTO searchDTO){
         return obtainRepository.getObtainList(searchDTO);
     }
+
+    public void deleteObtainByObtainId(Long obtainNum){
+        obtainRepository.deleteById(obtainNum);
+    }
 }
