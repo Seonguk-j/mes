@@ -13,6 +13,8 @@ public class SearchDTO {
 
     private String searchBy;
 
+    private String searchBy2;
+
     private String searchQuery ="";
 
 }
