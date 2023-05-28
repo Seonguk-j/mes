@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-@Table(name = "semi_product_id")
+@Table(name = "semi_product")
 public class SemiProduct {
 
     @Id
@@ -19,15 +19,15 @@ public class SemiProduct {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long semiProductId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(nullable = false, name = "item_id")
     private Item item;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(nullable = false, name = "process_id")
     private Process process;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(nullable = false, name = "lot_log_id")
     private LotLog lotLog;
 
