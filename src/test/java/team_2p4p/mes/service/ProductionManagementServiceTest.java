@@ -18,6 +18,7 @@ public class ProductionManagementServiceTest {
     @Autowired
     private ProductionManagementService productionManagementService;
     @Autowired LotLogService lotLogService;
+    @Autowired ProductService productService;
 
     Calculator cal = new Calculator();
 
@@ -30,10 +31,17 @@ public class ProductionManagementServiceTest {
     }
 
     @Test
-    public void lot (){
+    public void lot(){
         ObtainDTO obtainDTO = new ObtainDTO();
         obtainDTO.setObtainId(1L);
         lotLogService.recordLot(obtainDTO);
     }
+
+//    @Test
+//    public void product(){
+//        ObtainDTO obtainDTO = new ObtainDTO();
+//        obtainDTO.setObtainId(1L);
+//        productService.regProduct(obtainDTO);
+//    }
 
 }

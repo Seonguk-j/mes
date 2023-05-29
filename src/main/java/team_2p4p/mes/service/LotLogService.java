@@ -2,17 +2,11 @@ package team_2p4p.mes.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.stereotype.Service;
-import team_2p4p.mes.dto.ItemDTO;
-import team_2p4p.mes.dto.LotLogDTO;
-import team_2p4p.mes.dto.ObtainDTO;
-import team_2p4p.mes.entity.LotLog;
-import team_2p4p.mes.entity.Obtain;
-import team_2p4p.mes.entity.ProductionManagement;
-import team_2p4p.mes.repository.ItemRepository;
-import team_2p4p.mes.repository.LotLogRepository;
-import team_2p4p.mes.repository.ObtainRepository;
-import team_2p4p.mes.repository.OrderMaterialRepository;
+import team_2p4p.mes.dto.*;
+import team_2p4p.mes.entity.*;
+import team_2p4p.mes.repository.*;
 import team_2p4p.mes.util.calculator.CalcOrderMaterial;
 import team_2p4p.mes.util.calculator.Calculator;
 import team_2p4p.mes.util.calculator.MesAll;
@@ -36,11 +30,15 @@ public class LotLogService {
     private final ObtainRepository obtainRepository;
     private final CalcOrderMaterial calcOrderMaterial;
     private final ItemService itemService;
+    private final ItemRepository itemRepository;
+    private final ProductRepository productRepository;
+    private final SendRepository sendRepository;
     Calculator cal = new Calculator();
 
     public void recordLot(ObtainDTO dto){
 
         obtainService.getConfirmList();
+        System.out.println("==== 로트적기");
 
         dto = obtainService.entityToDto(obtainRepository.findById(dto.getObtainId()).orElseThrow());
         // id로 해당 수주DTO를 찾아온다.
@@ -146,6 +144,9 @@ public class LotLogService {
         int liquidJ2 = 0;
         //3 액체제조 시스템2 로트
         for (int i = 0; i < mesAll.getLiquidSystemCount2(); i++) {
+            System.out.println("액체2");
+            System.out.println(mesAll.getLiquidSystemCount2());
+            System.out.println(mesAll.getWhereList());
             LotLogDTO liquid2Lot = new LotLogDTO();
             liquid2Lot.setProcess("액체제조기2");
             liquid2Lot.setItem(itemService.findItemById(dto.getItemId()));
@@ -155,6 +156,7 @@ public class LotLogService {
             liquid2Lot.setOutputTime(mesAll.getLiquidSystemOutputTimeList2().get(i));
             dateString = (liquid2Lot.getOutputTime().format(DateTimeFormatter.ofPattern("yyyyMMddhhmm"))).substring(2);
             liquid2Lot.setLot("L2-"+dateString+"-"+(int)mesAll.getLiquidSystemOutputAmountList2().get(i));
+
             if(mesAll.getWhereList().get(0) == 1){
                 //첫번째가 기계 1로 들어갔을때
                 liquid2Lot.setLotPLogId1(preProcessingLotIdList.get(liquidJ2+1));
@@ -249,10 +251,12 @@ public class LotLogService {
         }
 
 
-        List<Long> PackingLotIdList = new ArrayList<>();
+        List<Long> packingLotIdList = new ArrayList<>();
         String packingKind = (orderLot.getItem().getItemId()==1)?"양배추즙(box) ":(orderLot.getItem().getItemId()==2)?"흑마늘즙(box)":(orderLot.getItem().getItemId()==3)?"석류스틱(box)":"매실스틱(box)";
+        int packingAllAmount = 0;
         // 포장로트
         for (int i = 0; i < mesAll.getPackingCount(); i++) {
+            packingAllAmount += (int)mesAll.getPackingOutputAmountList().get(i);
             LotLogDTO packingLot = new LotLogDTO();
             packingLot.setProcess("포장");
             packingLot.setItem(itemService.findItemById(dto.getItemId()));
@@ -264,8 +268,45 @@ public class LotLogService {
             packingLot.setLot("PK-"+dateString+"-"+(int)mesAll.getPackingOutputAmountList().get(i));
             packingLot.setLotPLogId1(checkLotIdList.get(i));
             lotLog = dtoToEntity(packingLot);
-            PackingLotIdList.add(lotLogRepository.save(lotLog).getLotLogId());
+            packingLotIdList.add(lotLogRepository.save(lotLog).getLotLogId());
+
+            // product 등록
+            ProductDto productDto = new ProductDto();
+            productDto.setProductStock(Long.valueOf(mesAll.getPackingOutputAmountList().get(i)));
+            productDto.setItemId(mesAll.getItemId());
+            productDto.setExportStat(false);
+            productDto.setMakeDate(mesAll.getPackingOutputTimeList().get(i));
+
+            Product product = Product.builder()
+                    .item(itemRepository.findById(mesAll.getItemId()).orElseThrow())
+                    .productStock(productDto.getProductStock())
+                    .makeDate(productDto.getMakeDate())
+                    .exportStat(productDto.isExportStat())
+                    .lotLogId(lotLogRepository.findById(packingLotIdList.get(i)).orElseThrow())
+                    .build();
+            productRepository.save(product);
+
         }
+
+        // send 등록
+        SendDTO sendDTO = new SendDTO();
+        sendDTO.setItemId(mesAll.getItemId());
+        sendDTO.setObtainDTO(dto);
+        sendDTO.setItem(itemService.findItemById(sendDTO.getItemId()));
+        sendDTO.setSendStat(false);
+        sendDTO.setSendProductNum(dto.getObtainAmount());
+
+        Send send = Send.builder()
+                .item(sendDTO.getItem())
+                .obtain(obtainService.dtoToEntity(sendDTO.getObtainDTO()))
+                .sendStat(sendDTO.isSendStat())
+                .sendProductNum(sendDTO.getSendProductNum())
+                .build();
+
+        sendRepository.save(send);
+
+        int productIdx = packingAllAmount - Math.toIntExact(dto.getObtainAmount());
+
     }
 
 
@@ -303,9 +344,6 @@ public class LotLogService {
 
         return dto;
     }
-
-
-
 }
 
 

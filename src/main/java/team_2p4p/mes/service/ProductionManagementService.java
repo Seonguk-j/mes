@@ -1,15 +1,19 @@
 package team_2p4p.mes.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import team_2p4p.mes.dto.ObtainDTO;
-import team_2p4p.mes.entity.Obtain;
-import team_2p4p.mes.entity.ProductionManagement;
+import team_2p4p.mes.dto.ProductDto;
+import team_2p4p.mes.entity.*;
+import team_2p4p.mes.repository.ItemRepository;
 import team_2p4p.mes.repository.ObtainRepository;
+import team_2p4p.mes.repository.ProductRepository;
 import team_2p4p.mes.repository.ProductionManagementRepository;
 import team_2p4p.mes.util.calculator.CalcOrderMaterial;
 import team_2p4p.mes.util.calculator.Calculator;
 import team_2p4p.mes.util.calculator.MesAll;
+import team_2p4p.mes.util.process.Factory;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
@@ -19,6 +23,7 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 @RequiredArgsConstructor
+@Log4j2
 public class ProductionManagementService {
 
     private final ProductionManagementRepository productionManagementRepository;
@@ -26,7 +31,8 @@ public class ProductionManagementService {
     private final ObtainRepository obtainRepository;
     private final CalcOrderMaterial calcOrderMaterial;
     private final LotLogService lotLogService;
-    private final CalcOrderMaterial calcOrderMaterialService;
+    private final ItemRepository itemRepository;
+    private ProductRepository productRepository;
 
     Calculator cal = new Calculator();
     public void productionManagement(ObtainDTO dto) {
@@ -48,6 +54,8 @@ public class ProductionManagementService {
 
         obtainService.getConfirmList();
 
+        System.out.println(Factory.getInstance());
+        System.out.println("==== 생산계획");
         dto = obtainService.entityToDto(obtainRepository.findById(dto.getObtainId()).orElseThrow());
         // id로 해당 수주DTO를 찾아온다.
         MesAll mesAll = calcOrderMaterial.estimateDate(dto.getItemId(), Math.toIntExact(dto.getObtainAmount()), LocalDateTime.now());
@@ -135,7 +143,6 @@ public class ProductionManagementService {
 
             // 7 검사
             for (int i = 0; i < mesAll.getCheckCount(); i++) {
-                System.out.println("검사?");
                 ProductionManagement checkProcessPlan = ProductionManagement.builder()
                         .obtain(obtain)
                         .processAmount((long) mesAll.getCheckInputAmountList().get(i))
@@ -144,12 +151,12 @@ public class ProductionManagementService {
                         .process("검사")
                         .build();
                 productionManagementRepository.save(checkProcessPlan);
+
             }
 
 
-            // 8 포장
+            // 8 포장 완제품에도 등록
             for (int i = 0; i < mesAll.getPackingCount(); i++) {
-                System.out.println("포장");
                 ProductionManagement packingProcessPlan = ProductionManagement.builder()
                         .obtain(obtain)
                         .processAmount((long) mesAll.getPackingInputAmountList().get(i))
@@ -158,16 +165,17 @@ public class ProductionManagementService {
                         .process("포장")
                         .build();
                 productionManagementRepository.save(packingProcessPlan);
+
             }
     }
 
 
     public void confirmAndAddProductionManagement(ObtainDTO dto){
         productionManagement(dto);
-        //calcOrderMaterialService.test(dto.getItemId(), Math.toIntExact(dto.getObtainAmount()));
         lotLogService.recordLot(dto);
         obtainService.confirmObtain(dto); //생산일정을 짜고 t/f 등록
         obtainService.confirmAfterObtainCal();
+
     }
 
     public List<ProductionManagement> classification0(){
@@ -177,5 +185,10 @@ public class ProductionManagementService {
                 .filter(productionManagement -> productionManagement.getProcessStat() == 0)
                 .collect(Collectors.toList());
     return filteredList;
+    }
+
+
+    public void timeInit(){
+
     }
 }
