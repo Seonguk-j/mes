@@ -16,6 +16,7 @@ import team_2p4p.mes.repository.OrderMaterialRepository;
 import team_2p4p.mes.util.calculator.CalcOrderMaterial;
 import team_2p4p.mes.util.calculator.Calculator;
 import team_2p4p.mes.util.calculator.MesAll;
+import team_2p4p.mes.util.process.LiquidSystem;
 import team_2p4p.mes.util.process.PreProcessing;
 
 import javax.transaction.Transactional;
@@ -44,7 +45,8 @@ public class LotLogService {
         dto = obtainService.entityToDto(obtainRepository.findById(dto.getObtainId()).orElseThrow());
         // id로 해당 수주DTO를 찾아온다.
         MesAll mesAll = calcOrderMaterial.estimateDate(dto.getItemId(), Math.toIntExact(dto.getObtainAmount()), LocalDateTime.now());
-        calcOrderMaterial.test(dto.getItemId(), Math.toIntExact(dto.getObtainAmount()));
+        //calcOrderMaterial.test(dto.getItemId(), Math.toIntExact(dto.getObtainAmount()));
+        //위의 주석은 실제 실행할때 풀어야됨 계속 발주를 넣어서 확인이 어려워서 일단 주석
         cal.obtain(mesAll);
         // mesAll에 db값을 꺼내서 해당 mesAll을 찾아온다.
 
@@ -58,7 +60,7 @@ public class LotLogService {
 
         orderLot.setProcess("입고");
         orderLot.setItem(itemService.findItemById(dto.getItemId()));
-        String wareHouseKind = (orderLot.getItem().getItemId()==1)?"양배추":(orderLot.getItem().getItemId()==2)?"흑마늘":(orderLot.getItem().getItemId()==3)?"석류농축액":"매실농축액";
+        String wareHouseKind = (orderLot.getItem().getItemId()==1)?"양배추(kg)":(orderLot.getItem().getItemId()==2)?"흑마늘(kg)":(orderLot.getItem().getItemId()==3)?"석류농축액(kg)":"매실농축액(kg)";
         orderLot.setInputKind(wareHouseKind);
         orderLot.setItemId(orderLot.getItem().getItemId());
         orderLot.setLotStat(false);
@@ -76,7 +78,7 @@ public class LotLogService {
         LotLogDTO measurementLot = new LotLogDTO();
         measurementLot.setProcess("원료계량");
         measurementLot.setItem(itemService.findItemById(dto.getItemId()));
-        String measurementKind = (orderLot.getItem().getItemId()==1)?"양배추":(orderLot.getItem().getItemId()==2)?"흑마늘":(orderLot.getItem().getItemId()==3)?"석류농축액":"매실농축액";
+        String measurementKind = (orderLot.getItem().getItemId()==1)?"양배추(kg)":(orderLot.getItem().getItemId()==2)?"흑마늘(kg)":(orderLot.getItem().getItemId()==3)?"석류농축액(kg)":"매실농축액(kg)";
         measurementLot.setInputKind(measurementKind);
         measurementLot.setLotStat(false);
         measurementLot.setInputTime(mesAll.getInputMeasurementTime());
@@ -90,7 +92,7 @@ public class LotLogService {
 
         List<Long> preProcessingLotIdList = new ArrayList<>();
         //2 전처리 로트
-        String preInputKind = (orderLot.getItem().getItemId()==1)?"양배추":(orderLot.getItem().getItemId()==2)?"흑마늘":(orderLot.getItem().getItemId()==3)?"석류농축액":"매실농축액";
+        String preInputKind = (orderLot.getItem().getItemId()==1)?"양배추(kg)":(orderLot.getItem().getItemId()==2)?"흑마늘(kg)":(orderLot.getItem().getItemId()==3)?"석류농축액":"매실농축액";
         for (int i = 0; i < mesAll.getPreProcessingCount(); i++) {
             LotLogDTO preProcessLot = new LotLogDTO();
             preProcessLot.setProcess("전처리");
@@ -106,9 +108,9 @@ public class LotLogService {
             preProcessingLotIdList.add(lotLogRepository.save(lotLog).getLotLogId());
         }
 
-
-        List<Long> Liquid1LotIdList = new ArrayList<>();
-        String liquid1Kind = (orderLot.getItem().getItemId()==1)?"양배추 추출액":(orderLot.getItem().getItemId()==2)?"흑마늘 추출액":(orderLot.getItem().getItemId()==3)?"석류농축액":"매실농축액";
+        //액체제조기1 로트
+        List<Long> liquid1LotIdList = new ArrayList<>();
+        String liquid1Kind = (orderLot.getItem().getItemId()==1)?"양배추 추출액(L)":(orderLot.getItem().getItemId()==2)?"흑마늘 추출액(L)":(orderLot.getItem().getItemId()==3)?"석류농축액(L)":"매실농축액(L)";
 
         int liquidJ1 = 0;
         //3 액체제조 시스템1 로트
@@ -122,6 +124,7 @@ public class LotLogService {
             liquid1Lot.setOutputTime(mesAll.getLiquidSystemOutputTimeList1().get(i));
             dateString = (liquid1Lot.getOutputTime().format(DateTimeFormatter.ofPattern("yyyyMMddhhmm"))).substring(2);
             liquid1Lot.setLot("L1-"+dateString+"-"+(int)mesAll.getLiquidSystemOutputAmountList1().get(i));
+
             if(mesAll.getWhereList().get(0) == 1){
                 //첫번째가 기계 1로 들어갔을때
                 liquid1Lot.setLotPLogId1(preProcessingLotIdList.get(liquidJ1));
@@ -132,66 +135,137 @@ public class LotLogService {
             }
 
             lotLog = dtoToEntity(liquid1Lot);
-            Liquid1LotIdList.add(lotLogRepository.save(lotLog).getLotLogId());
+            liquid1LotIdList.add(lotLogRepository.save(lotLog).getLotLogId());
+        }
+
+
+        //액체제조기2 로트
+        List<Long> liquid2LotIdList = new ArrayList<>();
+        String liquid2Kind = (orderLot.getItem().getItemId()==1)?"양배추 추출액(L)":(orderLot.getItem().getItemId()==2)?"흑마늘 추출액(L)":(orderLot.getItem().getItemId()==3)?"석류농축액(L)":"매실농축액(L)";
+
+        int liquidJ2 = 0;
+        //3 액체제조 시스템2 로트
+        for (int i = 0; i < mesAll.getLiquidSystemCount2(); i++) {
+            LotLogDTO liquid2Lot = new LotLogDTO();
+            liquid2Lot.setProcess("액체제조기2");
+            liquid2Lot.setItem(itemService.findItemById(dto.getItemId()));
+            liquid2Lot.setInputKind(liquid2Kind);
+            liquid2Lot.setLotStat(false);
+            liquid2Lot.setInputTime(mesAll.getLiquidSystemInputTimeList2().get(i));
+            liquid2Lot.setOutputTime(mesAll.getLiquidSystemOutputTimeList2().get(i));
+            dateString = (liquid2Lot.getOutputTime().format(DateTimeFormatter.ofPattern("yyyyMMddhhmm"))).substring(2);
+            liquid2Lot.setLot("L2-"+dateString+"-"+(int)mesAll.getLiquidSystemOutputAmountList2().get(i));
+            if(mesAll.getWhereList().get(0) == 1){
+                //첫번째가 기계 1로 들어갔을때
+                liquid2Lot.setLotPLogId1(preProcessingLotIdList.get(liquidJ2+1));
+                liquidJ2 += 2;
+            }else{
+                liquid2Lot.setLotPLogId1(preProcessingLotIdList.get(liquidJ2));
+                liquidJ2 += 2;
+            }
+
+            lotLog = dtoToEntity(liquid2Lot);
+            liquid2LotIdList.add(lotLogRepository.save(lotLog).getLotLogId());
+        }
+
+
+        List<Long> fillPouchLotIdList = new ArrayList<>();
+        List<Long> fillStickLotIdList = new ArrayList<>();
+
+
+        String fillKind = (orderLot.getItem().getItemId()==1)?"양배추즙(포)":(orderLot.getItem().getItemId()==2)?"흑마늘즙(포)":(orderLot.getItem().getItemId()==3)?"석류스틱(포)":"매실스틱(포)";
+        int fillLiquid1Idx = 0;
+        int fillLiquid2Idx = 0;
+        //충진 로트
+        if (mesAll.getItemId() <= 2){
+            for (int i = 0; i < mesAll.getFillPouchCount(); i++) {
+                LotLogDTO fillPouchLot = new LotLogDTO();
+                fillPouchLot.setProcess("즙 충진기");
+                fillPouchLot.setItem(itemService.findItemById(dto.getItemId()));
+                fillPouchLot.setInputKind(fillKind);
+                fillPouchLot.setLotStat(false);
+                fillPouchLot.setInputTime(mesAll.getFillPouchInputTimeList().get(i));
+                fillPouchLot.setOutputTime(mesAll.getFillPouchOutputTimeList().get(i));
+                dateString = (fillPouchLot.getOutputTime().format(DateTimeFormatter.ofPattern("yyyyMMddhhmm"))).substring(2);
+                fillPouchLot.setLot("FP-"+dateString+"-"+(int)mesAll.getFillPouchOutputAmountList().get(i));
+
+                if(mesAll.getWhereList().get(i) == 1){
+                    fillPouchLot.setLotPLogId1(liquid1LotIdList.get(fillLiquid1Idx++));
+                }else{
+                    fillPouchLot.setLotPLogId1(liquid2LotIdList.get(fillLiquid2Idx++));
+                }
+                lotLog = dtoToEntity(fillPouchLot);
+                fillPouchLotIdList.add(lotLogRepository.save(lotLog).getLotLogId());
+            }
+        }else{
+            for (int i = 0; i < mesAll.getFillStickCount(); i++) {
+                LotLogDTO fillStickLot = new LotLogDTO();
+                fillStickLot.setProcess("스틱 충진기");
+                fillStickLot.setItem(itemService.findItemById(dto.getItemId()));
+                fillStickLot.setInputKind(fillKind);
+                fillStickLot.setLotStat(false);
+                fillStickLot.setInputTime(mesAll.getFillStickInputTimeList().get(i));
+                fillStickLot.setOutputTime(mesAll.getFillStickOutputTimeList().get(i));
+                dateString = (fillStickLot.getOutputTime().format(DateTimeFormatter.ofPattern("yyyyMMddhhmm"))).substring(2);
+                fillStickLot.setLot("FS-"+dateString+"-"+(int)mesAll.getFillStickOutputAmountList().get(i));
+                if(mesAll.getWhereList().get(i) == 1){
+                    fillStickLot.setLotPLogId1(liquid1LotIdList.get(fillLiquid1Idx++));
+
+                }else{
+                    fillStickLot.setLotPLogId1(liquid2LotIdList.get(fillLiquid2Idx++));
+                }
+                lotLog = dtoToEntity(fillStickLot);
+                fillStickLotIdList.add(lotLogRepository.save(lotLog).getLotLogId());
+           }
         }
 
 
 
-//
-//        // 5,6 충진
-//        if (mesAll.getItemId() <= 2) {
-//            for (int i = 0; i < mesAll.getFillPouchCount(); i++) {
-//                ProductionManagement fillPouchProcessLot = ProductionManagement.builder()
-//                        .obtain(obtain)
-//                        .processAmount((long) mesAll.getFillPouchInputAmountList().get(i))
-//                        .processStartTime(mesAll.getFillPouchInputTimeList().get(i))
-//                        .processFinishTime(mesAll.getFillPouchOutputTimeList().get(i))
-//                        .process("즙 충진기")
-//                        .build();
-//                lotLogRepository.save(fillPouchProcessPlan);
-//            }
-//        } else {
-//            for (int i = 0; i < mesAll.getFillStickCount(); i++) {
-//                ProductionManagement fillStickProcessLot = ProductionManagement.builder()
-//                        .obtain(obtain)
-//                        .processAmount((long) mesAll.getFillStickInputAmountList().get(i))
-//                        .processStartTime(mesAll.getFillStickInputTimeList().get(i))
-//                        .processFinishTime(mesAll.getFillStickOutputTimeList().get(i))
-//                        .process("스틱 충진기")
-//                        .build();
-//                lotLogRepository.save(fillStickProcessPlan);
-//
-//            }
-//        }
-//
-//
-//        // 7 검사
-//        for (int i = 0; i < mesAll.getCheckCount(); i++) {
-//            System.out.println("검사?");
-//            ProductionManagement checkProcessLot = ProductionManagement.builder()
-//                    .obtain(obtain)
-//                    .processAmount((long) mesAll.getCheckInputAmountList().get(i))
-//                    .processStartTime(mesAll.getCheckInputTimeList().get(i))
-//                    .processFinishTime(mesAll.getCheckOutputTimeList().get(i))
-//                    .process("검사")
-//                    .build();
-//            lotLogRepository.save(checkProcessPlan);
-//        }
-//
-//
-//        // 8 포장
-//        for (int i = 0; i < mesAll.getPackingCount(); i++) {
-//            System.out.println("포장");
-//            ProductionManagement packingProcessLot = ProductionManagement.builder()
-//                    .obtain(obtain)
-//                    .processAmount((long) mesAll.getPackingInputAmountList().get(i))
-//                    .processStartTime(mesAll.getPackingInputTimeList().get(i))
-//                    .processFinishTime(mesAll.getPackingOutputTimeList().get(i))
-//                    .process("포장")
-//                    .build();
-//            lotLogRepository.save(packingProcessPlan);
-//        }
+        List<Long> checkLotIdList = new ArrayList<>();
+        String checkKind = (orderLot.getItem().getItemId()==1)?"양배추즙(포)":(orderLot.getItem().getItemId()==2)?"흑마늘즙(포)":(orderLot.getItem().getItemId()==3)?"석류스틱(포)":"매실스틱(포)";
 
+        //  검사로트
+        for (int i = 0; i < mesAll.getCheckCount(); i++) {
+
+            LotLogDTO checkLot = new LotLogDTO();
+            checkLot.setProcess("검사");
+            checkLot.setItem(itemService.findItemById(dto.getItemId()));
+            checkLot.setInputKind(checkKind);
+            checkLot.setLotStat(false);
+            checkLot.setInputTime(mesAll.getCheckInputTimeList().get(i));
+            checkLot.setOutputTime(mesAll.getCheckOutputTimeList().get(i));
+            dateString = (checkLot.getOutputTime().format(DateTimeFormatter.ofPattern("yyyyMMddhhmm"))).substring(2);
+            checkLot.setLot("CK-"+dateString+"-"+(int)mesAll.getCheckOutputAmountList().get(i));
+            if(mesAll.getItemId()<=2){
+                //파우치 부모 로트 가져오기
+                checkLot.setLotPLogId1(fillPouchLotIdList.get(i));
+            }else{
+                //stick 부모 로트 가져오기
+                checkLot.setLotPLogId1(fillStickLotIdList.get(i));
+            }
+
+            lotLog = dtoToEntity(checkLot);
+            checkLotIdList.add(lotLogRepository.save(lotLog).getLotLogId());
+        }
+
+
+        List<Long> PackingLotIdList = new ArrayList<>();
+        String packingKind = (orderLot.getItem().getItemId()==1)?"양배추즙(box) ":(orderLot.getItem().getItemId()==2)?"흑마늘즙(box)":(orderLot.getItem().getItemId()==3)?"석류스틱(box)":"매실스틱(box)";
+        // 포장로트
+        for (int i = 0; i < mesAll.getPackingCount(); i++) {
+            LotLogDTO packingLot = new LotLogDTO();
+            packingLot.setProcess("포장");
+            packingLot.setItem(itemService.findItemById(dto.getItemId()));
+            packingLot.setInputKind(packingKind);
+            packingLot.setLotStat(false);
+            packingLot.setInputTime(mesAll.getPackingInputTimeList().get(i));
+            packingLot.setOutputTime(mesAll.getPackingOutputTimeList().get(i));
+            dateString = (packingLot.getOutputTime().format(DateTimeFormatter.ofPattern("yyyyMMddhhmm"))).substring(2);
+            packingLot.setLot("PK-"+dateString+"-"+(int)mesAll.getPackingOutputAmountList().get(i));
+            packingLot.setLotPLogId1(checkLotIdList.get(i));
+            lotLog = dtoToEntity(packingLot);
+            PackingLotIdList.add(lotLogRepository.save(lotLog).getLotLogId());
+        }
     }
 
 
@@ -233,3 +307,5 @@ public class LotLogService {
 
 
 }
+
+

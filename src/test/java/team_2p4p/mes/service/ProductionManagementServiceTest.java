@@ -30,7 +30,7 @@ public class ProductionManagementServiceTest {
     }
 
     @Test
-    public void lot(){
+    public void lot (){
         ObtainDTO obtainDTO = new ObtainDTO();
         obtainDTO.setObtainId(1L);
         lotLogService.recordLot(obtainDTO);

@@ -53,7 +53,7 @@ public class ObtainService {
         factory.getPreProcessing().getConfirmList().clear();
         factory.getLiquidSystem().getConfirmList().clear();
         factory.getFillPouchProcessing().getConfirmList().clear();
-        factory.getFillPouchProcessing().getConfirmList().clear();
+        factory.getFillStickProcessing().getConfirmList().clear();
         factory.getCheckProcessing().getConfirmList().clear();
         factory.getPacking().getConfirmList().clear();
 
@@ -66,7 +66,7 @@ public class ObtainService {
             factory.getPreProcessing().getConfirmList().add(mesAll);
             factory.getLiquidSystem().getConfirmList().add(mesAll);
             factory.getFillPouchProcessing().getConfirmList().add(mesAll);
-            factory.getFillPouchProcessing().getConfirmList().add(mesAll);
+            factory.getFillStickProcessing().getConfirmList().add(mesAll);
             factory.getCheckProcessing().getConfirmList().add(mesAll);
             factory.getPacking().getConfirmList().add(mesAll);
         }
