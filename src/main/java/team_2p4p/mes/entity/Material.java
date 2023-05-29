@@ -36,11 +36,11 @@ public class Material {
     @Column(nullable = false, name="material_stat")
     private int materialStat;
 
-    public void updateMaterial(int materialStat, LocalDateTime warehouseDate){
+    public void updateMaterial(int materialStat, long amount, LocalDateTime warehouseDate){
         this.materialId = getMaterialId();
         this.orderMaterial = getOrderMaterial();
         this.item = getItem();
-        this.materialStock = getMaterialStock();
+        this.materialStock = amount;
         this.warehouseDate = warehouseDate;
         this.materialStat = materialStat;
     }

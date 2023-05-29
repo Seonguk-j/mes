@@ -32,8 +32,8 @@ public class CalcOrderMaterial {
     private final ItemService itemService;
     private final OrderMaterialService orderMaterialService;
     private final MaterialService materialService;
-    private final ObtainService obtainService;
-    private final ObtainRepository obtainRepository;
+//    private final ObtainService obtainService;
+//    private final ObtainRepository obtainRepository;
 
     Calculator cal = new Calculator();
     public MesAll test(long itemId, int amount) {
@@ -305,15 +305,8 @@ public class CalcOrderMaterial {
         return time;
     }
 
-    public void useMaterial(ObtainDTO dto){
-        obtainService.getConfirmList();
-
-        dto = obtainService.entityToDto(obtainRepository.findById(dto.getObtainId()).orElseThrow());
-        // id로 해당 수주DTO를 찾아온다.
-        MesAll mesAll = estimateDate(dto.getItemId(), Math.toIntExact(dto.getObtainAmount()), LocalDateTime.now());
-        cal.obtain(mesAll);
-
-        materialService.useMaterial(dto.getItemId(), mesAll);
+    public void useMaterial(MesAll mesAll, long inputAmount){
+        materialService.useMaterial(mesAll.getItemId(), mesAll.getOrderId(), inputAmount);
     }
 
     @Scheduled(cron = "10 0 0 * * ?")

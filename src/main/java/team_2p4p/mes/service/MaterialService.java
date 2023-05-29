@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import team_2p4p.mes.entity.Material;
 import team_2p4p.mes.entity.OrderMaterial;
 import team_2p4p.mes.repository.MaterialRepository;
+import team_2p4p.mes.repository.OrderMaterialRepository;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
@@ -17,6 +18,8 @@ import java.util.List;
 @Log4j2
 public class MaterialService {
     private final MaterialRepository materialRepository;
+    private final  OrderMaterialService orderMaterialService;
+    private final ItemService itemService;
 
     public Long stockMaterialAmount(Long itemId) {
         List<Material> materialList = materialRepository.findByItemItemId(itemId);
@@ -51,17 +54,34 @@ public class MaterialService {
     }
 
     // 제품 생산시 재고 소진용
-    public  Material useMaterial(){
+    public Material useMaterial(Long itemId, Long orderId, Long amount){
         Material material;
-        if(materialRepository.findByMaterialStatAndItemItemId(1, itemId)){
-            for (Material mt : materialRepository.findByMaterialStatAndItemItemId(1, itemId)){
-                if (mt.getMaterialStock() == amount) {
+        if(!materialRepository.findByMaterialStatAndItemId(1, itemId).isEmpty()){
+            for (Material mt : materialRepository.findByMaterialStatAndItemId(1, itemId)){
+                if (mt.getMaterialStock() <= amount) {
                     material = mt;
-                    material.updateMaterial(2, LocalDateTime.now());
-                    return materialRepository.save(material);
+                    material.updateMaterial(2, mt.getMaterialStock(), LocalDateTime.now());
+                    amount -= mt.getMaterialStock();
+                    materialRepository.save(material);
+                }
+                else {
+                    material = mt;
+                    material.updateMaterial(1, mt.getMaterialStock() - amount, mt.getWarehouseDate());
+                    materialRepository.save(material);
+                    material = new Material(null, orderMaterialService.findByOrderId(orderId), itemService.findItemById(itemId), amount, LocalDateTime.now(), 2);
+                    materialRepository.save(material);
+                    amount = 0L;
+                }
+                if (amount == 0){
+                    return null;
                 }
             }
+            if (amount > 0){
+                material = new Material(null, orderMaterialService.findByOrderId(orderId), itemService.findItemById(itemId), amount, LocalDateTime.now(), 2);
+                return materialRepository.save(material);
+            }
         }
-        material = new Material(null, )
+        material = new Material(null, orderMaterialService.findByOrderId(orderId), itemService.findItemById(itemId), amount, LocalDateTime.now(), 2);
+        return materialRepository.save(material);
     }
 }

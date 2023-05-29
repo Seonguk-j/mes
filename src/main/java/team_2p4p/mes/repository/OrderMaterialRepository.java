@@ -16,5 +16,5 @@ public interface OrderMaterialRepository extends JpaRepository<OrderMaterial, Lo
     List<OrderMaterial> findByOrderDate(@Param("orderDate") LocalDate orderDate);
 
     @Query(value = "select * from order_material o where date(o.import_expect_date) = :importExpectDate and o.order_stat = 1", nativeQuery = true)
-    List<OrderMaterial> findByImportExpectDate(@Param("orderDate") LocalDate importExpectDate);
+    List<OrderMaterial> findByImportExpectDate(@Param("importExpectDate") LocalDate importExpectDate);
 }

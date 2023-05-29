@@ -95,4 +95,8 @@ public class OrderMaterialService {
         return orderMaterialList;
     }
 
+    public OrderMaterial findByOrderId(Long orderId) {
+        return orderMaterialRepository.findById(orderId).orElseThrow(() -> new NullPointerException("주문이 없습니다."));
+    }
+
 }

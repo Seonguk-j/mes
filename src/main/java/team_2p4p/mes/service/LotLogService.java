@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import team_2p4p.mes.dto.ItemDTO;
 import team_2p4p.mes.dto.LotLogDTO;
 import team_2p4p.mes.dto.ObtainDTO;
-import team_2p4p.mes.dto.OrderMaterialDto;
+import team_2p4p.mes.dto.OrderMaterialDTO;
 import team_2p4p.mes.entity.LotLog;
 import team_2p4p.mes.entity.Obtain;
 import team_2p4p.mes.entity.ProductionManagement;
@@ -60,7 +60,7 @@ public class LotLogService {
         dateString = (orderLot.getOutputTime().format(DateTimeFormatter.ofPattern("yyyyMMdd"))).substring(2);
         orderLot.setLot("WH-"+dateString+"-"+(int)(mesAll.getAmount()));
         LotLog lotLog = dtoToEntity(orderLot);
-//        OrderMaterialDto orderMaterialDto = orderMaterialRepository.findById();
+//        OrderMaterialDTO orderMaterialDto = orderMaterialRepository.findById();
         lotLogRepository.save(lotLog);
 
 //        //1 원료개량
