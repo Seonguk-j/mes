@@ -49,5 +49,10 @@ public class ProductService {
         return productList.isEmpty()? null :productList.get(productList.size() - 1);
     }
 
+    public List<Product> getProductList(){
+        List<Product> productList = productRepository.findAll();
+
+        return productList;
+    }
 
 }
