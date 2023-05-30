@@ -12,6 +12,7 @@ import team_2p4p.mes.util.calculator.Calculator;
 import team_2p4p.mes.util.calculator.MesAll;
 
 import javax.transaction.Transactional;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -25,7 +26,7 @@ public class ProductService {
 
 
     public Long productStock(Long itemId) {
-        List<Product> productList = productRepository.findByItemItemId(itemId);
+        List<Product> productList = productRepository.findByItemItemId(LocalDate.now(), itemId);
         Long stock = 0L;
         if(!productList.isEmpty()) {
             for (Product product : productList) {
@@ -44,7 +45,7 @@ public class ProductService {
     }
 
     public Product lastStock(Long itemId) {
-        List<Product> productList = productRepository.findByItemItemId(itemId);
+        List<Product> productList = productRepository.findByItemItemId(LocalDate.now(), itemId);
         return productList.isEmpty()? null :productList.get(productList.size() - 1);
     }
 
