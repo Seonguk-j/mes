@@ -168,7 +168,6 @@ public class ProductionManagementService {
 
             }
 
-        calcOrderMaterial.test(dto.getItemId(), Math.toIntExact(dto.getObtainAmount()));
 
     }
 

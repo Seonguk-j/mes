@@ -129,6 +129,7 @@ public class ObtainService {
 
         cal.confirmObtain(mesAll);
         obtainRepository.save(entity);
+        calcOrderMaterial.test(dto.getItemId(), Math.toIntExact(dto.getObtainAmount()));
 
     }
 
@@ -145,6 +146,7 @@ public class ObtainService {
             cal.obtain(mesAll);
             dtoList.get(i).setExpectDate(mesAll.getEstimateDate());
             obtainRepository.save(dtoToEntity(dtoList.get(i)));
+
         }
 
 
