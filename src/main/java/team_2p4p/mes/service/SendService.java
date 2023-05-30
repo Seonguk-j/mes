@@ -28,6 +28,7 @@ public class SendService {
             return filteredList;
     }
 
+
     public List<Send> getSendWaitList(){
             List<Send> sendList = sendRepository.findAll();
 
