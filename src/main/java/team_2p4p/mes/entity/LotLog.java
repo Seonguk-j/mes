@@ -48,4 +48,17 @@ public class LotLog {
 
     @Column(name="lot_p_log_id2")
     private Long lotPLogId2;
+
+    public void update() {
+        this.lotLogId = getLotLogId();
+        this.process = getProcess();
+        this.item = getItem();
+        this.inputKind =getInputKind();
+        this.lotStat = true;
+        this.inputTime = getInputTime();
+        this.outputTime = getOutputTime();
+        this.lot = getLot();
+        this.lotPLogId1 = getLotPLogId1();
+        this.lotPLogId2 = getLotPLogId2();
+    }
 }
