@@ -12,6 +12,7 @@ import team_2p4p.mes.entity.Process;
 import team_2p4p.mes.entity.*;
 import team_2p4p.mes.repository.*;
 import team_2p4p.mes.service.ObtainService;
+import team_2p4p.mes.service.ProductionManagementService;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -22,7 +23,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ObtainController {
     private final ObtainService obtainService;
-
+    private final ProductionManagementService productionManagementService;
     private final ObtainRepository obtainRepository;
 
     @PostMapping("/obtain/add")
@@ -42,7 +43,8 @@ public class ObtainController {
     public void ObtainConfirm(@PathVariable Long obtainNum){
         ObtainDTO dto = new ObtainDTO();
         dto.setObtainId(obtainNum);
-        obtainService.confirmObtain(dto);
+
+        productionManagementService.confirmAndAddProductionManagement(dto);
     }
     @DeleteMapping("/obtain/delete/{obtainNum}")
     public List<Obtain> ObtainDelete(@PathVariable Long obtainNum){
