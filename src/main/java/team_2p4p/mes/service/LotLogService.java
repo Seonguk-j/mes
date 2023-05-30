@@ -310,9 +310,24 @@ public class LotLogService {
     }
 
 
-//    public List<String> findPLot(LotLogDTO lotLogDTO){
-//        int id = lotLogDTO.getLotLogId()
-//    }
+    public List<String> findPLot(LotLogDTO lotLogDTO){
+        List<String> pList = new ArrayList<>();
+        long id = lotLogDTO.getLotLogId();
+
+        LotLog lotLog = lotLogRepository.findById(id).orElseThrow();
+        pList.add(lotLog.getLot());
+
+        while(true){
+
+            if(lotLog.getLotPLogId1() == 0){
+                break;
+            }
+            lotLog = lotLogRepository.findById(lotLog.getLotPLogId1()).orElseThrow();
+            pList.add(lotLog.getLot());
+        }
+
+        return pList;
+    }
 
 
 
