@@ -69,6 +69,19 @@ public class ReferenceRepositoryTests {
         itemService.saveItem("OP-009", "박스", "원자재");
     }
 
+    @Test
+    public void removeDb(){
+        init();
+    }
+    public void init(){
+        ItemInsert();
+        facility();
+        customer();
+        enterprise();
+        process();
+        bom();
+        routing();
+    }
 
     @Test
     public void facility(){
