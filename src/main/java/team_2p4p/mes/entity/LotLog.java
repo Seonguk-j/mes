@@ -1,5 +1,6 @@
 package team_2p4p.mes.entity;
 
+import com.querydsl.core.types.Order;
 import lombok.*;
 
 import javax.persistence.*;
@@ -19,17 +20,13 @@ public class LotLog {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long lotLogId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "process_id")
-    private Process process;
+    @Column(name="process")
+    private String process;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id")
     private Item item;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "material_id")
-    private Material material;
 
     @Column(name="input_kind")
     private String inputKind;
@@ -47,7 +44,7 @@ public class LotLog {
     private String lot;
 
     @Column(name="lot_p_log_id")
-    private Long lotPLogId;
+    private Long lotPLogId1;
 
     @Column(name="lot_p_log_id2")
     private Long lotPLogId2;

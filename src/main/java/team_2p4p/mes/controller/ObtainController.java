@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import team_2p4p.mes.dto.ObtainDTO;
+import team_2p4p.mes.dto.SearchDTO;
 import team_2p4p.mes.entity.Process;
 import team_2p4p.mes.entity.*;
 import team_2p4p.mes.repository.*;
@@ -30,19 +31,30 @@ public class ObtainController {
             // ObtainDTO에서 필요한 데이터 추출
         obtainService.regObtain(obtainDTO);
             // 필요한 로직 수행
-
-
             // 처리 결과 반환
 
         } catch (IllegalStateException e) {
             // 예외 처리
             // ...
         }
-
     }
+
+    @DeleteMapping("/obtain/delete/{obtainNum}")
+    public List<Obtain> ObtainDelete(@PathVariable Long obtainNum){
+        obtainService.deleteObtainByObtainId(obtainNum);
+        return obtainRepository.findAll();
+    }
+
     @GetMapping("/obtain/list")
     public List<Obtain> obtains(){
         List<Obtain> obtainList = obtainRepository.findAll();
         return obtainList;
     }
+    @PostMapping("/obtain/search/list")
+    public List<Obtain> obtainSearch(@RequestBody SearchDTO searchDTO){
+        System.out.println("searchBy; "+ searchDTO.getSearchBy());
+        System.out.println("검색 결과:" + obtainService.getObtainList(searchDTO));
+        return obtainService.getObtainList(searchDTO);
+    }
 }
+

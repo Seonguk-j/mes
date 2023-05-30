@@ -8,34 +8,35 @@ package team_2p4p.mes.util.calculator;
  */
 
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
 import team_2p4p.mes.entity.Item;
 import team_2p4p.mes.entity.OrderMaterial;
 import team_2p4p.mes.entity.Product;
 import team_2p4p.mes.service.ItemService;
+import team_2p4p.mes.service.MaterialService;
 import team_2p4p.mes.service.OrderMaterialService;
 import team_2p4p.mes.service.ProductService;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+@Service
+@RequiredArgsConstructor
 public class CalcOrderMaterial {
-    long itemId;            // 제품 id
-    int amount;               // 주문수량(box)
     static MesAll mesAll;
 
-    @Autowired
-    private static ProductService productService;
-    @Autowired
-    private static ItemService itemService;
-    @Autowired
-    private static OrderMaterialService orderMaterialService;
+    private final ProductService productService;
+    private final ItemService itemService;
+    private final OrderMaterialService orderMaterialService;
+    private final MaterialService materialService;
 
-    CalcOrderMaterial(long itemId, int amount) {
 
-        this.itemId = itemId;
-        this.amount = amount;
+    public MesAll test(long itemId, int amount) {
         mesAll = new MesAll();
         LocalDateTime now = LocalDateTime.now();   // 수주시간
         LocalDateTime time;
@@ -54,20 +55,24 @@ public class CalcOrderMaterial {
             // mesAll에 대한 값이 tae에게 넘어갈 필요가 없음.
             // 이부분에 대한 부분 추가 고려 필요
             // 23.05.23 db에 재고에서 수주량 차감
-            productService.addMinusProductStock(item, (long) amount, product.getMakeDate(), product.getLot());
+            productService.addMinusProductStock(item, (long) amount, product.getMakeDate(), product.getLotLogId());
         } else {
             // 수주량이 재고량보다 많은 경우 am > 0
             // 재고수량 0으로 만들어줌 -> 출하로 넘겨야 함
             // 23.05.23 db에 재고에서 수주량 차감
             Long stock = productService.productStock(itemId);
             if(stock != 0)
-                productService.addMinusProductStock(item, stock, product.getMakeDate(), product.getLot());
+                productService.addMinusProductStock(item, stock, product.getMakeDate(), product.getLotLogId());
             // 부족한 만큼에 대한 재료들이 발주 필요 데이터베이스(현재 orderList)에 저장
             saveOrderList(itemId, comparedAmount, now);
             // 메인재료 도착예정일 계산
             time = estimateDate(itemId, comparedAmount, now).time;
+            long orderId = orderMaterialService.findOrderId(itemId + 8);
+            mesAll.orderId = orderId;
+            System.out.println("주문 아이디 : " + mesAll.orderId);
             mesAll.time = time;
         }
+        return mesAll;
 //
 //
 //
@@ -103,9 +108,12 @@ public class CalcOrderMaterial {
     }
 
     // 수주 확정 전 날짜 예측을 위한 매소드
-    public static MesAll estimateDate(Long itemId, int amount, LocalDateTime now) {
+    public MesAll estimateDate(Long itemId, int amount, LocalDateTime now) {
+
+        System.out.println("들어오는 amount" + amount);
         MesAll mesAll = new MesAll();
         mesAll.itemId = itemId;
+        long materialId = itemId + 8;   // 원자재 id는 제품 id에 +8 해줌
 
         int comparedAmount = compareStockedProduct(itemId, amount);
 
@@ -134,9 +142,10 @@ public class CalcOrderMaterial {
             // already에 메인 원자재량을 추가해줌
 
             int already = 0;
-            int maxOrder = minMaxOrder(itemId)[1];
+            int maxOrder = minMaxOrder(materialId)[1];
+//            원래라면 여기 materialId가 들어가야지
 
-            OrderMaterial orderMaterial = orderMaterialService.checkOrderMaterial(itemId);
+            OrderMaterial orderMaterial = orderMaterialService.checkOrderMaterial(materialId);
 
             if(orderMaterial != null) {
                 already = Math.toIntExact(orderMaterial.getOrderItemAmount());
@@ -155,8 +164,8 @@ public class CalcOrderMaterial {
             //  -> mesAll 추가로 발송
             // 추가 주문이 필요 없는 경우(ex 기존 750kg만 필요해서 최소 1000kg을 맞추기 위해 1000kg을 주문했으나, 250kg치가 추가로 수주된 경우)
             //  -> mesAll 추가발송 x or amount를 0으로 발송
-            int beforeAmount = calcEstimateAmount(itemId, already);
-            int afterAmount = calcEstimateAmount(itemId, totalOrderAmount);
+            int beforeAmount = calcEstimateAmount(materialId, already);
+            int afterAmount = calcEstimateAmount(materialId, totalOrderAmount);
             int sendAmount = afterAmount - beforeAmount;
             mesAll.amount = sendAmount;
 
@@ -168,18 +177,19 @@ public class CalcOrderMaterial {
 //            System.out.println("태영에게 보내야 할 양 : " + sendAmount);
 
             if (totalOrderAmount <= maxOrder) {
-                mesAll.time = calcEstimateDate(itemId, now);
+                mesAll.time = calcEstimateDate(materialId, now);
             } else {
                 if (totalOrderAmount % maxOrder == 0) {
                     now = calcWeekend(now, totalOrderAmount / maxOrder);
-                    mesAll.time = calcEstimateDate(itemId, now);
+                    mesAll.time = calcEstimateDate(materialId, now);
                 } else {
                     now = calcWeekend(now, totalOrderAmount / maxOrder + 1);
-                    mesAll.time = calcEstimateDate(itemId, now);
+                    mesAll.time = calcEstimateDate(materialId, now);
                 }
             }
         }
 
+        System.out.println("리턴전 amount" + mesAll.orderId);
         return mesAll;
     }
 
@@ -207,7 +217,7 @@ public class CalcOrderMaterial {
     static LocalDateTime calcEstimateDate(Long itemId, LocalDateTime date) {
         LocalDateTime expectDate;
 
-        if (itemId < 3) {
+        if (itemId < 11) {
             if (date.getHour() < 12) {
                 expectDate = calcImportExpectDate(itemId, date);
             } else {
@@ -249,11 +259,11 @@ public class CalcOrderMaterial {
 //        }
 //    }
 
+
     // 완제품 재고와 주문량 비교 매소드
-    static int compareStockedProduct(long itemId, int amount) {
+    int compareStockedProduct(long itemId, int amount) {
         // 23.05.23 db에서 가져오는 내용 추가
         Long stock = productService.productStock(itemId);
-
         return (int) (amount - stock);
 //      // 완제품 재고가 부족한 경우
 //      if(MesAll.stockProduct[(int) itemId] < amount) {
@@ -272,26 +282,27 @@ public class CalcOrderMaterial {
         // 발주 필요량 계산
         // 23.05.24 db에 추가 및 업데이트 내용 추가
         Map<String, Object> needItem = needItem(itemId, amount);
+        long materialId = itemId + 8;   // 원자재 아이디 = 아이템아이디 + 8;
 //        MesAll.orderList[(int) itemId] += Integer.parseInt(String.valueOf(needItem.get("material")));
 //        MesAll.orderList[8] += Integer.parseInt(String.valueOf(needItem.get("box")));
         Long materialAmount = Long.parseLong(String.valueOf(needItem.get("material")));
-        Long boxAmount = Long.parseLong(String.valueOf(needItem.get("box")));
+//        Long boxAmount = Long.parseLong(String.valueOf(needItem.get("box")));
 
-        orderMaterialService.saveOrderMaterial(itemId, materialAmount, now, calcImportExpectDate(itemId, now));
-        orderMaterialService.saveOrderMaterial(8L, boxAmount, now, calcImportExpectDate(8L, now));
-
-        if (itemId <= 2) {
-//            MesAll.orderList[6] += Integer.parseInt(String.valueOf(needItem.get("pouch")));
-            Long pouchAmount = Long.parseLong(String.valueOf(needItem.get("pouch")));
-            orderMaterialService.saveOrderMaterial(6L, pouchAmount, now, calcImportExpectDate(6L, now));
-        } else {
-//            MesAll.orderList[5] += Integer.parseInt(String.valueOf(needItem.get("collagen")));
-//            MesAll.orderList[7] += Integer.parseInt(String.valueOf(needItem.get("pouch")));
-            Long collagenAmount = Long.parseLong(String.valueOf(needItem.get("collagen")));
-            Long stickAmount = Long.parseLong(String.valueOf(needItem.get("pouch")));
-            orderMaterialService.saveOrderMaterial(5L, collagenAmount, now, calcImportExpectDate(5L, now));
-            orderMaterialService.saveOrderMaterial(7L, stickAmount, now, calcImportExpectDate(7L, now));
-        }
+        orderMaterialService.saveOrderMaterial(materialId, materialAmount, now, calcEstimateDate(materialId, now));
+//        orderMaterialService.saveOrderMaterial(8L, boxAmount, now, calcEstimateDate(8L, now));
+//
+//        if (itemId <= 2) {
+////            MesAll.orderList[6] += Integer.parseInt(String.valueOf(needItem.get("pouch")));
+//            Long pouchAmount = Long.parseLong(String.valueOf(needItem.get("pouch")));
+//            orderMaterialService.saveOrderMaterial(6L, pouchAmount, now, calcEstimateDate(6L, now));
+//        } else {
+////            MesAll.orderList[5] += Integer.parseInt(String.valueOf(needItem.get("collagen")));
+////            MesAll.orderList[7] += Integer.parseInt(String.valueOf(needItem.get("pouch")));
+//            Long collagenAmount = Long.parseLong(String.valueOf(needItem.get("collagen")));
+//            Long stickAmount = Long.parseLong(String.valueOf(needItem.get("pouch")));
+//            orderMaterialService.saveOrderMaterial(5L, collagenAmount, now, calcEstimateDate(5L, now));
+//            orderMaterialService.saveOrderMaterial(7L, stickAmount, now, calcEstimateDate(7L, now));
+//        }
     }
 
     // 제품을 생산하기 위해 필요한 자재와 그에 따른 양 계산 매소드
@@ -322,82 +333,115 @@ public class CalcOrderMaterial {
         return needItem;
     }
 
-    // 재고와 필요 자재 량을 비교하여 주문 해야하는 양을 계산하는 매소드
-    // 재고가 부족한 경우 mesAll.orderList에 (필요량 - 재고량)을 추가
-    // 재고가 충분한 경우 재고량 소진(추후 다른 아이템을 수주 받을 경우 재고 혼동 방지를 위함)
-    void compareStockedItem(long itemId, int amount) {
-        Map<String, Object> needItem = needItem(itemId, amount);
-        int material = Integer.parseInt(String.valueOf(needItem.get("material")));
-        int pouch = Integer.parseInt(String.valueOf(needItem.get("pouch")));
-        int collagen;
-        int box = Integer.parseInt(String.valueOf(needItem.get("box")));
-
-//      System.out.println("material : " + material);
-        if (itemId == 1) {
-            MesAll.orderList[1] += material;
-            if (MesAll.stockPouch < pouch) {      // 파우치재고가 부족한 경우
-                MesAll.orderList[6] += (pouch - MesAll.stockPouch);
-            } else
-                MesAll.stockPouch -= pouch;
-        } else if (itemId == 2) {
-            MesAll.orderList[2] += material;
-            if (MesAll.stockPouch < pouch) {      // 파우치재고가 부족한 경우
-                MesAll.orderList[6] += (pouch - MesAll.stockPouch);
-            } else
-                MesAll.stockPouch -= pouch;
-        } else if (itemId == 3) {
-            MesAll.orderList[3] += material;
-        } else {
-            MesAll.orderList[4] += material;
-        }
-
-        if (itemId > 2) {
-            collagen = Integer.parseInt(String.valueOf(needItem.get("collagen")));
-            if (MesAll.stockCollagen < collagen) {      // 콜라겐재고가 부족한 경우
-                MesAll.orderList[5] += collagen - MesAll.stockCollagen;
-            } else
-                MesAll.stockCollagen -= collagen;
-            if (MesAll.stockStickPouch < pouch) {      // 파우치스틱재고가 부족한 경우
-                MesAll.orderList[7] += pouch - MesAll.stockStickPouch;
-            } else
-                MesAll.stockStickPouch -= pouch;
-        }
-
-        if (MesAll.stockBox < box) {               // 박스재고가 부족한 경우
-            MesAll.orderList[8] += box - MesAll.stockBox;
-        } else
-            MesAll.stockBox -= box;
-    }
+//    // 재고와 필요 자재 량을 비교하여 주문 해야하는 양을 계산하는 매소드
+//    // 재고가 부족한 경우 mesAll.orderList에 (필요량 - 재고량)을 추가
+//    // 재고가 충분한 경우 재고량 소진(추후 다른 아이템을 수주 받을 경우 재고 혼동 방지를 위함)
+//    void compareStockedItem(long itemId, int amount) {
+//        Map<String, Object> needItem = needItem(itemId, amount);
+//        int material = Integer.parseInt(String.valueOf(needItem.get("material")));
+//        int pouch = Integer.parseInt(String.valueOf(needItem.get("pouch")));
+//        int collagen;
+//        int box = Integer.parseInt(String.valueOf(needItem.get("box")));
+//
+////      System.out.println("material : " + material);
+//        if (itemId == 1) {
+//            MesAll.orderList[1] += material;
+//            if (MesAll.stockPouch < pouch) {      // 파우치재고가 부족한 경우
+//                MesAll.orderList[6] += (pouch - MesAll.stockPouch);
+//            } else
+//                MesAll.stockPouch -= pouch;
+//        } else if (itemId == 2) {
+//            MesAll.orderList[2] += material;
+//            if (MesAll.stockPouch < pouch) {      // 파우치재고가 부족한 경우
+//                MesAll.orderList[6] += (pouch - MesAll.stockPouch);
+//            } else
+//                MesAll.stockPouch -= pouch;
+//        } else if (itemId == 3) {
+//            MesAll.orderList[3] += material;
+//        } else {
+//            MesAll.orderList[4] += material;
+//        }
+//
+//        if (itemId > 2) {
+//            collagen = Integer.parseInt(String.valueOf(needItem.get("collagen")));
+//            if (MesAll.stockCollagen < collagen) {      // 콜라겐재고가 부족한 경우
+//                MesAll.orderList[5] += collagen - MesAll.stockCollagen;
+//            } else
+//                MesAll.stockCollagen -= collagen;
+//            if (MesAll.stockStickPouch < pouch) {      // 파우치스틱재고가 부족한 경우
+//                MesAll.orderList[7] += pouch - MesAll.stockStickPouch;
+//            } else
+//                MesAll.stockStickPouch -= pouch;
+//        }
+//
+//        if (MesAll.stockBox < box) {               // 박스재고가 부족한 경우
+//            MesAll.orderList[8] += box - MesAll.stockBox;
+//        } else
+//            MesAll.stockBox -= box;
+//    }
 
     // 각 자재별 최소, 최대 주문량
     static int[] minMaxOrder(long itemId) {
         int[] range = new int[2];         // range[0] : 최소 주문량, range[1] : 최대 주문량
 
-        if (itemId == 1) {         // 양배추
-            range[0] = 1000;
-            range[1] = 5000;
-        } else if (itemId == 2) {      // 흑마늘
-            range[0] = 10;
-            range[1] = 5000;
-        } else if (itemId == 3) {      // 석류액기스
-            range[0] = 5;
-            range[1] = 500;
-        } else if (itemId == 4) {      // 매실액기스
-            range[0] = 5;
-            range[1] = 500;
-        } else if (itemId == 5) {      // 콜라겐
-            range[0] = 5;
-            range[1] = 500;
-        } else if (itemId == 6) {      // 파우치
-            range[0] = 1000;
-            range[1] = 1000000;
-        } else if (itemId == 7) {      // 스틱파우치
-            range[0] = 1000;
-            range[1] = 1000000;
-        } else {                  // 포장box
-            range[0] = 500;
-            range[1] = 10000;
+        switch ((int) itemId){
+            case 9 :         // 양배추
+                range[0] = 1000;
+                range[1] = 5000;
+            break;
+            case 10 :      // 흑마늘
+                range[0] = 10;
+                range[1] = 5000;
+            break;
+            case 11 :      // 석류액기스
+                range[0] = 5;
+                range[1] = 500;
+            break;
+            case 12 :      // 매실액기스
+                range[0] = 5;
+                range[1] = 500;
+            break;
+            case 14 :      // 콜라겐
+                range[0] = 5;
+                range[1] = 500;
+            break;
+            case 15 :      // 파우치
+                range[0] = 1000;
+                range[1] = 1000000;
+            break;
+            case 16 :      // 스틱파우치
+                range[0] = 1000;
+                range[1] = 1000000;
+            break;
+            default :      // 포장box
+                range[0] = 500;
+                range[1] = 10000;
         }
+//        if (itemId == 1) {         // 양배추
+//            range[0] = 1000;
+//            range[1] = 5000;
+//        } else if (itemId == 2) {      // 흑마늘
+//            range[0] = 10;
+//            range[1] = 5000;
+//        } else if (itemId == 3) {      // 석류액기스
+//            range[0] = 5;
+//            range[1] = 500;
+//        } else if (itemId == 4) {      // 매실액기스
+//            range[0] = 5;
+//            range[1] = 500;
+//        } else if (itemId == 5) {      // 콜라겐
+//            range[0] = 5;
+//            range[1] = 500;
+//        } else if (itemId == 6) {      // 파우치
+//            range[0] = 1000;
+//            range[1] = 1000000;
+//        } else if (itemId == 7) {      // 스틱파우치
+//            range[0] = 1000;
+//            range[1] = 1000000;
+//        } else {                  // 포장box
+//            range[0] = 500;
+//            range[1] = 10000;
+//        }
 
         return range;
     }
@@ -412,37 +456,37 @@ public class CalcOrderMaterial {
 
 
 
-
-    // 23.05.24 수정중
-    // 재고와 비교하여 필요한 원자재 주문 매소드(재고와 비교는 이전 과정에서 이미 진행됨)
-    // 주문량이 최대 주문량을 넘어설 경우, 금일 시점으로 최대주문량만 주문 후 나머지 양은 데이터베이스에 저장해 둬야함.
-    // (현재 mesAll.orderList를 주문필요량을 저장하는 데이터 베이스로 가정)
-    void orderItem(long itemId) {
-        LocalDateTime time = LocalDateTime.now();      // 발주시간
-        int amount = MesAll.orderList[(int) itemId];   // 주문량
-
-        int[] range = minMaxOrder(itemId);            // range[0] : 최소 주문량, range[1] : 최대 주문량
-
-        if (amount < range[1]) {
-            if (amount % range[0] == 0) {
-                MesAll.todayOrderList[(int) itemId] = amount;
-            } else {
-                MesAll.todayOrderList[(int) itemId] = (amount / range[0] + 1) * range[0];
-            }
-            MesAll.orderList[(int) itemId] = 0;
-        } else {
-            // 필요주문량(orderList) 에 금일 주문량(todayOrderList) 빼줌.
-            MesAll.todayOrderList[(int) itemId] = range[1];
-            MesAll.orderList[(int) itemId] -= range[1];
-        }
-
-        // db(발주관리)저장 필요
-        // 현재 메인재료에 대해서만 넘겨줌.
-        if (itemId == mesAll.itemId) {
-            LocalDateTime importExpectDate = calcImportExpectDate(itemId, time);
-            mesAll.time = importExpectDate;
-        }
-    }
+//
+//    // 23.05.24 수정중
+//    // 재고와 비교하여 필요한 원자재 주문 매소드(재고와 비교는 이전 과정에서 이미 진행됨)
+//    // 주문량이 최대 주문량을 넘어설 경우, 금일 시점으로 최대주문량만 주문 후 나머지 양은 데이터베이스에 저장해 둬야함.
+//    // (현재 mesAll.orderList를 주문필요량을 저장하는 데이터 베이스로 가정)
+//    void orderItem(long itemId) {
+//        LocalDateTime time = LocalDateTime.now();      // 발주시간
+//        int amount = MesAll.orderList[(int) itemId];   // 주문량
+//
+//        int[] range = minMaxOrder(itemId);            // range[0] : 최소 주문량, range[1] : 최대 주문량
+//
+//        if (amount < range[1]) {
+//            if (amount % range[0] == 0) {
+//                MesAll.todayOrderList[(int) itemId] = amount;
+//            } else {
+//                MesAll.todayOrderList[(int) itemId] = (amount / range[0] + 1) * range[0];
+//            }
+//            MesAll.orderList[(int) itemId] = 0;
+//        } else {
+//            // 필요주문량(orderList) 에 금일 주문량(todayOrderList) 빼줌.
+//            MesAll.todayOrderList[(int) itemId] = range[1];
+//            MesAll.orderList[(int) itemId] -= range[1];
+//        }
+//
+//        // db(발주관리)저장 필요
+//        // 현재 메인재료에 대해서만 넘겨줌.
+//        if (itemId == mesAll.itemId) {
+//            LocalDateTime importExpectDate = calcEstimateDate(itemId, time);
+//            mesAll.time = importExpectDate;
+//        }
+//    }
 
     // 원자재 주문은 11:59, 14:59에 일괄주문으로 지정
     // 원자재 주문은 평일만 가능
@@ -473,5 +517,179 @@ public class CalcOrderMaterial {
         time = time.withNano(0);
 
         return time;
+    }
+
+
+
+
+
+
+
+
+    // test
+    @Scheduled(cron = "11 55 0 * * ?")   // 매일 12시 전에 실행
+    public void morningOrderMaterialSchedule() {
+        if(LocalDateTime.now().getDayOfWeek().getValue() <= 5) {
+            // 발주대기 아이템중 itemId가 1보다 크거나 같고 2보다 작거나 같은 아이템 가져옴
+            for (int i = 9; i <= 10; i++) {
+                orderConfirmItem(i);               // 주문 매서드 실행
+            }
+        }
+    }
+
+    @Scheduled(cron = "14 55 0 * * ?")   // 매일 15시 전에 실행
+    public void afternoonOrderMaterialSchedule() {
+        if(LocalDateTime.now().getDayOfWeek().getValue() <= 5) {
+            for (int i = 11; i <= 12; i++) {
+                orderConfirmItem(i);
+            }
+            // 주문한 메인재료를 기준으로 부자재 주문 수량 조정
+            adjustItems();
+            // 15시 이전 부자재 주문
+            for (int i = 14; i <= 17; i++) {
+                orderConfirmItem(i);
+            }
+        }
+    }
+
+    void orderConfirmItem(long itemId) {
+        if(orderMaterialService.checkOrderMaterial(itemId) != null) {
+            OrderMaterial orderMaterial = orderMaterialService.checkOrderMaterial(itemId);
+            LocalDateTime now = LocalDateTime.now();           // 발주시간
+            Long amount = orderMaterial.getOrderItemAmount();    // 주문량
+            int[] range = minMaxOrder((int) itemId);            // range[0] : 최소 주문량, range[1] : 최대 주문량
+
+            if (amount < range[1]) {
+                if (amount % range[0] != 0) {
+                    // 이 상황이면 amount를 조정해서 발주 확정으로 바꿔준다
+                    amount = (amount / range[0] + 1) * range[0];
+                }
+                // 발주 확정으로 바꾸는 매소드 실행
+                orderMaterialService.confirmOrderMaterial(orderMaterial, amount, now, calcImportExpectDate(itemId, now));
+            } else {
+                orderMaterialService.confirmOrderMaterial(orderMaterial, (long) range[1], now, calcImportExpectDate(itemId, now));
+                orderMaterialService.saveOrderMaterial(itemId, amount - range[1], now, calcImportExpectDate(itemId, now.plusDays(1)));
+                // 필요주문량(orderList) 에 금일 주문량(todayOrderList) 빼줌.
+//                MesAll.todayOrderList[(int) itemId] = range[1];
+//                MesAll.orderList[(int) itemId] -= range[1];
+            }
+        }
+//
+//        // db(발주관리)저장 필요
+//        // 현재 메인재료에 대해서만 넘겨줌.
+//        if (itemId == mesAll.itemId) {
+//            LocalDateTime importExpectDate = calcImportExpectDate(itemId, time);
+//            mesAll.time = importExpectDate;
+//        }
+    }
+
+//    확인용
+    void adjustItems() {
+        long[] orderList = new long[18];
+        for(int i = 0; i < 18; i++){
+            orderList[i] = 0L;
+        }
+        LocalDateTime now = LocalDateTime.now();
+        // 원자재 담을 배열 생성
+        List<OrderMaterial> orderMaterialList = orderMaterialService.todayOrderMaterial();
+        // 금일 주문한 원자재가 있을경우 배열에 저장
+        for (int i = 0; i < orderMaterialList.size(); i++) {
+            System.out.println("Scheduler 클래스 adjustItems의 값 확인용 : " + Math.toIntExact(orderMaterialList.get(i).getItem().getItemId()));
+            orderList[Math.toIntExact(orderMaterialList.get(i).getItem().getItemId())] = orderMaterialList.get(i).getOrderItemAmount();
+            // orderMaterialList의 i번째 값의 itemId에 해당하는 orderList에 oderMaterial 저장
+        }
+
+        // 금일 주문한 원자재가 있을 경우 필요 부자재 양을 계산
+        // 필요 부자재양을 계산
+        // 주문대기에 부자재가 있을 경우 주문대기에 값을 추가
+        // 재고에 부자재가 있을 경우 값을 차감
+        // 없을 경우 원자재수에 따른 부자재 주문
+
+        Long amount;
+        Long addAmount;         // 금일 원자재 주문에 따른 필요량
+        Long alreadyAmount;     // 주문대기중인 부자재가 있을 경우
+        Long stockAmount;       // 부자재 재고가 있을경우 stockAmount에 저장
+
+        if(orderList[11] != 0 || orderList[12] != 0){
+            addAmount = (orderList[11] + orderList[12]) * 2 / 5;
+            alreadyAmount = 0L;
+            if (orderMaterialService.checkOrderMaterial(14L) != null) {
+                alreadyAmount = orderMaterialService.checkOrderMaterial(14L).getOrderItemAmount();
+            }
+            stockAmount = materialService.stockMaterialAmount(14L);
+            amount = alreadyAmount + addAmount - stockAmount;
+            if (stockAmount > 0) {
+                if (amount < 0) {
+                    materialService.useStockMaterial(14L, addAmount, now);
+                } else {
+                    orderMaterialService.saveOrderMaterial(14L, amount, now, calcImportExpectDate(14L, now));
+                    materialService.useStockMaterial(14L, stockAmount, now);
+                }
+            }
+            else
+                orderMaterialService.saveOrderMaterial(14L, amount, now, calcImportExpectDate(14L, now));
+        }
+        if (orderList[9] != 0 || orderList[10] != 0) {
+            alreadyAmount = 0L;
+            addAmount = 20 * orderList[9] + 120 * orderList[10];
+            if (orderMaterialService.checkOrderMaterial(15L) != null) {
+                alreadyAmount = orderMaterialService.checkOrderMaterial(15L).getOrderItemAmount();
+            }
+            stockAmount = materialService.stockMaterialAmount(15L);
+            amount = alreadyAmount + addAmount - stockAmount;
+            System.out.println("주문 해야 할 포장지 양 : " + amount);
+            // 주문해야할 총 부자재양
+            if (stockAmount > 0) {
+                if (amount < 0) {
+                    materialService.useStockMaterial(15L, addAmount, now);
+                } else {
+                    orderMaterialService.saveOrderMaterial(15L, amount, now, calcImportExpectDate(15L, now));
+                    materialService.useStockMaterial(15L, stockAmount, now);
+                }
+            }
+            else
+                orderMaterialService.saveOrderMaterial(15L, amount, now, calcImportExpectDate(15L, now));
+        }
+        if (orderList[11] != 0 || orderList[12] != 0) {
+            alreadyAmount = 0L;
+            addAmount = (orderList[11] + orderList[12]) * 200;
+            if (orderMaterialService.checkOrderMaterial(16L) != null) {
+                alreadyAmount = orderMaterialService.checkOrderMaterial(16L).getOrderItemAmount();
+            }
+            stockAmount = materialService.stockMaterialAmount(16L);
+            amount = alreadyAmount + addAmount - stockAmount;
+            // 주문해야할 총 부자재양
+            if (stockAmount > 0) {
+                if (amount < 0) {
+                    materialService.useStockMaterial(16L, addAmount, now);
+                } else {
+                    orderMaterialService.saveOrderMaterial(16L, amount, now, calcImportExpectDate(16L, now));
+                    materialService.useStockMaterial(16L, stockAmount, now);
+                }
+            }
+            else
+                orderMaterialService.saveOrderMaterial(16L, amount, now, calcImportExpectDate(16L, now));
+        }
+
+        if (orderList[9] != 0 || orderList[10] != 0 || orderList[11] != 0 || orderList[12] != 0) {
+            alreadyAmount = 0L;
+            addAmount = orderList[9] * 2 / 3 +  orderList[10] * 4 + (orderList[11] + orderList[12]) * 8;
+            if (orderMaterialService.checkOrderMaterial(17L) != null) {
+                alreadyAmount = orderMaterialService.checkOrderMaterial(17L).getOrderItemAmount();
+            }
+            stockAmount = materialService.stockMaterialAmount(17L);
+            amount = alreadyAmount + addAmount - stockAmount;
+            // 주문해야할 총 부자재양
+            if (stockAmount > 0) {
+                if (amount < 0) {
+                    materialService.useStockMaterial(17L, addAmount, now);
+                } else {
+                    orderMaterialService.saveOrderMaterial(17L, amount, now, calcImportExpectDate(17L, now));
+                    materialService.useStockMaterial(17L, stockAmount, now);
+                }
+            }
+            else
+                orderMaterialService.saveOrderMaterial(17L, amount, now, calcImportExpectDate(17L, now));
+        }
     }
 }

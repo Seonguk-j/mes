@@ -2,6 +2,7 @@ package team_2p4p.mes.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import team_2p4p.mes.entity.Enterprise;
 import team_2p4p.mes.entity.Item;
@@ -37,34 +38,57 @@ public class OrderMaterialService {
         List<OrderMaterial> orderMaterialList = orderMaterialRepository.findByItemItemId(itemId);
         Item item = itemRepository.findById(itemId).orElseThrow(() -> new IllegalArgumentException("아이템이 없습니다."));
         Enterprise enterprise = enterpriseRepository.findByItemItemId(itemId);
-        OrderMaterial orderMaterial = orderMaterialList.get(orderMaterialList.size() - 1);
-        if(orderMaterial.getOrderStat() == 0) {
-            orderMaterial.updateOrderMaterial(orderMaterial, orderMaterial.getOrderItemAmount() + amount, orderDate, importExpectDate, 0);
-        }
-        else {
+        System.out.println("협력업체 : " + enterprise.toString());
+        OrderMaterial orderMaterial;
+        if (orderMaterialList.isEmpty()){
             orderMaterial = new OrderMaterial(null, item, enterprise, amount, orderDate, importExpectDate, 0);
         }
+        else {
+            orderMaterial = orderMaterialList.get(orderMaterialList.size() - 1);
+            if (orderMaterial.getOrderStat() == 0) {
+                orderMaterial.updateOrderMaterial(orderMaterial, orderMaterial.getOrderItemAmount() + amount, orderDate, importExpectDate, 0);
+            } else {
+                orderMaterial = new OrderMaterial(null, item, enterprise, amount, orderDate, importExpectDate, 0);
+            }
+        }
+        System.out.println("테스트 : " + orderMaterial.toString());
 
         return orderMaterialRepository.save(orderMaterial);
     }
 
 
+    @Nullable
     public OrderMaterial checkOrderMaterial(Long itemId) {
         List<OrderMaterial> orderMaterialList = orderMaterialRepository.findByItemItemId(itemId);
-        if(orderMaterialList.get(orderMaterialList.size() - 1).getOrderStat() == 0)
-            return orderMaterialList.get(orderMaterialList.size() - 1);
+        if(!orderMaterialList.isEmpty()) {
+            if (orderMaterialList.get(orderMaterialList.size() - 1).getOrderStat() == 0)
+                return orderMaterialList.get(orderMaterialList.size() - 1);
+        }
         return null;
     }
 
     public OrderMaterial confirmOrderMaterial(OrderMaterial orderMaterial, Long amount, LocalDateTime orderDate, LocalDateTime importExpectDate) {
-        orderMaterial.updateOrderMaterial(orderMaterial, orderMaterial.getOrderItemAmount() + amount, orderDate, importExpectDate, 1);
+        orderMaterial.updateOrderMaterial(orderMaterial, amount, orderDate, importExpectDate, 1);
         return orderMaterialRepository.save(orderMaterial);
     }
 
     public List<OrderMaterial> todayOrderMaterial() {
         LocalDate today = LocalDate.now();
         List<OrderMaterial> orderMaterialList = orderMaterialRepository.findByOrderDate(today);
+//        List<OrderMaterial> outputOrderMaterialList = new ArrayList<>();
+//        for(OrderMaterial orderMaterial : orderMaterialList) {
+//            if(orderMaterial.getOrderStat() == 1)
+//                outputOrderMaterialList.add(orderMaterial);
+//        }
         return orderMaterialList;
+    }
+
+    public long findOrderId(Long itemId) {
+        if (!orderMaterialRepository.findByItemItemId(itemId).isEmpty()) {
+            List<OrderMaterial> orderMaterialList = orderMaterialRepository.findByItemItemId(itemId);
+            return orderMaterialList.get(orderMaterialList.size() - 1).getOrderId();
+        }
+        return -1;
     }
 
 }

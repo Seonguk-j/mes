@@ -17,6 +17,8 @@ public class ProductionManagementServiceTest {
 
     @Autowired
     private ProductionManagementService productionManagementService;
+    @Autowired LotLogService lotLogService;
+    @Autowired ProductService productService;
 
     Calculator cal = new Calculator();
 
@@ -24,9 +26,22 @@ public class ProductionManagementServiceTest {
     @Test
     public void confirm(){ // 생산계획생성후 수주테이블에 확정시간찍기
         ObtainDTO obtainDTO = new ObtainDTO();
-        obtainDTO.setObtainId(12L);
+        obtainDTO.setObtainId(1L);
         productionManagementService.confirmAndAddProductionManagement(obtainDTO);
     }
 
+    @Test
+    public void lot(){
+        ObtainDTO obtainDTO = new ObtainDTO();
+        obtainDTO.setObtainId(1L);
+        lotLogService.recordLot(obtainDTO);
+    }
+
+//    @Test
+//    public void product(){
+//        ObtainDTO obtainDTO = new ObtainDTO();
+//        obtainDTO.setObtainId(1L);
+//        productService.regProduct(obtainDTO);
+//    }
 
 }

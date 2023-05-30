@@ -65,8 +65,10 @@ public class ReferenceRepositoryTests {
         itemService.saveItem("OP-005", "정제수", "원자재");
         itemService.saveItem("OP-006", "콜라겐", "원자재");
         itemService.saveItem("OP-007", "포장지", "원자재");
-        itemService.saveItem("OP-008", "박스", "원자재");
+        itemService.saveItem("OP-008", "스틱", "원자재");
+        itemService.saveItem("OP-009", "박스", "원자재");
     }
+
 
     @Test
     public void facility(){
@@ -77,10 +79,10 @@ public class ReferenceRepositoryTests {
         facilityService.saveFacility("추출기", "2000L", 20, itemService.findItem("양배추"),itemService.findItem("흑마늘"), itemService.findItem("정제수"), null, null);
         facilityService.saveFacility("저장탱크", "2000L", 20, itemService.findItem("석류농축액"),itemService.findItem("매실농축액"), itemService.findItem("정제수"), itemService.findItem("콜라겐"), null);
         facilityService.saveFacility("저장탱크", "2000L", 20, itemService.findItem("석류농축액"),itemService.findItem("매실농축액"), itemService.findItem("정제수"), itemService.findItem("콜라겐"), null);
-        facilityService.saveFacility("스틱충진기 1열", "1500ea/1h",20,itemService.findItem("포장지"),itemService.findItem("석류젤리"),itemService.findItem("매실젤리"),null, null);
-        facilityService.saveFacility("스틱충진기 2열", "1500ea/1h",20,itemService.findItem("포장지"),itemService.findItem("석류젤리"),itemService.findItem("매실젤리"),null, null);
         facilityService.saveFacility("파우치포장 1열", "1750ea/1h",20,itemService.findItem("포장지"),itemService.findItem("양배추 추출액"),itemService.findItem("흑마늘 추출액"),null, null);
         facilityService.saveFacility("파우치포장 2열", "1750ea/1h",20,itemService.findItem("포장지"),itemService.findItem("양배추 추출액"),itemService.findItem("흑마늘 추출액"),null, null);
+        facilityService.saveFacility("스틱충진기 1열", "1500ea/1h",20,itemService.findItem("스틱"),itemService.findItem("석류젤리"),itemService.findItem("매실젤리"),null, null);
+        facilityService.saveFacility("스틱충진기 2열", "1500ea/1h",20,itemService.findItem("스틱"),itemService.findItem("석류젤리"),itemService.findItem("매실젤리"),null, null);
         facilityService.saveFacility("금속검출기", "5000/1h",10,null,itemService.findItem("양배추 추출액"),itemService.findItem("흑마늘 추출액"),null, null);
         facilityService.saveFacility("포장", "200box/1h",20,itemService.findItem("박스"),itemService.findItem("양배추즙"),itemService.findItem("흑마늘즙"),itemService.findItem("석류젤리 스틱"),itemService.findItem("매실젤리 스틱"));
     }
@@ -106,6 +108,7 @@ public class ReferenceRepositoryTests {
         enterpriseService.saveEnterprise(itemService.findItem("매실농축액"), "성욱농협","3Day // 15:00 이전 주문");
         enterpriseService.saveEnterprise(itemService.findItem("콜라겐"), "성욱농협","3Day // 15:00 이전 주문");
         enterpriseService.saveEnterprise(itemService.findItem("포장지"), "불고미포장","0 // 창고");
+        enterpriseService.saveEnterprise(itemService.findItem("스틱"), "불고미포장","0 // 창고");
 
     }
     @Test

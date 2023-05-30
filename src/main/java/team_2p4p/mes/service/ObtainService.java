@@ -2,8 +2,10 @@ package team_2p4p.mes.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import team_2p4p.mes.dto.ObtainDTO;
+import team_2p4p.mes.dto.SearchDTO;
 import team_2p4p.mes.entity.Customer;
 import team_2p4p.mes.entity.Item;
 import team_2p4p.mes.entity.Obtain;
@@ -26,7 +28,10 @@ import java.util.List;
 @Transactional
 @RequiredArgsConstructor
 @Log4j2
+
 public class ObtainService {
+
+    private final CalcOrderMaterial calcOrderMaterial;
 
     private final ObtainRepository obtainRepository;
     private final ItemRepository itemRepository;
@@ -43,27 +48,27 @@ public class ObtainService {
         List<Obtain> list = obtainRepository.findByObtainStat(true);
         List<ObtainDTO> dtoList = new ArrayList<>();
 
+        System.out.println("확정리스트 : " + list);
         Factory factory = Factory.getInstance();
-        factory.getMeasurement().getConfirmList().clear();
-        factory.getPreProcessing().getConfirmList().clear();
-        factory.getLiquidSystem().getConfirmList().clear();
-        factory.getFillPouchProcessing().getConfirmList().clear();
-        factory.getFillPouchProcessing().getConfirmList().clear();
-        factory.getCheckProcessing().getConfirmList().clear();
-        factory.getPacking().getConfirmList().clear();
+
+        factory.clearList();
 
         for(int i = 0; i < list.size(); i++){
 
             dtoList.add(entityToDto(list.get(i)));
-            MesAll mesAll = CalcOrderMaterial.estimateDate(dtoList.get(i).getItemId(), Math.toIntExact(dtoList.get(i).getObtainAmount()), dtoList.get(i).getObtainStatDate());
+            MesAll mesAll = calcOrderMaterial.estimateDate(dtoList.get(i).getItemId(), Math.toIntExact(dtoList.get(i).getObtainAmount()), dtoList.get(i).getObtainStatDate());
             cal.obtain(mesAll);
+
             factory.getMeasurement().getConfirmList().add(mesAll);
             factory.getPreProcessing().getConfirmList().add(mesAll);
             factory.getLiquidSystem().getConfirmList().add(mesAll);
             factory.getFillPouchProcessing().getConfirmList().add(mesAll);
-            factory.getFillPouchProcessing().getConfirmList().add(mesAll);
+            factory.getFillStickProcessing().getConfirmList().add(mesAll);
             factory.getCheckProcessing().getConfirmList().add(mesAll);
             factory.getPacking().getConfirmList().add(mesAll);
+
+            System.out.println("컨펌리스트 mesAll");
+            System.out.println(mesAll);
         }
     }
 
@@ -72,6 +77,7 @@ public class ObtainService {
         getConfirmList();
 
         //제품명 저장
+        System.out.println(item);
         dto.setItemId(item.getItemId());
         dto.setItem(item);
         System.out.println("수량:"+ dto.getObtainAmount());
@@ -88,8 +94,10 @@ public class ObtainService {
         //수주 상태 저장
         dto.setObtainStat(false);
 
+        //고객사 요청일 저장
+
         //예상납기일 계산
-        MesAll obtainInfo = CalcOrderMaterial.estimateDate(dto.getItemId(), Math.toIntExact(dto.getObtainAmount()), obtainDate);
+        MesAll obtainInfo = calcOrderMaterial.estimateDate(dto.getItemId(), Math.toIntExact(dto.getObtainAmount()), obtainDate);
         cal.obtain(obtainInfo);
         //예상납기일 저장
         dto.setExpectDate(obtainInfo.getEstimateDate());
@@ -108,7 +116,7 @@ public class ObtainService {
         getConfirmList();
 
         dto = entityToDto(obtainRepository.findById(dto.getObtainId()).orElseThrow());
-        MesAll mesAll = CalcOrderMaterial.estimateDate(dto.getItemId(), Math.toIntExact(dto.getObtainAmount()), LocalDateTime.now());
+        MesAll mesAll = calcOrderMaterial.estimateDate(dto.getItemId(), Math.toIntExact(dto.getObtainAmount()), LocalDateTime.now());
         cal.obtain(mesAll);
 
 
@@ -131,7 +139,7 @@ public class ObtainService {
         List<ObtainDTO> dtoList = new ArrayList<>();
         for(int i = 0; i < entityList.size(); i++){
             dtoList.add(entityToDto(entityList.get(i))); // entity를 dto로 변환 후 dto List에 넣어줌
-            MesAll mesAll = CalcOrderMaterial.estimateDate(dtoList.get(i).getItemId(), Math.toIntExact(dtoList.get(i).getObtainAmount()), LocalDateTime.now());
+            MesAll mesAll = calcOrderMaterial.estimateDate(dtoList.get(i).getItemId(), Math.toIntExact(dtoList.get(i).getObtainAmount()), LocalDateTime.now());
             cal.obtain(mesAll);
             dtoList.get(i).setExpectDate(mesAll.getEstimateDate());
             obtainRepository.save(dtoToEntity(dtoList.get(i)));
@@ -174,5 +182,11 @@ public class ObtainService {
         return dto;
     }
 
+    public List<Obtain> getObtainList(SearchDTO searchDTO){
+        return obtainRepository.getObtainList(searchDTO);
+    }
 
+    public void deleteObtainByObtainId(Long obtainNum){
+        obtainRepository.deleteById(obtainNum);
+    }
 }

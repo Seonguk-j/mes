@@ -40,6 +40,7 @@ public class ObtainDTO {
     private LocalDateTime obtainDate;
 
     @NotBlank(message = "납기일은 필수 입력 값입니다.")
+
     //납기일
     private LocalDateTime customerRequestDate;
 

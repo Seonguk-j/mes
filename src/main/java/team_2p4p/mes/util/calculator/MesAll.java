@@ -53,34 +53,22 @@ public class MesAll {
 
     }
 
-    static int stockCabbage = 0;         // 양배추 재고량(kg) : 1
-    static int stockGarlic = 0;            // 흑마늘 재고량(kg) : 2
-    static int stockPomegranate = 0;      // 석류액기스 재고량(kg) : 3
-    static int stockPlum = 0;            // 매실액기스 재고량(kg) : 4
-    static int stockCollagen = 0;         // 콜라겐 재고량(kg) : 5
-    static int stockPouch = 0;            // 파우치 재고량(ea) : 6
-    static int stockStickPouch = 0;         // 스틱파우치 재고량(ea) : 7
-    static int stockBox = 0;            // 박스 재고량(ea) : 8
-
-    static int[] stockProduct = new int[5];   // 완성품 재고량(1 ~ 4)
-
-    static int[][] obtainList = new int[2][10];
 
     boolean stockEnough;            // 완성품 재고 충분한 경우 : true, 부족한 경우 : false;
 
     // 발주 주문 종합을 위한 배열
-    static int[] orderList = new int[9];
+//    static int[] orderList = new int[9];
 //   static int[] orderList = {0, 0, 100, 300, 50, 0, 0, 0, 0};
 
     // 금일 발주 진행을 위한 배열
-    static int[] todayOrderList = new int[9];
+//    static int[] todayOrderList = new int[9];
 
 
     // uk -> tae
     long itemId; // 원료계량 전에 return 받은 itemId 0,1,2,3
     double amount; // 원료계량 전에 return 받은 amount 원료계량 후에도 이값을 return함
     LocalDateTime time;
-
+    long orderId;
 
 
     private double measurementAmount; // 원료 계량 투입량

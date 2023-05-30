@@ -38,6 +38,8 @@ public class MaterialService {
 
     public Material findLatestMaterial(Long itemId) {
         List<Material> materialList = materialRepository.findByItemItemId(itemId);
+        if(materialList.isEmpty())
+            return null;
         return materialList.get(materialList.size() - 1);
     }
 }
