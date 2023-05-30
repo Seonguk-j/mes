@@ -36,4 +36,13 @@ public class Product {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "lot_id")
     private Lot lot;
+
+    public void update() {
+        this.productId = getProductId();
+        this.item = getItem();
+        this.productStock = getProductStock();
+        this.makeDate = getMakeDate();
+        this.exportStat = true;
+        this.lot = getLot();
+    }
 }

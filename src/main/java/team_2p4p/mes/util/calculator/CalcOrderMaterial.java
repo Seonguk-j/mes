@@ -11,11 +11,9 @@ package team_2p4p.mes.util.calculator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import team_2p4p.mes.dto.ObtainDTO;
 import team_2p4p.mes.entity.Item;
 import team_2p4p.mes.entity.OrderMaterial;
 import team_2p4p.mes.entity.Product;
-import team_2p4p.mes.repository.ObtainRepository;
 import team_2p4p.mes.service.*;
 
 import java.time.LocalDateTime;
@@ -32,8 +30,6 @@ public class CalcOrderMaterial {
     private final ItemService itemService;
     private final OrderMaterialService orderMaterialService;
     private final MaterialService materialService;
-//    private final ObtainService obtainService;
-//    private final ObtainRepository obtainRepository;
 
     Calculator cal = new Calculator();
     public MesAll test(long itemId, int amount) {
@@ -65,6 +61,8 @@ public class CalcOrderMaterial {
                 productService.addMinusProductStock(item, stock, product.getMakeDate(), product.getLot());
             // 부족한 만큼에 대한 재료들이 발주 필요 데이터베이스(현재 orderList)에 저장
             saveOrderList(itemId, comparedAmount, now);
+            // estimateDate를 사용해야할거같기는 한데...
+            mesAll.amount = calcEstimateAmount(itemId, comparedAmount);
             // 메인재료 도착예정일 계산
             time = estimateDate(itemId, comparedAmount, now).time;
             long orderId = orderMaterialService.findOrderId(itemId + 8);
@@ -110,7 +108,6 @@ public class CalcOrderMaterial {
 
             int already = 0;
             int maxOrder = minMaxOrder(materialId)[1];
-//            원래라면 여기 materialId가 들어가야지
 
             OrderMaterial orderMaterial = orderMaterialService.checkOrderMaterial(materialId);
 
@@ -141,7 +138,6 @@ public class CalcOrderMaterial {
                 }
             }
         }
-
         return mesAll;
     }
 

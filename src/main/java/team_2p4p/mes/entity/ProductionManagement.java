@@ -45,4 +45,14 @@ public class ProductionManagement {
         this.processAmount = processAmount;
         this.processStat = 0;
     }
+
+    public void update(int stat) {
+        this.productionManagementId = getProductionManagementId();
+        this.obtain = getObtain();
+        this.process = getProcess();
+        this.processStartTime = getProcessStartTime();
+        this.processFinishTime = getProcessFinishTime();
+        this.processAmount = getProcessAmount();
+        this.processStat = stat;
+    }
 }

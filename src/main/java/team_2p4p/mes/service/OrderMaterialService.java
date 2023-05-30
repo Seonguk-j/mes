@@ -38,7 +38,6 @@ public class OrderMaterialService {
         List<OrderMaterial> orderMaterialList = orderMaterialRepository.findByItemItemId(itemId);
         Item item = itemRepository.findById(itemId).orElseThrow(() -> new IllegalArgumentException("아이템이 없습니다."));
         Enterprise enterprise = enterpriseRepository.findByItemItemId(itemId);
-        System.out.println("협력업체 : " + enterprise.toString());
         OrderMaterial orderMaterial;
         if (orderMaterialList.isEmpty()){
             orderMaterial = new OrderMaterial(null, item, enterprise, amount, orderDate, importExpectDate, 0);
@@ -51,8 +50,6 @@ public class OrderMaterialService {
                 orderMaterial = new OrderMaterial(null, item, enterprise, amount, orderDate, importExpectDate, 0);
             }
         }
-        System.out.println("테스트 : " + orderMaterial.toString());
-
         return orderMaterialRepository.save(orderMaterial);
     }
 

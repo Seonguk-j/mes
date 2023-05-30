@@ -21,7 +21,6 @@ public class ProductService {
 
     public Long productStock(Long itemId) {
         List<Product> productList = productRepository.findByItemItemId(itemId);
-        System.out.println("크기 : " + productList.size());
         Long stock = 0L;
         if(!productList.isEmpty()) {
             for (Product product : productList) {
@@ -31,7 +30,6 @@ public class ProductService {
                     stock -= product.getProductStock();
             }
         }
-        System.out.println("양 : " + stock);
         return stock;
     }
 
