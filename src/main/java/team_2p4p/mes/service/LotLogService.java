@@ -310,6 +310,13 @@ public class LotLogService {
     }
 
 
+//    public List<String> findPLot(LotLogDTO lotLogDTO){
+//        int id = lotLogDTO.getLotLogId()
+//    }
+
+
+
+
     public LotLog dtoToEntity(LotLogDTO dto){
 
         LotLog entity = LotLog.builder()
