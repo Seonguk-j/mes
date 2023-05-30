@@ -28,7 +28,7 @@ public class StockController {
         return productRepository.findAll();
     }
 
-    //완제품 조회
+    //원자재 조회
     @GetMapping("/material/list")
     public List<Material> materialList(){
         return materialRepository.findAll();
