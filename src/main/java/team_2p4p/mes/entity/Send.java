@@ -19,11 +19,11 @@ public class Send {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long sendId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(nullable = false, name = "item_id")
     private Item item;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(nullable = false, name = "obtain_id")
     private Obtain obtain;
 

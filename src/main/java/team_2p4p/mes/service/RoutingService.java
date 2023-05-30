@@ -28,7 +28,6 @@ public class RoutingService {
                 .process6(process6)
                 .process7(process7)
                 .build();
-        System.out.println(routing);
         routingRepository.save(routing);
     }
 

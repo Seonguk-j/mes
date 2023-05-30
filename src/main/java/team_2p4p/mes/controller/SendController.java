@@ -25,6 +25,5 @@ public class SendController {
     @GetMapping("wait")
     public List<Send> sendWait(){
         return sendService.getSendWaitList();
-
     }
 }
