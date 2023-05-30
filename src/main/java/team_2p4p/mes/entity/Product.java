@@ -34,6 +34,16 @@ public class Product {
     private boolean exportStat;
 
     @ManyToOne(fetch = FetchType.LAZY)
+
     @JoinColumn( name = "lot_log_id")
     private LotLog lotLogId;
+
+    public void update() {
+        this.productId = getProductId();
+        this.item = getItem();
+        this.productStock = getProductStock();
+        this.makeDate = getMakeDate();
+        this.exportStat = true;
+        this.lot = getLot();
+    }
 }

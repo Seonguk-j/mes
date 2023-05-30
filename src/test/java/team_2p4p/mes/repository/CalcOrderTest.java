@@ -92,5 +92,19 @@ public class CalcOrderTest {
         calcOrderMaterial.morningOrderMaterialSchedule();
         calcOrderMaterial.afternoonOrderMaterialSchedule();
 
+        calcOrderMaterial.inputMaterialSchedule();
+        MesAll mesAll = new MesAll();
+        mesAll.setItemId(9L);
+        mesAll.setOrderId(1L);
+
+    }
+
+
+    @Test
+    public void materialStatTest() {
+        MesAll mesAll = new MesAll();
+        mesAll.setItemId(9L);
+        mesAll.setOrderId(1L);
+        calcOrderMaterial.useMaterial(mesAll, 3000L);
     }
 }

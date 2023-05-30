@@ -1,8 +1,14 @@
 package team_2p4p.mes.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import team_2p4p.mes.entity.Bom;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import team_2p4p.mes.entity.Send;
 
-public interface SendRepository extends JpaRepository<Send, Long> {
+import java.time.LocalDate;
+import java.util.List;
+
+public interface SendRepository extends JpaRepository<SendRepository, Long> {
+    @Query(value = "select * from send where Date(obtain.expect_date) >= :today and send_stat = 0", nativeQuery = true)
+    List<Send> statZeroToOne(@Param("today") LocalDate today);
 }

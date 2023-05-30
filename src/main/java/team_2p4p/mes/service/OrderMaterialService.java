@@ -38,7 +38,6 @@ public class OrderMaterialService {
         List<OrderMaterial> orderMaterialList = orderMaterialRepository.findByItemItemId(itemId);
         Item item = itemRepository.findById(itemId).orElseThrow(() -> new IllegalArgumentException("아이템이 없습니다."));
         Enterprise enterprise = enterpriseRepository.findByItemItemId(itemId);
-        System.out.println("협력업체 : " + enterprise.toString());
         OrderMaterial orderMaterial;
         if (orderMaterialList.isEmpty()){
             orderMaterial = new OrderMaterial(null, item, enterprise, amount, orderDate, importExpectDate, 0);
@@ -51,11 +50,13 @@ public class OrderMaterialService {
                 orderMaterial = new OrderMaterial(null, item, enterprise, amount, orderDate, importExpectDate, 0);
             }
         }
-        System.out.println("테스트 : " + orderMaterial.toString());
-
         return orderMaterialRepository.save(orderMaterial);
     }
 
+    public OrderMaterial saveFinishOrderMaterial(OrderMaterial orderMaterial){
+        orderMaterial.updateOrderMaterial(orderMaterial, orderMaterial.getOrderItemAmount(), orderMaterial.getOrderDate(), orderMaterial.getImportExpectDate(), 2);
+        return orderMaterialRepository.save(orderMaterial);
+    }
 
     @Nullable
     public OrderMaterial checkOrderMaterial(Long itemId) {
@@ -75,11 +76,6 @@ public class OrderMaterialService {
     public List<OrderMaterial> todayOrderMaterial() {
         LocalDate today = LocalDate.now();
         List<OrderMaterial> orderMaterialList = orderMaterialRepository.findByOrderDate(today);
-//        List<OrderMaterial> outputOrderMaterialList = new ArrayList<>();
-//        for(OrderMaterial orderMaterial : orderMaterialList) {
-//            if(orderMaterial.getOrderStat() == 1)
-//                outputOrderMaterialList.add(orderMaterial);
-//        }
         return orderMaterialList;
     }
 
@@ -89,6 +85,15 @@ public class OrderMaterialService {
             return orderMaterialList.get(orderMaterialList.size() - 1).getOrderId();
         }
         return -1;
+    }
+
+    public List<OrderMaterial> finishOrderMaterial() {
+        List<OrderMaterial> orderMaterialList = orderMaterialRepository.findByImportExpectDate(LocalDate.now());
+        return orderMaterialList;
+    }
+
+    public OrderMaterial findByOrderId(Long orderId) {
+        return orderMaterialRepository.findById(orderId).orElseThrow(() -> new NullPointerException("주문이 없습니다."));
     }
 
 }

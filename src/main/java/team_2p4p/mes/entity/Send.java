@@ -19,11 +19,11 @@ public class Send {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long sendId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(nullable = false, name = "item_id")
     private Item item;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(nullable = false, name = "obtain_id")
     private Obtain obtain;
 
@@ -33,4 +33,15 @@ public class Send {
     @Column(nullable = false, name="send_stat")
     private boolean sendStat;
 
+    @Column(nullable = false, name="material_in_date")
+    private LocalDateTime materialInDate;
+
+    public void update() {
+        this.sendId = getSendId();
+        this.item = getItem();
+        this.obtain = getObtain();
+        this.sendProductNum = getSendProductNum();
+        this.sendStat = true;
+        this.materialInDate = getMaterialInDate();
+    }
 }
