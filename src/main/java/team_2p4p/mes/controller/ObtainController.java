@@ -52,7 +52,7 @@ public class ObtainController {
 
     @GetMapping("/obtain/list")
     public List<Obtain> obtains(){
-        List<Obtain> obtainList = obtainRepository.findAll();
+        List<Obtain> obtainList = obtainService.classification0();
         return obtainList;
     }
 

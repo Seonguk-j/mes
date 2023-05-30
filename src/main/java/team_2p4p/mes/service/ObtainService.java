@@ -192,6 +192,15 @@ public class ObtainService {
         obtainRepository.deleteById(obtainNum);
     }
 
+    public List<Obtain> classification0(){
+        List<Obtain> obtains = obtainRepository.findAll();
+
+        List<Obtain> filteredList = obtains.stream()
+                .filter(obtain -> obtain.isObtainStat()==false)
+                .collect(Collectors.toList());
+        return filteredList;
+    }
+
     public List<Obtain> classification(){
         List<Obtain> obtains = obtainRepository.findAll();
 
