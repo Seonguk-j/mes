@@ -16,7 +16,7 @@ import java.util.List;
 @RestController
 @RequestMapping("juicyfresh/")
 @RequiredArgsConstructor
-public class StockController {
+public class    StockController {
 
     private final ProductRepository productRepository;
 
