@@ -8,7 +8,7 @@ import team_2p4p.mes.entity.Send;
 import java.time.LocalDate;
 import java.util.List;
 
-public interface SendRepository extends JpaRepository<SendRepository, Long> {
-    @Query(value = "select * from send where Date(obtain.expect_date) >= :today and send_stat = 0", nativeQuery = true)
-    List<Send> statZeroToOne(@Param("today") LocalDate today);
+public interface SendRepository extends JpaRepository<Send, Long> {
+   // @Query(value = "select * from send where Date(obtain.expect_date) >= :today and send_stat = 0", nativeQuery = true)
+    //List<Send> statZeroToOne(@Param("today") LocalDate today);
 }

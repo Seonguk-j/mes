@@ -33,6 +33,7 @@ public class CalcOrderMaterial {
 
     Calculator cal = new Calculator();
     public MesAll test(long itemId, int amount) {
+        System.out.println("인풋 amount" + amount);
         mesAll = new MesAll();
         LocalDateTime now = LocalDateTime.now();   // 수주시간
         LocalDateTime time;
@@ -51,14 +52,14 @@ public class CalcOrderMaterial {
             // mesAll에 대한 값이 tae에게 넘어갈 필요가 없음.
             // 이부분에 대한 부분 추가 고려 필요
             // 23.05.23 db에 재고에서 수주량 차감
-            productService.addMinusProductStock(item, (long) amount, product.getMakeDate(), product.getLot());
+            productService.addMinusProductStock(item, (long) amount, product.getMakeDate(), product.getLotLogId());
         } else {
             // 수주량이 재고량보다 많은 경우 am > 0
             // 재고수량 0으로 만들어줌 -> 출하로 넘겨야 함
             // 23.05.23 db에 재고에서 수주량 차감
             Long stock = productService.productStock(itemId);
             if(stock != 0)
-                productService.addMinusProductStock(item, stock, product.getMakeDate(), product.getLot());
+                productService.addMinusProductStock(item, stock, product.getMakeDate(), product.getLotLogId());
             // 부족한 만큼에 대한 재료들이 발주 필요 데이터베이스(현재 orderList)에 저장
             saveOrderList(itemId, comparedAmount, now);
             // estimateDate를 사용해야할거같기는 한데...
@@ -69,6 +70,8 @@ public class CalcOrderMaterial {
             mesAll.orderId = orderId;
             mesAll.time = time;
         }
+        System.out.println("아웃풋 amount" + mesAll.amount);
+
         return mesAll;
     }
 
@@ -138,6 +141,8 @@ public class CalcOrderMaterial {
                 }
             }
         }
+        System.out.println("리턴전");
+        System.out.println(mesAll.getAmount());
         return mesAll;
     }
 
