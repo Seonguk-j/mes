@@ -22,16 +22,59 @@ public class StockController {
 
     private final MaterialRepository materialRepository;
 
-    //완제품 조회
+    //완제품 입출
     @GetMapping("/product/list")
     public List<Product> productList(){
         return productRepository.findAll();
     }
 
-    //원자재 조회
+    //원자재 입출
     @GetMapping("/material/list")
     public List<Material> materialList(){
-        return materialRepository.findAll();
+        return materialRepository.findInputOutput();
     }
 
+    @GetMapping("/product/stock")
+    public Long[] productStock(){
+        Long[] stocks = {0L, 0L, 0L, 0L};
+        for (int i = 0; i < 4; i++) {
+            List<Product> productList = productRepository.findStock(i + 1L);
+            if(!productList.isEmpty()) {
+                for (Product product : productList) {
+                    stocks[i] += product.getProductStock();
+                }
+            }
+        }
+        return stocks;
+    }
+
+    @GetMapping("/material/stock")
+    public Long[] materialStock(){
+        Long[] stocks = {0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L};
+        for (int i = 9; i < 13; i++) {
+            List<Material> materialList = materialRepository.findStock(Long.valueOf(i));
+            if(!materialList.isEmpty()) {
+                for (Material material : materialList) {
+                    if(material.getMaterialStat() == 0)
+                        stocks[i - 9] += material.getMaterialStock();
+                    else if (material.getMaterialStat() == 2) {
+                        stocks[i - 9] -= material.getMaterialStock();
+                    }
+                }
+            }
+        }
+        for (int i = 14; i < 18; i++) {
+            List<Material> materialList = materialRepository.findStock(Long.valueOf(i));
+            if(!materialList.isEmpty()) {
+                for (Material material : materialList) {
+                    if(material.getMaterialStat() == 0)
+                        stocks[i - 10] += material.getMaterialStock();
+                    else if (material.getMaterialStat() == 2) {
+                        stocks[i - 10] -= material.getMaterialStock();
+                    }
+                }
+            }
+        }
+        return stocks;
+    }
 }
