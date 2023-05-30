@@ -48,27 +48,27 @@ public class ObtainService {
         List<Obtain> list = obtainRepository.findByObtainStat(true);
         List<ObtainDTO> dtoList = new ArrayList<>();
 
+        System.out.println("확정리스트 : " + list);
         Factory factory = Factory.getInstance();
-        factory.getMeasurement().getConfirmList().clear();
-        factory.getPreProcessing().getConfirmList().clear();
-        factory.getLiquidSystem().getConfirmList().clear();
-        factory.getFillPouchProcessing().getConfirmList().clear();
-        factory.getFillPouchProcessing().getConfirmList().clear();
-        factory.getCheckProcessing().getConfirmList().clear();
-        factory.getPacking().getConfirmList().clear();
+
+        factory.clearList();
 
         for(int i = 0; i < list.size(); i++){
 
             dtoList.add(entityToDto(list.get(i)));
             MesAll mesAll = calcOrderMaterial.estimateDate(dtoList.get(i).getItemId(), Math.toIntExact(dtoList.get(i).getObtainAmount()), dtoList.get(i).getObtainStatDate());
             cal.obtain(mesAll);
+
             factory.getMeasurement().getConfirmList().add(mesAll);
             factory.getPreProcessing().getConfirmList().add(mesAll);
             factory.getLiquidSystem().getConfirmList().add(mesAll);
             factory.getFillPouchProcessing().getConfirmList().add(mesAll);
-            factory.getFillPouchProcessing().getConfirmList().add(mesAll);
+            factory.getFillStickProcessing().getConfirmList().add(mesAll);
             factory.getCheckProcessing().getConfirmList().add(mesAll);
             factory.getPacking().getConfirmList().add(mesAll);
+
+            System.out.println("컨펌리스트 mesAll");
+            System.out.println(mesAll);
         }
     }
 
@@ -77,6 +77,7 @@ public class ObtainService {
         getConfirmList();
 
         //제품명 저장
+        System.out.println(item);
         dto.setItemId(item.getItemId());
         dto.setItem(item);
         System.out.println("수량:"+ dto.getObtainAmount());

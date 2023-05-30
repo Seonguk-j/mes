@@ -34,6 +34,6 @@ public class Product {
     private boolean exportStat;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "lot_id")
-    private Lot lot;
+    @JoinColumn( name = "lot_log_id")
+    private LotLog lotLogId;
 }

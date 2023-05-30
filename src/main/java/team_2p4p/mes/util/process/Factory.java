@@ -32,4 +32,16 @@ public class Factory {
 
         return factory;
     }
+
+    public void clearList(){
+
+        getMeasurement().getConfirmList().clear();
+        getPreProcessing().getConfirmList().clear();
+        getLiquidSystem().getConfirmList().clear();
+        getFillPouchProcessing().getConfirmList().clear();
+        getFillStickProcessing().getConfirmList().clear();
+        getCheckProcessing().getConfirmList().clear();
+        getPacking().getConfirmList().clear();
+
+    }
 }

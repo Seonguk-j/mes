@@ -55,14 +55,14 @@ public class CalcOrderMaterial {
             // mesAll에 대한 값이 tae에게 넘어갈 필요가 없음.
             // 이부분에 대한 부분 추가 고려 필요
             // 23.05.23 db에 재고에서 수주량 차감
-            productService.addMinusProductStock(item, (long) amount, product.getMakeDate(), product.getLot());
+            productService.addMinusProductStock(item, (long) amount, product.getMakeDate(), product.getLotLogId());
         } else {
             // 수주량이 재고량보다 많은 경우 am > 0
             // 재고수량 0으로 만들어줌 -> 출하로 넘겨야 함
             // 23.05.23 db에 재고에서 수주량 차감
             Long stock = productService.productStock(itemId);
             if(stock != 0)
-                productService.addMinusProductStock(item, stock, product.getMakeDate(), product.getLot());
+                productService.addMinusProductStock(item, stock, product.getMakeDate(), product.getLotLogId());
             // 부족한 만큼에 대한 재료들이 발주 필요 데이터베이스(현재 orderList)에 저장
             saveOrderList(itemId, comparedAmount, now);
             // 메인재료 도착예정일 계산
@@ -109,6 +109,8 @@ public class CalcOrderMaterial {
 
     // 수주 확정 전 날짜 예측을 위한 매소드
     public MesAll estimateDate(Long itemId, int amount, LocalDateTime now) {
+
+        System.out.println("들어오는 amount" + amount);
         MesAll mesAll = new MesAll();
         mesAll.itemId = itemId;
         long materialId = itemId + 8;   // 원자재 id는 제품 id에 +8 해줌
@@ -187,6 +189,7 @@ public class CalcOrderMaterial {
             }
         }
 
+        System.out.println("리턴전 amount" + mesAll.orderId);
         return mesAll;
     }
 

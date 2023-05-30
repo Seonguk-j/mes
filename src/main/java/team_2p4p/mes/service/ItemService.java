@@ -3,6 +3,7 @@ package team_2p4p.mes.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import team_2p4p.mes.dto.ItemDTO;
 import team_2p4p.mes.entity.Item;
 import team_2p4p.mes.repository.ItemRepository;
 
