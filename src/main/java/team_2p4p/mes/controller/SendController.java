@@ -17,9 +17,9 @@ public class SendController {
     private final SendService sendService;
 
     @GetMapping("past")
-    public List<Send> sendPast() {
-        return sendService.getSendList();
-    }
+        public List<Send> sendPast() {
+            return sendService.getSendList();
+        }
 
 
     @GetMapping("wait")

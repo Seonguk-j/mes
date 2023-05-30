@@ -29,7 +29,7 @@ public class ObtainTests {
     @Test void regObtainTest(){
 
         ObtainDTO obtainDTO = new ObtainDTO();
-        obtainDTO.setItemName("양배추즙");
+        obtainDTO.setItemName("석류 젤리스틱");
         obtainDTO.setObtainAmount(3000L);
         obtainDTO.setCustomerRequestDate(LocalDateTime.now().plusDays(20));
 
