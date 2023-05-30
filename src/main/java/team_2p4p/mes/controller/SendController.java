@@ -26,4 +26,5 @@ public class SendController {
     public List<Send> sendWait(){
         return sendService.getSendWaitList();
     }
+
 }
