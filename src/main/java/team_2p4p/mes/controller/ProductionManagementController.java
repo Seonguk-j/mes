@@ -36,4 +36,10 @@ public class ProductionManagementController {
         return productionManagementService.classification1();
     }
 
+    //생산 현황 조회
+    @GetMapping("/productionsituation/list")
+    public List<ProductionManagement> productionsituation(){
+        return productionManagementService.classification2();
+    }
+
 }

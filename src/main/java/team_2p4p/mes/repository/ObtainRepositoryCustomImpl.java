@@ -24,7 +24,7 @@ public class ObtainRepositoryCustomImpl implements ObtainRepositoryCustom {
 
     private BooleanExpression regDtsAfter(String searchAfterDateType) {
         LocalDate date = LocalDate.now();
-        if (StringUtils.equals("all", searchAfterDateType) || searchAfterDateType == null) {
+        if (StringUtils.equals("전체", searchAfterDateType) || searchAfterDateType == null) {
             return null;
         } else {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -35,7 +35,7 @@ public class ObtainRepositoryCustomImpl implements ObtainRepositoryCustom {
 
     private BooleanExpression regDtsBefore(String searchBeforeDateType) {
         LocalDate date = LocalDate.now();
-        if (StringUtils.equals("all", searchBeforeDateType) || searchBeforeDateType == null) {
+        if (StringUtils.equals("전체", searchBeforeDateType) || searchBeforeDateType == null) {
             return null;
         } else {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -47,16 +47,15 @@ public class ObtainRepositoryCustomImpl implements ObtainRepositoryCustom {
 
     private BooleanExpression searchByLike(String searchBy, String searchQuery) {
 
-        if (StringUtils.isEmpty(searchQuery)) { // 검색어가 없는 경우
+        if (StringUtils.equals("전체", searchQuery)&&StringUtils.equals("전체", searchBy)) { // 검색어가 없는 경우
             return null; // null을 반환하여 전체를 조회하도록 합니다.
-        }
+        }else if(StringUtils.equals(null, searchQuery)&&StringUtils.equals(null, searchBy))
+            return null;
 
-        if (StringUtils.equals("제품명", searchBy)) {
-            if(searchBy.equals(null)) return  null;
-            else  return QObtain.obtain.item.itemName.like("%" + searchQuery + "%");
-        } else if (StringUtils.equals("업체명", searchBy)) {
-            if(searchBy.equals(null)) return  null;
-            else return QObtain.obtain.customer.customerName.like("%" + searchQuery + "%");
+        if (StringUtils.equals("전체", searchBy)&&!searchQuery.isEmpty()) {
+            return QObtain.obtain.customer.customerName.like("%" + searchQuery + "%");
+        } else if (StringUtils.equals("전체", searchQuery)&&!searchBy.isEmpty()) {
+            return QObtain.obtain.item.itemName.like("%" + searchQuery + "%");
         }
         return null;
     }
