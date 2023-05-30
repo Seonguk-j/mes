@@ -20,7 +20,7 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long productId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "item_id")
     private Item item;
 
@@ -33,7 +33,7 @@ public class Product {
     @Column(nullable = false, name="export_stat")
     private boolean exportStat;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
 
     @JoinColumn( name = "lot_log_id")
     private LotLog lotLogId;
