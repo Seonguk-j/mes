@@ -2,6 +2,7 @@ package team_2p4p.mes.dto;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.modelmapper.ModelMapper;
 import team_2p4p.mes.entity.Customer;
 import team_2p4p.mes.entity.Item;
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@ToString
 public class LotLogDTO {
 
 

@@ -1,9 +1,7 @@
 package team_2p4p.mes.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import team_2p4p.mes.dto.LotLogDTO;
 import team_2p4p.mes.entity.LotLog;
 import team_2p4p.mes.entity.Material;
@@ -89,8 +87,16 @@ public class    StockController {
         return lotLogRepository.findAll();
     }
 
-    @GetMapping("plot")
-    public List<String> pLotList(LotLogDTO lotLogDTO){
+    @PostMapping("plot/{lotLogId}")
+    public List<String> pLotList(@PathVariable Long lotLogId){
+        System.out.println("들어옴?");
+        LotLogDTO lotLogDTO = new LotLogDTO();
+        lotLogDTO.setLotLogId(lotLogId);
+
+        System.out.println(lotLogDTO);
+
+        System.out.println(lotLogService.findPLot(lotLogDTO));
+
         return lotLogService.findPLot(lotLogDTO);
     }
 
