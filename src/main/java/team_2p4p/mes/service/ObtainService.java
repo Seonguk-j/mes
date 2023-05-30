@@ -196,7 +196,7 @@ public class ObtainService {
         List<Obtain> obtains = obtainRepository.findAll();
 
         List<Obtain> filteredList = obtains.stream()
-                .filter(obtain -> obtain.isObtainStat()==false)
+                .filter(obtain -> !obtain.isObtainStat())
                 .collect(Collectors.toList());
         return filteredList;
     }
