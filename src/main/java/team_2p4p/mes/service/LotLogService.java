@@ -123,13 +123,19 @@ public class LotLogService {
             dateString = (liquid1Lot.getOutputTime().format(DateTimeFormatter.ofPattern("yyyyMMddhhmm"))).substring(2);
             liquid1Lot.setLot("L1-"+dateString+"-"+(int)mesAll.getLiquidSystemOutputAmountList1().get(i));
 
-            if(mesAll.getWhereList().get(0) == 1){
-                //첫번째가 기계 1로 들어갔을때
-                liquid1Lot.setLotPLogId1(preProcessingLotIdList.get(liquidJ1));
-                liquidJ1 += 2;
+            if(mesAll.getItemId() <= 2){
+
+                if(mesAll.getWhereList().get(0) == 1){
+                    //첫번째가 기계 1로 들어갔을때
+                    liquid1Lot.setLotPLogId1(preProcessingLotIdList.get(liquidJ1));
+                    liquidJ1 += 2;
+                }else{
+                    liquid1Lot.setLotPLogId1(preProcessingLotIdList.get(liquidJ1+1));
+                    liquidJ1 += 2;
+                }
+
             }else{
-                liquid1Lot.setLotPLogId1(preProcessingLotIdList.get(liquidJ1+1));
-                liquidJ1 += 2;
+                liquid1Lot.setLotPLogId1(measurementId);
             }
 
             lotLog = dtoToEntity(liquid1Lot);
@@ -157,13 +163,19 @@ public class LotLogService {
             dateString = (liquid2Lot.getOutputTime().format(DateTimeFormatter.ofPattern("yyyyMMddhhmm"))).substring(2);
             liquid2Lot.setLot("L2-"+dateString+"-"+(int)mesAll.getLiquidSystemOutputAmountList2().get(i));
 
-            if(mesAll.getWhereList().get(0) == 1){
-                //첫번째가 기계 1로 들어갔을때
-                liquid2Lot.setLotPLogId1(preProcessingLotIdList.get(liquidJ2+1));
-                liquidJ2 += 2;
+            if(mesAll.getItemId() <= 2){
+
+                if(mesAll.getWhereList().get(0) == 1){
+                    //첫번째가 기계 1로 들어갔을때
+                    liquid2Lot.setLotPLogId1(preProcessingLotIdList.get(liquidJ2+1));
+                    liquidJ2 += 2;
+                }else{
+                    liquid2Lot.setLotPLogId1(preProcessingLotIdList.get(liquidJ2));
+                    liquidJ2 += 2;
+                }
             }else{
-                liquid2Lot.setLotPLogId1(preProcessingLotIdList.get(liquidJ2));
-                liquidJ2 += 2;
+                liquid2Lot.setLotPLogId1(measurementId);
+
             }
 
             lotLog = dtoToEntity(liquid2Lot);
