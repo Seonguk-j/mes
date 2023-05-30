@@ -55,6 +55,13 @@ public class ObtainController {
         List<Obtain> obtainList = obtainRepository.findAll();
         return obtainList;
     }
+
+
+    @GetMapping("/obtain/confirm/list")
+    public List<Obtain> confirmObtains(){
+        List<Obtain> obtainList = obtainService.classification();
+        return obtainList;
+    }
     @PostMapping("/obtain/search/list")
     public List<Obtain> obtainSearch(@RequestBody SearchDTO searchDTO){
         System.out.println("searchBy; "+ searchDTO.getSearchBy());

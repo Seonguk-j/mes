@@ -9,6 +9,7 @@ import team_2p4p.mes.dto.SearchDTO;
 import team_2p4p.mes.entity.Customer;
 import team_2p4p.mes.entity.Item;
 import team_2p4p.mes.entity.Obtain;
+import team_2p4p.mes.entity.ProductionManagement;
 import team_2p4p.mes.repository.CustomerRepository;
 import team_2p4p.mes.repository.ItemRepository;
 import team_2p4p.mes.repository.ObtainRepository;
@@ -23,6 +24,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -189,4 +191,15 @@ public class ObtainService {
     public void deleteObtainByObtainId(Long obtainNum){
         obtainRepository.deleteById(obtainNum);
     }
+
+    public List<Obtain> classification(){
+        List<Obtain> obtains = obtainRepository.findAll();
+
+        List<Obtain> filteredList = obtains.stream()
+                .filter(obtain -> obtain.isObtainStat())
+                .collect(Collectors.toList());
+        return filteredList;
+    }
+
+
 }
