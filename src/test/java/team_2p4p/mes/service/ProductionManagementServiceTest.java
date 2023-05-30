@@ -37,11 +37,6 @@ public class ProductionManagementServiceTest {
         lotLogService.recordLot(obtainDTO);
     }
 
-//    @Test
-//    public void product(){
-//        ObtainDTO obtainDTO = new ObtainDTO();
-//        obtainDTO.setObtainId(1L);
-//        productService.regProduct(obtainDTO);
-//    }
+
 
 }

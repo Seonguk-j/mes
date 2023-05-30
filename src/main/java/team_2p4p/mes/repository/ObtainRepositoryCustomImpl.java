@@ -63,16 +63,29 @@ public class ObtainRepositoryCustomImpl implements ObtainRepositoryCustom {
     }
 
 
+//    @Override
+//    public List<Obtain> getObtainList(SearchDTO searchDto) {
+//        List<Obtain> results = queryFactory
+//                .selectFrom(QObtain.obtain)
+//                .where(regDtsAfter(searchDto.getSearchAfterDateType()),
+//                        regDtsBefore(searchDto.getSearchAfterDateType()),
+//                        searchByLike(searchDto.getSearchBy(), searchDto.getSearchQuery()))
+//                .orderBy(QObtain.obtain.obtainId.desc())
+//                .fetch();
+//
+//        return results;
     @Override
     public List<Obtain> getObtainList(SearchDTO searchDto) {
         List<Obtain> results = queryFactory
                 .selectFrom(QObtain.obtain)
                 .where(regDtsAfter(searchDto.getSearchAfterDateType()),
-                        regDtsBefore(searchDto.getSearchAfterDateType()),
+                        regDtsBefore(searchDto.getSearchBeforeDateType()), // 수정된 부분
                         searchByLike(searchDto.getSearchBy(), searchDto.getSearchQuery()))
                 .orderBy(QObtain.obtain.obtainId.desc())
                 .fetch();
 
         return results;
     }
+
 }
+
