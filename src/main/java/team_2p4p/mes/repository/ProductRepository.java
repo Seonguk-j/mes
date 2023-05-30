@@ -10,7 +10,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
-    @Query(value = "select * from product where Date(make_date) >= :today and export_stat = 0 and item_id = :itemId", nativeQuery = true)
+    @Query(value = "select * from product where Date(make_date) <= :today and export_stat = 0 and item_id = :itemId", nativeQuery = true)
     List<Product> findByItemItemId(@Param("today") LocalDate today, @Param("itemId") Long itemId);
 
 //    @Query(value = "select * from product where Date(make_date) >= :today and export_stat = 0", nativeQuery = true)

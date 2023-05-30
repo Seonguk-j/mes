@@ -70,7 +70,7 @@ public class CalcOrderMaterial {
             mesAll.orderId = orderId;
             mesAll.time = time;
         }
-        System.out.println("아웃풋 amount" +mesAll.amount);
+        System.out.println("아웃풋 amount" + mesAll.amount);
 
         return mesAll;
     }
