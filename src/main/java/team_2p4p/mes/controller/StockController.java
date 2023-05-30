@@ -37,44 +37,46 @@ public class    StockController {
     @GetMapping("/product/stock")
     public Long[] productStock(){
         Long[] stocks = {0L, 0L, 0L, 0L};
-        for (int i = 0; i < 4; i++) {
-            List<Product> productList = productRepository.findStock(i + 1L);
+        for (long i = 0; i < 4; i++) {
+             List<Product> productList = productRepository.findStock(i);
             if(!productList.isEmpty()) {
                 for (Product product : productList) {
-                    stocks[i] += product.getProductStock();
+                    stocks[(int) i] += product.getProductStock();
                 }
             }
         }
+        System.out.println("재고 확인용 : " + stocks.toString());
         return stocks;
     }
 
     @GetMapping("/material/stock")
     public Long[] materialStock(){
         Long[] stocks = {0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L};
-        for (int i = 9; i < 13; i++) {
-            List<Material> materialList = materialRepository.findStock(Long.valueOf(i));
+        for (long i = 9; i < 13; i++) {
+            List<Material> materialList = materialRepository.findStock(i);
             if(!materialList.isEmpty()) {
                 for (Material material : materialList) {
                     if(material.getMaterialStat() == 0)
-                        stocks[i - 9] += material.getMaterialStock();
+                        stocks[(int) (i - 9)] += material.getMaterialStock();
                     else if (material.getMaterialStat() == 2) {
-                        stocks[i - 9] -= material.getMaterialStock();
+                        stocks[(int) (i - 9)] -= material.getMaterialStock();
                     }
                 }
             }
         }
-        for (int i = 14; i < 18; i++) {
-            List<Material> materialList = materialRepository.findStock(Long.valueOf(i));
+        for (long i = 14; i < 18; i++) {
+            List<Material> materialList = materialRepository.findStock(i);
             if(!materialList.isEmpty()) {
                 for (Material material : materialList) {
                     if(material.getMaterialStat() == 0)
-                        stocks[i - 10] += material.getMaterialStock();
+                        stocks[(int) (i - 10)] += material.getMaterialStock();
                     else if (material.getMaterialStat() == 2) {
-                        stocks[i - 10] -= material.getMaterialStock();
+                        stocks[(int) (i - 10)] -= material.getMaterialStock();
                     }
                 }
             }
         }
+        System.out.println("재고 확인용 : " + stocks.toString());
         return stocks;
     }
 }

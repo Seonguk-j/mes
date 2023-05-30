@@ -19,6 +19,6 @@ public interface MaterialRepository extends JpaRepository<Material, Long> {
     @Query(value = "select * from material m where m.material_stat != 1", nativeQuery = true)
     public List<Material> findInputOutput();
 
-    @Query(value = "select * from material m where m.item_id = itemId and material_stat != 1", nativeQuery = true)
+    @Query(value = "select * from material m where m.item_id = :itemId and material_stat != 1", nativeQuery = true)
     List<Material> findStock(@Param("itemId") Long itemId);
 }
