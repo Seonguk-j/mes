@@ -360,14 +360,17 @@ public class Calculator {
 
             while (true){
                 System.out.println("여기!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-                System.out.println(factory.getFillStickProcessing().getConfirmList());
-
+                if(j == -1){
+                    lastTime = LocalDateTime.now();
+                    break;
+                }
                 if(factory.getFillStickProcessing().getConfirmList().get(j).getFillStickCount()!=0){
 
                     List<LocalDateTime> list = factory.getFillStickProcessing().getConfirmList().get(j).getFillStickOutputTimeList();
                     lastTime = list.get(list.size()-1);
                     break;
                 }
+
                 j--;
             }
 
