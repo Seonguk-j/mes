@@ -167,6 +167,9 @@ public class ProductionManagementService {
                 productionManagementRepository.save(packingProcessPlan);
 
             }
+
+        calcOrderMaterial.test(dto.getItemId(), Math.toIntExact(dto.getObtainAmount()));
+
     }
 
 
