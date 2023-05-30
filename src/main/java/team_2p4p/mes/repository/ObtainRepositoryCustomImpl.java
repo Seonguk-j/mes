@@ -47,16 +47,18 @@ public class ObtainRepositoryCustomImpl implements ObtainRepositoryCustom {
 
     private BooleanExpression searchByLike(String searchBy, String searchQuery) {
 
-        if (StringUtils.equals("전체", searchQuery)&&StringUtils.equals("전체", searchBy)) { // 검색어가 없는 경우
-            return null; // null을 반환하여 전체를 조회하도록 합니다.
-        }else if(StringUtils.equals(null, searchQuery)&&StringUtils.equals(null, searchBy))
+        if (StringUtils.equals("전체", searchBy)) {
+            // 검색어가 없는 경우 null을 반환하여 전체를 조회하도록 합니다.
+            return null;
+        }else if(StringUtils.equals(null, searchBy))
             return null;
 
-        if (StringUtils.equals("전체", searchBy)&&!searchQuery.isEmpty()) {
+        if (StringUtils.equals("업체명", searchBy)) {
             return QObtain.obtain.customer.customerName.like("%" + searchQuery + "%");
-        } else if (StringUtils.equals("전체", searchQuery)&&!searchBy.isEmpty()) {
+        } else if (StringUtils.equals("제품명", searchBy)) {
             return QObtain.obtain.item.itemName.like("%" + searchQuery + "%");
         }
+
         return null;
     }
 
