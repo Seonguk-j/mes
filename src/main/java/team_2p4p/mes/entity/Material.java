@@ -19,11 +19,11 @@ public class Material {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long materialId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(nullable = false, name = "order_id")
     private OrderMaterial orderMaterial;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(nullable = false, name = "item_id")
     private Item item;
 
