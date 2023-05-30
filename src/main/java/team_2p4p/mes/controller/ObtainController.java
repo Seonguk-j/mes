@@ -38,7 +38,12 @@ public class ObtainController {
             // ...
         }
     }
-
+    @PostMapping("/obtain/confirm/{obtainNum}")
+    public void ObtainConfirm(@PathVariable Long obtainNum){
+        ObtainDTO dto = new ObtainDTO();
+        dto.setObtainId(obtainNum);
+        obtainService.confirmObtain(dto);
+    }
     @DeleteMapping("/obtain/delete/{obtainNum}")
     public List<Obtain> ObtainDelete(@PathVariable Long obtainNum){
         obtainService.deleteObtainByObtainId(obtainNum);
