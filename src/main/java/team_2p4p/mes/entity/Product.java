@@ -44,6 +44,6 @@ public class Product {
         this.productStock = getProductStock();
         this.makeDate = getMakeDate();
         this.exportStat = true;
-        this.lot = getLot();
+        this.lotLogId = getLotLogId();
     }
 }

@@ -13,6 +13,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Nullable
     List<Product> findByItemItemId(Long itemId);
 
-    @Query(value = "select * from product where Date(make_date) >= :today and export_stat = 0", nativeQuery = true)
-    List<Product> statZeroToOne(@Param("today") LocalDate today);
+//    @Query(value = "select * from product where Date(make_date) >= :today and export_stat = 0", nativeQuery = true)
+//    List<Product> statZeroToOne(@Param("today") LocalDate today);
 }

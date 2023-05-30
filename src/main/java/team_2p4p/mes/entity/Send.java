@@ -33,8 +33,6 @@ public class Send {
     @Column(nullable = false, name="send_stat")
     private boolean sendStat;
 
-    @Column(nullable = false, name="material_in_date")
-    private LocalDateTime materialInDate;
 
     public void update() {
         this.sendId = getSendId();
@@ -42,6 +40,5 @@ public class Send {
         this.obtain = getObtain();
         this.sendProductNum = getSendProductNum();
         this.sendStat = true;
-        this.materialInDate = getMaterialInDate();
     }
 }

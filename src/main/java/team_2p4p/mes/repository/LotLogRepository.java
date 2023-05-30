@@ -9,6 +9,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface LotLogRepository extends JpaRepository<LotLog,Long> {
-    @Query(value = "select * from lot_log where Date(output_time) >= :today and lot_stat = 0", nativeQuery = true)
-    List<LotLog> statZeroToOne(@Param("today") LocalDate today);
+//    @Query(value = "select * from lot_log where Date(output_time) >= :today and lot_stat = 0", nativeQuery = true)
+//    List<LotLog> statZeroToOne(@Param("today") LocalDate today);
 }
