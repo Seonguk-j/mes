@@ -1,5 +1,6 @@
 package team_2p4p.mes.service;
 
+import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -12,13 +13,16 @@ import team_2p4p.mes.util.calculator.MesAll;
 import java.util.Optional;
 
 @SpringBootTest
+@Log4j2
 public class ProductionManagementServiceTest {
 
 
     @Autowired
     private ProductionManagementService productionManagementService;
-    @Autowired LotLogService lotLogService;
-    @Autowired ProductService productService;
+    @Autowired
+    private LotLogService lotLogService;
+    @Autowired
+    private ProductService productService;
 
     Calculator cal = new Calculator();
 
@@ -35,6 +39,11 @@ public class ProductionManagementServiceTest {
         ObtainDTO obtainDTO = new ObtainDTO();
         obtainDTO.setObtainId(1L);
         lotLogService.recordLot(obtainDTO);
+    }
+
+    @Test
+    public void testest(){
+        log.info("abc");
     }
 
 

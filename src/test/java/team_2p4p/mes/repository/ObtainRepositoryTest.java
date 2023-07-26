@@ -1,5 +1,6 @@
 package team_2p4p.mes.repository;
 
+import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -16,7 +17,7 @@ import team_2p4p.mes.service.ObtainService;
 import java.time.LocalDateTime;
 
 @SpringBootTest
-
+@Log4j2
 public class ObtainRepositoryTest {
 
     @Autowired
@@ -34,10 +35,10 @@ public class ObtainRepositoryTest {
     @Autowired
     private CustomerRepository customerRepository;
 
-    @Test
-    public  void test() {
-
-    }
+//    @Test
+//    public  void test() {
+//        log.info("hello");
+//    }
 
     @Test
     void test2(){
