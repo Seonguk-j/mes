@@ -12,15 +12,15 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-@Table(name = "item")
+@Table(name = "ITEM")
 public class Item {
 
     @Id
-    @Column(name="item_id")
+    @Column(name="ITEM_ID")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long itemId;
 
-    @Column(nullable = false, name="item_code")
+    @Column(nullable = false, name="ITEM_CODE")
     private String itemCode;
 
     @Column(name="item_name")

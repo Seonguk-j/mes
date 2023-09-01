@@ -38,7 +38,7 @@ public class LotLogService {
     public void recordLot(ObtainDTO dto){
 
         obtainService.getConfirmList();
-        System.out.println("==== 로트적기");
+        log.info("==== 로트적기");
 
         dto = obtainService.entityToDto(obtainRepository.findById(dto.getObtainId()).orElseThrow());
         // id로 해당 수주DTO를 찾아온다.
@@ -152,9 +152,10 @@ public class LotLogService {
         int liquidJ2 = 0;
         //3 액체제조 시스템2 로트
         for (int i = 0; i < mesAll.getLiquidSystemCount2(); i++) {
-            System.out.println("액체2");
-            System.out.println(mesAll.getLiquidSystemCount2());
-            System.out.println(mesAll.getWhereList());
+            log.info("액체2");
+            log.info(mesAll.getLiquidSystemCount2());
+            log.info(mesAll.getWhereList());
+            log.info(mesAll.getItemId());
             LotLogDTO liquid2Lot = new LotLogDTO();
             liquid2Lot.setProcess("액체제조기2");
             liquid2Lot.setItem(itemService.findItemById(dto.getItemId()));

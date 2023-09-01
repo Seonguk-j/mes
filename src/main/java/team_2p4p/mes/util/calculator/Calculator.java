@@ -1,5 +1,6 @@
 package team_2p4p.mes.util.calculator;
 
+import lombok.extern.log4j.Log4j2;
 import net.bytebuddy.asm.Advice;
 import org.hibernate.loader.collection.SubselectOneToManyLoader;
 import org.thymeleaf.spring5.processor.SpringInputCheckboxFieldTagProcessor;
@@ -12,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Log4j2
 public class Calculator {
 
     int measuremntLeadTime = 20;
@@ -359,7 +361,7 @@ public class Calculator {
             int j = factory.getFillStickProcessing().getConfirmList().size() - 1;
 
             while (true){
-                System.out.println("여기!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                log.info("여기!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
                 if(j == -1){
                     lastTime = LocalDateTime.now();
                     break;
@@ -791,7 +793,7 @@ public class Calculator {
                     if(liquidSystem.getConfirmList().get(liquidSystem.getConfirmList().size()-1).getLiquidSystemCount1()==0){
                         // 기계 1이 비었으면 기계1투입(직전 수주에서 없기때문에 그전의 수주에서 가져와야된다) (직전 수주에서 기계 2의 스케줄이 있는상황)
 
-                        System.out.println("1로 들어옴");
+                        log.info("1로 들어옴");
                         //여기서 시간은 확정리스트 마지막
                         if(liquidSystem.getConfirmList().size() >= 2){
 
@@ -811,7 +813,7 @@ public class Calculator {
 
                         // 기계 2가 비었으면 기계2투입 (기계 1은 스케줄이 있는상황)
                         // 직전 확정에서 2가 없으면 그전 확정도 따져봐야함
-                        System.out.println("2로 들어옴");
+                        log.info("2로 들어옴");
                         if(liquidSystem.getConfirmList().size() >= 2){
 
                             MesAll tmpMesAll = liquidSystem.getConfirmList().get(liquidSystem.getConfirmList().size()-2);
@@ -830,14 +832,14 @@ public class Calculator {
 
                     }else{
                         //confirmList의 시간을 확인하고 기계1과 1계2의 마지막 시간을 찾아온다.
-                        System.out.println("3으로 들어옴");
+                        log.info("3으로 들어옴");
                         List<LocalDateTime> machine1List = liquidSystem.getConfirmList().get(liquidSystem.getConfirmList().size() - 1).getLiquidSystemOutputTimeList1(); //액체제조 확정리스트 맨마지막의 아웃풋 타임리스트
                         List<LocalDateTime> machine2List = liquidSystem.getConfirmList().get(liquidSystem.getConfirmList().size() - 1).getLiquidSystemOutputTimeList2(); //액체제조 확정리스트 맨마지막의 아웃풋 타임리스트
                         LocalDateTime machine1LastTime = machine1List.get(machine1List.size()-1);//기계 1 끝나는시간
                         LocalDateTime machine2LastTime = machine2List.get(machine2List.size()-1); //기계 2 끝나는 시간
 
-                        System.out.println("머신 1라스트" + machine1LastTime);
-                        System.out.println("머신 2라스트" + machine2LastTime);
+                        log.info("머신 1라스트" + machine1LastTime);
+                        log.info("머신 2라스트" + machine2LastTime);
 
                         if(machine1LastTime.isBefore(machine2LastTime)) {
                             // 기계1이 먼저끝날때
@@ -906,16 +908,16 @@ public class Calculator {
             // 양배추나 흑마늘일때
             if(i == 0){
                 //첫번째 투입일때
-                System.out.println("양배추나 흑마늘일때");
+                log.info("양배추나 흑마늘일때");
                 if(liquidSystem.getConfirmList().isEmpty()){
                     //액체제조 1과 2가 전부 비었을때 1에 투입
-                    System.out.println("--- 둘다 비었을때");
+                    log.info("--- 둘다 비었을때");
                     inputLiquidMachine1(mesAll,leadTime,i,amount,mesAll.getOutputPreProcessingTimeList().get(i));
                 }else {
                     // 확정 스케줄이 있을때
                     if(liquidSystem.getConfirmList().get(liquidSystem.getConfirmList().size()-1).getLiquidSystemCount1()==0){
                         // 기계 1이 비었으면 기계1투입 (기계 2는 스케줄이 있는상황)
-                        System.out.println("--- 기계1이 비었을때");
+                        log.info("--- 기계1이 비었을때");
 
                         if(liquidSystem.getConfirmList().size() >= 2){
 
@@ -935,8 +937,8 @@ public class Calculator {
                     }else if (liquidSystem.getConfirmList().get(liquidSystem.getConfirmList().size()-1).getLiquidSystemCount2()==0){
                         // 기계 2가 비었으면 기계2투입 (기계 1은 스케줄이 있는상황)
                         // 기계 2는 그 전의 수주정보에서 가져와야 된다.
-                        System.out.println("--- 기계2가 비었을때");
-                        System.out.println(liquidSystem.getConfirmList());
+                        log.info("--- 기계2가 비었을때");
+                        log.info(liquidSystem.getConfirmList());
 
                         inputLiquidMachine2(mesAll,leadTime,i,amount,mesAll.getOutputPreProcessingTimeList().get(i));
                         if(liquidSystem.getConfirmList().size() >= 2){
@@ -959,7 +961,7 @@ public class Calculator {
                         List<LocalDateTime> machine2List = liquidSystem.getConfirmList().get(liquidSystem.getConfirmList().size() - 1).getLiquidSystemOutputTimeList2(); //액체제조 확정리스트 맨마지막의 아웃풋 타임리스트
                         LocalDateTime machine1LastTime = machine1List.get(machine1List.size()-1);//기계 1 끝나는시간
                         LocalDateTime machine2LastTime = machine2List.get(machine2List.size()-1); //기계 2 끝나는 시간
-                        System.out.println("--- 둘다 안비었을때");
+                        log.info("--- 둘다 안비었을때");
                         if(machine1LastTime.isBefore(machine2LastTime)) {
                             // 기계1이 먼저끝날때
                             if(machine1LastTime.isAfter(mesAll.getOutputMeasurementTime())){
